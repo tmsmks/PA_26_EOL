@@ -1,0 +1,2 @@
+# Éditeur graphique End of Life — Phase 0
+flask>=2.0
