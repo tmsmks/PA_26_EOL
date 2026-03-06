@@ -155,7 +155,12 @@ def _build_editor_html(scene: dict) -> str:
             block += '<div class="scores">'
             for sk in SKILLS:
                 val = _get_score(r, sk)
-                block += f'<label>{sk}</label><input type="number" class="score" data-i="{i}" data-r="{r_idx}" data-skill="{sk}" value="{val}" min="-3" max="3">'
+                block += (
+                    f'<div class="score-item">'
+                    f'<label>{sk}</label>'
+                    f'<input type="number" class="score" data-i="{i}" data-r="{r_idx}" '
+                    f'data-skill="{sk}" value="{val}" min="-3" max="3"></div>'
+                )
             block += "</div></div>"
         block += "</div>"
         parts.append(block)

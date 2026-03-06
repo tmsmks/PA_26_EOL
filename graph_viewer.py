@@ -65,18 +65,20 @@ body {{ margin: 0; font-family: system-ui, -apple-system, sans-serif; background
 .main {{ flex: 1; position: relative; min-width: 0; min-height: 0; }}
 #network {{ position: absolute; top: 0; left: 0; right: 0; bottom: 40px; width: 100%; background: #0f0f14; min-height: 350px; }}
 .hint {{ position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: #52525b; font-size: 11px; }}
-.editor {{ width: 400px; background: #18181b; padding: 14px; border-left: 1px solid #27272a; overflow-y: auto; }}
+.editor {{ width: 520px; background: #18181b; padding: 14px; border-left: 1px solid #27272a; overflow-y: auto; }}
 .editor h3 {{ margin: 0 0 10px; font-size: 13px; color: #38bdf8; }}
 .scene-intro {{ margin-bottom: 14px; }}
 .scene-intro label {{ display: block; font-size: 10px; color: #71717a; margin-bottom: 4px; }}
-.scene-intro textarea {{ width: 100%; padding: 8px; font-size: 12px; background: #27272a; color: #fff; border: 1px solid #3f3f46; border-radius: 6px; resize: vertical; }}
-.block {{ margin-bottom: 14px; padding: 12px; background: #27272a; border-radius: 8px; border: 1px solid #3f3f46; }}
+.scene-intro textarea {{ width: 100%; padding: 10px; font-size: 14px; font-weight: 500; background: #27272a; color: #f9fafb; border: 1px solid #4b5563; border-radius: 8px; resize: vertical; }}
+.block {{ margin-bottom: 18px; padding: 16px; background: #27272a; border-radius: 10px; border: 1px solid #3f3f46; }}
 .block .header {{ margin-bottom: 8px; font-weight: 600; color: #38bdf8; font-size: 12px; }}
 .block label {{ display: block; font-size: 10px; color: #71717a; margin: 6px 0 3px; }}
-.block textarea {{ width: 100%; padding: 8px; font-size: 12px; background: #18181b; color: #fff; border: 1px solid #3f3f46; border-radius: 6px; resize: vertical; }}
+.block textarea {{ width: 100%; padding: 9px; font-size: 14px; font-weight: 500; background: #18181b; color: #f9fafb; border: 1px solid #4b5563; border-radius: 8px; resize: vertical; }}
 .resp {{ margin: 10px 0; padding-left: 10px; border-left: 2px solid #3f3f46; }}
-.scores {{ display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }}
-.scores input {{ width: 50px; padding: 4px; font-size: 12px; }}
+.scores {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }}
+.scores .score-item {{ display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 6px; }}
+.scores .score-item input {{ width: 40px; padding: 3px; font-size: 13px; text-align: center; }}
+.scores .score-item label {{ font-size: 11px; color: #e5e7eb; }}
 .export {{ background: #38bdf8; color: #0f0f14; border: none; padding: 12px; cursor: pointer; border-radius: 8px; width: 100%; font-weight: 600; margin-top: 12px; font-size: 13px; }}
 .export:hover {{ background: #0ea5e9; }}
 .export-secondary {{ background: #3f3f46; margin-top: 8px; }}
@@ -219,7 +221,7 @@ function renderParcours(s) {{
     var html = '<div class="parcours-card">' + imgHtml + '<span class="actor">' + esc(ia.actor) + '</span><div class="text">' + esc(ia.text || "—") + '</div>';
     if (ia.responses && ia.responses.length > 0) {{
         ia.responses.forEach(function(r, i) {{
-            var label = (r.text || "").length > 80 ? (r.text || "").substring(0, 80) + "…" : (r.text || "→ I" + r.next_id);
+            var label = r.text || ("→ I" + r.next_id);
             var scores = {{ RespectAndDignity: r.RespectAndDignity||0, Empathy: r.Empathy||0, Compassion: r.Compassion||0, EmotionalRegulation: r.EmotionalRegulation||0, CommunicationClarity: r.CommunicationClarity||0, ProfessionalBoundaries: r.ProfessionalBoundaries||0, InterprofessionalCollaboration: r.InterprofessionalCollaboration||0 }};
             html += '<button class="parcours-choice" data-next="' + r.next_id + '" data-target="' + esc(r.target_node_id || "") + '" data-edge="' + esc(r.edge_id || "") + '" data-scores="' + esc(JSON.stringify(scores)) + '">' + esc(label) + '</button>';
         }});
@@ -227,6 +229,17 @@ function renderParcours(s) {{
         html += '<div class="parcours-end">Fin de cette branche.</div>';
     }}
     html += '</div>';
+
+    // Affichage du score courant du parcours (mise à jour en direct)
+    var labels = {{ RespectAndDignity: "Respect et dignité", Empathy: "Empathie", Compassion: "Compassion", EmotionalRegulation: "Régulation émotionnelle", CommunicationClarity: "Clarté communication", ProfessionalBoundaries: "Frontières pro.", InterprofessionalCollaboration: "Collab. interpro." }};
+    var liveTotals = '<div class="parcours-totals"><h4>Score courant du parcours</h4>';
+    for (var k in parcoursScores) {{
+        var v = parcoursScores[k] || 0;
+        var cls = v > 0 ? "positive" : (v < 0 ? "negative" : "zero");
+        liveTotals += '<div class="score-line ' + cls + '">' + (labels[k] || k) + ': ' + (v >= 0 ? '+' : '') + v + '</div>';
+    }}
+    liveTotals += '</div>';
+    html += liveTotals;
     document.getElementById("parcours-content").innerHTML = html;
     document.getElementById("parcours-restart").style.display = parcoursPath.nodes.length > 0 ? "block" : "none";
     document.querySelectorAll(".parcours-choice").forEach(function(btn) {{
@@ -258,7 +271,7 @@ function highlightPath() {{
         }});
         edgesDS.getIds().forEach(function(eid) {{
             var inPath = pathEdges.indexOf(eid) >= 0;
-            edgesDS.update({{ id: eid, color: inPath ? "#22c55e" : "#3f3f46" }});
+            edgesDS.update({{ id: eid, color: inPath ? "#4ade80" : "#9ca3af" }});
         }});
     }} catch (err) {{ console.warn("highlightPath:", err); }}
 }}
@@ -274,9 +287,9 @@ function showScene(idx) {{
     document.getElementById("ed-content").innerHTML = introHtml + s.editor;
 
     var opts = {{
-        nodes: {{ font: {{ size: 18, color: "#fafafa", face: "system-ui, -apple-system, sans-serif" }}, shape: "box", color: {{ background: "#27272a", border: "#38bdf8" }}, margin: 20, borderWidth: 2, widthConstraint: {{ minimum: 160, maximum: 280 }} }},
-        edges: {{ arrows: "to", width: 2, color: "#3f3f46", font: {{ color: "#94a3b8", size: 12, face: "system-ui, sans-serif" }} }},
-        layout: {{ hierarchical: {{ enabled: true, direction: "UD", sortMethod: "directed", levelSeparation: 380, nodeSpacing: 420, treeSpacing: 380, blockShifting: true, edgeMinimization: true }} }},
+        nodes: {{ font: {{ size: 38, color: "#f9fafb", face: "system-ui, -apple-system, sans-serif", bold: true }}, shape: "box", color: {{ background: "#18181b", border: "#38bdf8" }}, margin: 32, borderWidth: 2, widthConstraint: {{ minimum: 260, maximum: 360 }} }},
+        edges: {{ arrows: "to", width: 2, color: "#9ca3af", font: {{ color: "#e5e7eb", size: 20, face: "system-ui, sans-serif" }} }},
+        layout: {{ hierarchical: {{ enabled: true, direction: "UD", sortMethod: "directed", levelSeparation: 380, nodeSpacing: 480, treeSpacing: 440, blockShifting: true, edgeMinimization: true }} }},
         physics: {{ enabled: false }},
         interaction: {{ zoomView: true, dragView: true }}
     }};
@@ -291,8 +304,8 @@ function showScene(idx) {{
         nodesDS = new vis.DataSet(s.nodes);
         edgesDS = new vis.DataSet(s.edges);
         network = new vis.Network(container, {{ nodes: nodesDS, edges: edgesDS }}, opts);
-        network.once("afterDrawing", function() {{ network.fit({{ animation: {{ duration: 400 }}, scale: 1.3 }}); }});
-        setTimeout(function() {{ if (network) {{ network.redraw(); network.fit({{ scale: 1.3 }}); }} }}, 300);
+        network.once("afterDrawing", function() {{ network.fit({{ animation: {{ duration: 400 }}, scale: 1.6 }}); }});
+        setTimeout(function() {{ if (network) {{ network.redraw(); network.fit({{ scale: 1.6 }}); }} }}, 300);
         network.on("click", function(params) {{
             if (params.nodes && params.nodes.length > 0) {{
                 var nid = String(params.nodes[0]);
