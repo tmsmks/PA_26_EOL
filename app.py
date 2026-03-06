@@ -10,7 +10,10 @@ from flask import Flask, send_from_directory, request, jsonify
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GRAPHES_DIR = os.path.join(BASE_DIR, "output", "graphes")
-DATA_PATH = os.path.join(BASE_DIR, "data", "Chapters_v2-1.json")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+CHAPTERS_DIR = os.path.join(DATA_DIR, "chapters")
+IMAGES_DIR = os.path.join(DATA_DIR, "images")
+DATA_PATH = os.path.join(CHAPTERS_DIR, "Chapters_v3-4-c_emotional-illustration.json")
 
 app = Flask(__name__, static_folder=GRAPHES_DIR, static_url_path="")
 
@@ -21,6 +24,12 @@ def index():
     return send_from_directory(GRAPHES_DIR, "index.html")
 
 
+@app.route("/api/data/images/<path:filename>")
+def serve_images(filename):
+    """Sert les images des personnages depuis data/images/ pour le parcours joueur."""
+    return send_from_directory(IMAGES_DIR, filename)
+
+
 @app.route("/<path:path>")
 def serve_graphes(path):
     """Sert les fichiers HTML et autres ressources depuis output/graphes."""
@@ -29,7 +38,7 @@ def serve_graphes(path):
 
 @app.route("/api/save", methods=["POST"])
 def api_save():
-    """Sauvegarde les données modifiées dans Chapters_v2-1.json."""
+    """Sauvegarde les données modifiées dans Chapters_v3-4-c_emotional-illustration.json."""
     try:
         data = request.get_json()
         if not data or "Chapters" not in data:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 End of Life - graph_builder.py
-Charge Chapters_v2-1.json, construit les nœuds et arêtes pour la visualisation.
+Charge Chapters_v3-4-c_emotional-illustration.json, construit les nœuds et arêtes pour la visualisation.
 EG-7 : NextInteractionID -1 = fin de branche (valide).
 """
 import json
@@ -9,7 +9,22 @@ import os
 from collections import defaultdict
 
 LABEL_MAX = 38
-SKILLS = ["Authenticity", "Respect", "Compassion", "Hope", "Empathy"]
+# Dimensions principales (v3) : au niveau des réponses
+SKILLS = [
+    "RespectAndDignity",
+    "Empathy",
+    "Compassion",
+    "EmotionalRegulation",
+    "CommunicationClarity",
+    "ProfessionalBoundaries",
+    "InterprofessionalCollaboration",
+]
+
+
+def _get_score(r: dict, skill: str) -> int:
+    """Lit un score depuis la réponse (dimensions v3 : SoftSkillDimensions ou champs plats)."""
+    soft = r.get("SoftSkillDimensions") or {}
+    return soft.get(skill, r.get(skill, 0))
 
 
 def load_chapters(json_path: str) -> dict:
@@ -139,7 +154,7 @@ def _build_editor_html(scene: dict) -> str:
             block += f'<textarea class="edit" data-type="response" data-i="{i}" data-r="{r_idx}" rows="2">{_escape_html(rtext)}</textarea>'
             block += '<div class="scores">'
             for sk in SKILLS:
-                val = r.get(sk, 0)
+                val = _get_score(r, sk)
                 block += f'<label>{sk}</label><input type="number" class="score" data-i="{i}" data-r="{r_idx}" data-skill="{sk}" value="{val}" min="-3" max="3">'
             block += "</div></div>"
         block += "</div>"
@@ -152,7 +167,7 @@ def _build_parcours(
 ) -> tuple:
     """
     Construit la structure parcours joueur : liste ordonnée et map id -> entry.
-    Entry : { node_id, actor, text, responses: [{ next_id, target_node_id, edge_id, Authenticity, ... }] }
+    Entry : { node_id, actor, text, responses: [{ next_id, target_node_id, edge_id, RespectAndDignity, ... }] }
     """
     interactions = scene.get("Interactions", [])
     id_to_ia = {ia["Id"]: ia for ia in interactions}
@@ -195,16 +210,19 @@ def _build_parcours(
                 "next_id": str(next_id) if next_id is not None else "-1",
                 "target_node_id": target_node_id,
                 "edge_id": edge_id,
-                "Authenticity": r.get("Authenticity", 0),
-                "Respect": r.get("Respect", 0),
-                "Compassion": r.get("Compassion", 0),
-                "Hope": r.get("Hope", 0),
-                "Empathy": r.get("Empathy", 0),
+                "RespectAndDignity": _get_score(r, "RespectAndDignity"),
+                "Empathy": _get_score(r, "Empathy"),
+                "Compassion": _get_score(r, "Compassion"),
+                "EmotionalRegulation": _get_score(r, "EmotionalRegulation"),
+                "CommunicationClarity": _get_score(r, "CommunicationClarity"),
+                "ProfessionalBoundaries": _get_score(r, "ProfessionalBoundaries"),
+                "InterprofessionalCollaboration": _get_score(r, "InterprofessionalCollaboration"),
             })
         entry = {
             "node_id": node_id,
             "actor": actor,
             "text": text,
+            "image": ia.get("AgentFacialExpression") or "",
             "responses": responses,
         }
         parcours.append(entry)
@@ -241,13 +259,21 @@ def _build_parcours(
                     "next_id": str(next_id) if next_id is not None else "-1",
                     "target_node_id": target_node_id,
                     "edge_id": edge_id,
-                    "Authenticity": r.get("Authenticity", 0),
-                    "Respect": r.get("Respect", 0),
-                    "Compassion": r.get("Compassion", 0),
-                    "Hope": r.get("Hope", 0),
-                    "Empathy": r.get("Empathy", 0),
+                    "RespectAndDignity": _get_score(r, "RespectAndDignity"),
+                    "Empathy": _get_score(r, "Empathy"),
+                    "Compassion": _get_score(r, "Compassion"),
+                    "EmotionalRegulation": _get_score(r, "EmotionalRegulation"),
+                    "CommunicationClarity": _get_score(r, "CommunicationClarity"),
+                    "ProfessionalBoundaries": _get_score(r, "ProfessionalBoundaries"),
+                    "InterprofessionalCollaboration": _get_score(r, "InterprofessionalCollaboration"),
                 })
-            entry = {"node_id": node_id, "actor": actor, "text": ia.get("Text", ""), "responses": responses}
+            entry = {
+                "node_id": node_id,
+                "actor": actor,
+                "text": ia.get("Text", ""),
+                "image": ia.get("AgentFacialExpression") or "",
+                "responses": responses,
+            }
             id_to_parcours_final[sid] = entry
 
     return parcours, id_to_parcours_final
@@ -286,7 +312,7 @@ def validate_next_interaction_ids(json_path: str) -> list:
 
 if __name__ == "__main__":
     base = os.path.dirname(os.path.abspath(__file__))
-    path = os.path.join(base, "data", "Chapters_v2-1.json")
+    path = os.path.join(base, "data", "chapters", "Chapters_v3-4-c_emotional-illustration.json")
     errors = validate_next_interaction_ids(path)
     if errors:
         for e in errors:

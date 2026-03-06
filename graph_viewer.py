@@ -12,7 +12,7 @@ import re
 from graph_builder import load_chapters, build_scene_graph
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(BASE_DIR, "data", "Chapters_v2-1.json")
+DATA_PATH = os.path.join(BASE_DIR, "data", "chapters", "Chapters_v3-4-c_emotional-illustration.json")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output", "graphes")
 
 
@@ -95,6 +95,7 @@ body {{ margin: 0; font-family: system-ui, -apple-system, sans-serif; background
 .panel-edit.hidden {{ display: none; }}
 .panel-parcours.active {{ display: flex; }}
 .parcours-card {{ background: #27272a; border-radius: 10px; padding: 16px; margin-bottom: 12px; border: 1px solid #3f3f46; }}
+.parcours-card .parcours-image {{ width: 100%; max-width: 200px; height: auto; border-radius: 8px; margin-bottom: 12px; display: block; object-fit: cover; }}
 .parcours-card .actor {{ display: inline-block; background: #38bdf8; color: #0f0f14; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-bottom: 10px; }}
 .parcours-card .text {{ font-size: 14px; line-height: 1.5; margin-bottom: 16px; color: #e4e4e7; }}
 .parcours-choice {{ display: block; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; background: #3f3f46; border: 1px solid #52525b; color: #e4e4e7; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.15s; }}
@@ -128,7 +129,7 @@ body {{ margin: 0; font-family: system-ui, -apple-system, sans-serif; background
     <div class="panel-edit" id="panel-edit">
         <h3 id="ed-title">Sélectionnez un scénario</h3>
         <div id="ed-content"><div class="empty">Cliquez sur un scénario à gauche.</div></div>
-        <button class="export" id="save-btn">Valider et sauvegarder dans Chapters_v2-1.json</button>
+        <button class="export" id="save-btn">Valider et sauvegarder dans Chapters_v3-4-c_emotional-illustration.json</button>
         <button class="export export-secondary" id="export-btn">Télécharger (JSON)</button>
         <div id="save-status"></div>
         <div id="validation"></div>
@@ -161,7 +162,7 @@ var edgesDS = null;
 var currentSceneIdx = 0;
 var parcoursPath = {{ nodes: [], edges: [] }};
 var parcoursCurrent = null;
-var parcoursScores = {{ Authenticity: 0, Respect: 0, Compassion: 0, Hope: 0, Empathy: 0 }};
+var parcoursScores = {{ RespectAndDignity: 0, Empathy: 0, Compassion: 0, EmotionalRegulation: 0, CommunicationClarity: 0, ProfessionalBoundaries: 0, InterprofessionalCollaboration: 0 }};
 
 function setMode(mode) {{
     document.querySelectorAll(".mode-btn").forEach(function(b) {{ b.classList.toggle("active", b.dataset.mode === mode); }});
@@ -170,7 +171,7 @@ function setMode(mode) {{
     if (mode === "parcours" && scenesData.length > 0) {{
         parcoursPath = {{ nodes: [], edges: [] }};
         parcoursCurrent = null;
-        parcoursScores = {{ Authenticity: 0, Respect: 0, Compassion: 0, Hope: 0, Empathy: 0 }};
+        parcoursScores = {{ RespectAndDignity: 0, Empathy: 0, Compassion: 0, EmotionalRegulation: 0, CommunicationClarity: 0, ProfessionalBoundaries: 0, InterprofessionalCollaboration: 0 }};
         showParcoursScene(currentSceneIdx);
     }} else {{
         parcoursPath = {{ nodes: [], edges: [] }};
@@ -188,7 +189,7 @@ function showParcoursScene(idx) {{
         return;
     }}
     parcoursPath = {{ nodes: [], edges: [] }};
-    parcoursScores = {{ Authenticity: 0, Respect: 0, Compassion: 0, Hope: 0, Empathy: 0 }};
+    parcoursScores = {{ RespectAndDignity: 0, Empathy: 0, Compassion: 0, EmotionalRegulation: 0, CommunicationClarity: 0, ProfessionalBoundaries: 0, InterprofessionalCollaboration: 0 }};
     parcoursCurrent = s.parcours[0];
     renderParcours(s);
     highlightPath();
@@ -201,7 +202,7 @@ function renderParcours(s) {{
         var totalsHtml = '<div class="parcours-card"><div class="parcours-end">Fin de cette branche.</div>';
         if (parcoursPath.nodes.length > 0) {{
             totalsHtml += '<div class="parcours-totals"><h4>Score total du parcours</h4>';
-            var labels = {{ Authenticity: "Authenticité", Respect: "Respect", Compassion: "Compassion", Hope: "Espoir", Empathy: "Empathie" }};
+            var labels = {{ RespectAndDignity: "Respect et dignité", Empathy: "Empathie", Compassion: "Compassion", EmotionalRegulation: "Régulation émotionnelle", CommunicationClarity: "Clarté communication", ProfessionalBoundaries: "Frontières pro.", InterprofessionalCollaboration: "Collab. interpro." }};
             for (var k in parcoursScores) {{
                 var v = parcoursScores[k];
                 var cls = v > 0 ? "positive" : (v < 0 ? "negative" : "zero");
@@ -214,11 +215,13 @@ function renderParcours(s) {{
         document.getElementById("parcours-restart").style.display = parcoursPath.nodes.length > 0 ? "block" : "none";
         return;
     }}
-    var html = '<div class="parcours-card"><span class="actor">' + esc(ia.actor) + '</span><div class="text">' + esc(ia.text || "—") + '</div>';
+    var imgHtml = (ia.image) ? '<img class="parcours-image" src="/api/data/images/' + esc(ia.image) + '" alt="" />' : '';
+    var html = '<div class="parcours-card">' + imgHtml + '<span class="actor">' + esc(ia.actor) + '</span><div class="text">' + esc(ia.text || "—") + '</div>';
     if (ia.responses && ia.responses.length > 0) {{
         ia.responses.forEach(function(r, i) {{
             var label = (r.text || "").length > 80 ? (r.text || "").substring(0, 80) + "…" : (r.text || "→ I" + r.next_id);
-            html += '<button class="parcours-choice" data-next="' + r.next_id + '" data-target="' + esc(r.target_node_id || "") + '" data-edge="' + esc(r.edge_id || "") + '" data-auth="' + (r.Authenticity||0) + '" data-respect="' + (r.Respect||0) + '" data-compassion="' + (r.Compassion||0) + '" data-hope="' + (r.Hope||0) + '" data-empathy="' + (r.Empathy||0) + '">' + esc(label) + '</button>';
+            var scores = {{ RespectAndDignity: r.RespectAndDignity||0, Empathy: r.Empathy||0, Compassion: r.Compassion||0, EmotionalRegulation: r.EmotionalRegulation||0, CommunicationClarity: r.CommunicationClarity||0, ProfessionalBoundaries: r.ProfessionalBoundaries||0, InterprofessionalCollaboration: r.InterprofessionalCollaboration||0 }};
+            html += '<button class="parcours-choice" data-next="' + r.next_id + '" data-target="' + esc(r.target_node_id || "") + '" data-edge="' + esc(r.edge_id || "") + '" data-scores="' + esc(JSON.stringify(scores)) + '">' + esc(label) + '</button>';
         }});
     }} else {{
         html += '<div class="parcours-end">Fin de cette branche.</div>';
@@ -228,11 +231,8 @@ function renderParcours(s) {{
     document.getElementById("parcours-restart").style.display = parcoursPath.nodes.length > 0 ? "block" : "none";
     document.querySelectorAll(".parcours-choice").forEach(function(btn) {{
         btn.addEventListener("click", function() {{
-            parcoursScores.Authenticity += parseInt(this.dataset.auth) || 0;
-            parcoursScores.Respect += parseInt(this.dataset.respect) || 0;
-            parcoursScores.Compassion += parseInt(this.dataset.compassion) || 0;
-            parcoursScores.Hope += parseInt(this.dataset.hope) || 0;
-            parcoursScores.Empathy += parseInt(this.dataset.empathy) || 0;
+            var scores = JSON.parse(this.dataset.scores || "{{}}");
+            for (var k in scores) parcoursScores[k] = (parcoursScores[k] || 0) + (parseInt(scores[k]) || 0);
             var nextId = this.dataset.next;
             var edgeId = this.dataset.edge;
             if (parcoursCurrent && parcoursCurrent.node_id) parcoursPath.nodes.push(parcoursCurrent.node_id);

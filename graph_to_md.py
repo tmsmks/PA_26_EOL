@@ -8,7 +8,7 @@ import os
 from graph_builder import load_chapters, build_scene_graph
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(BASE_DIR, "data", "Chapters_v2-1.json")
+DATA_PATH = os.path.join(BASE_DIR, "data", "chapters", "Chapters_v3-4-c_emotional-illustration.json")
 OUTPUT_PATH = os.path.join(BASE_DIR, "output", "graphes_end_of_life.md")
 
 LABEL_MAX = 20
@@ -79,7 +79,7 @@ def scene_to_mermaid(chapter_id: int, chapter_name: str, scene: dict) -> str:
 
 def main():
     data = load_chapters(DATA_PATH)
-    parts = ["# Graphes End of Life", "", "Structure des scénarios — Généré à partir de Chapters_v2-1.json", "", "---", ""]
+    parts = ["# Graphes End of Life", "", "Structure des scénarios — Généré à partir de Chapters_v3-4-c_emotional-illustration.json", "", "---", ""]
 
     for ch in data.get("Chapters", []):
         chapter_id = ch["Id"]

@@ -6,7 +6,7 @@ Outil de visualisation et d’édition des scénarios du serious game **End of L
 
 ```
 ├── data/
-│   └── Chapters_v2-1.json    # Données des chapitres (Chapters → Scenes → Interactions → Responses)
+│   └── Chapters_v3-3-b_polishNarratif.json    # Données des chapitres (Chapters → Scenes → Interactions → Responses)
 ├── docs/
 │   └── Cahier_des_charges_IA_EndOfLife.md
 ├── output/
@@ -53,7 +53,7 @@ Puis ouvrir **http://localhost:8765** dans le navigateur.
 - **Mode Édition** : modification des textes (interactions, réponses), `SceneIntroduction`, `Name`, et des scores (Authenticité, Respect, Compassion, Espoir, Empathie).
 - **Mode Parcours joueur** : parcours interactif du scénario, chemin marqué en vert sur le graphe, scores cumulés affichés à la fin.
 - **Recherche** (EG-3) : filtrage des scénarios et des nœuds par texte.
-- **Sauvegarde** : bouton « Valider et sauvegarder » pour enregistrer dans `data/Chapters_v2-1.json`, ou téléchargement JSON.
+- **Sauvegarde** : bouton « Valider et sauvegarder » pour enregistrer dans `data/Chapters_v3-3-b_polishNarratif.json`, ou téléchargement JSON.
 
 ## Spécifications
 

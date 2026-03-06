@@ -1,2 +1,5 @@
 # Éditeur graphique End of Life — Phase 0
 flask>=2.0
+# Module d'enrichissement (4.2) avec LLM OpenAI
+openai>=1.0.0
+requests>=2.0

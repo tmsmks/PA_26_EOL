@@ -51,7 +51,7 @@ Chaque choix modifie **cinq compétences** :
 
 ### 1.2 Données du projet
 
-Les scénarios sont stockés dans **`Chapters_v2-1.json`** :
+Les scénarios sont stockés dans **`Chapters_v3-3-b_polishNarratif.json`** :
 
 ```
 Chapters → Scenes → Interactions → Responses
@@ -87,7 +87,7 @@ Chaque réponse contient : `Text`, `Authenticity`, `Respect`, `Compassion`, `Hop
 
 - Construction et visualisation du graphe des scénarios
 - Outils d'assistance à l'édition du scénario (enrichissement, scoring)
-- Intégration avec `Chapters_v2-1.json`
+- Intégration avec `Chapters_v3-3-b_polishNarratif.json`
 - Documentation formateur
 - Déploiement en environnement exploitable
 
@@ -103,14 +103,14 @@ Chaque réponse contient : `Text`, `Authenticity`, `Respect`, `Compassion`, `Hop
 
 | Fichier | Rôle |
 | --- | --- |
-| **graph_builder.py** | Charge `Chapters_v2-1.json`, construit nœuds (interactions) et arêtes (réponses avec `NextInteractionID`). Génère le panneau d'édition (Name, Text, scores) et la structure parcours joueur. Valide les `NextInteractionID` (EG-7 : -1 = fin de branche). |
+| **graph_builder.py** | Charge `Chapters_v3-3-b_polishNarratif.json`, construit nœuds (interactions) et arêtes (réponses avec `NextInteractionID`). Génère le panneau d'édition (Name, Text, scores) et la structure parcours joueur. Valide les `NextInteractionID` (EG-7 : -1 = fin de branche). |
 | **graph_viewer.py** | Génère des pages HTML par chapitre avec vis-network (layout hiérarchique). Sidebar : liste des scénarios, recherche par texte (EG-3). Mode **Édition** : modification `SceneIntroduction`, Name, Text, scores des interactions/réponses ; boutons « Valider et sauvegarder » (API), « Télécharger JSON ». Mode **Parcours joueur** : simulation interactive, choix de réponses, chemin en vert sur le graphe, cumul des scores finaux. |
 | **graph_to_md.py** | Export vers `output/graphes_end_of_life.md` au format Mermaid (flowchart TD) : un diagramme par scène (nœuds, arêtes). |
-| **app.py** | Serveur Flask (port 8765) : sert `output/graphes/` (index + pages chapitre) ; API POST `/api/save` pour persister les modifications dans `Chapters_v2-1.json`. |
+| **app.py** | Serveur Flask (port 8765) : sert `output/graphes/` (index + pages chapitre) ; API POST `/api/save` pour persister les modifications dans `Chapters_v3-3-b_polishNarratif.json`. |
 
 | Élément | Détail |
 | --- | --- |
-| **Entrées** | JSON `Chapters_v2-1.json` |
+| **Entrées** | JSON `Chapters_v3-3-b_polishNarratif.json` |
 | **Sorties** | Pages HTML interactives (`output/graphes/*.html`), index de navigation, fichier Markdown Mermaid (`output/graphes_end_of_life.md`) |
 | **Règles** | `NextInteractionID` -1 = fin de branche (EG-7) ; sauvegarde uniquement via API si serveur lancé |
 
@@ -154,7 +154,7 @@ Chaque réponse contient : `Text`, `Authenticity`, `Respect`, `Compassion`, `Hop
 | --- | --- |
 | Backend | Python 3.x |
 | LLM | API (OpenAI, Anthropic) ou local (Ollama) |
-| Données | JSON (`Chapters_v2-1.json`) |
+| Données | JSON (`Chapters_v3-3-b_polishNarratif.json`) |
 | Interface | CLI ou Web (Streamlit/Gradio) |
 
 ### 5.2 Contraintes
@@ -205,7 +205,7 @@ Chapters[]
 
 ### B. Références
 
-- `Chapters_v2-1.json` — Structure des scénarios
+- `Chapters_v3-3-b_polishNarratif.json` — Structure des scénarios
 - `PA_2023_rapport_H-Jaton.pdf` — Rapport projet End of Life (Master HES-SO)
 
 ---
