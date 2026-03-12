@@ -79,6 +79,7 @@ body {{ margin: 0; font-family: system-ui, -apple-system, sans-serif; background
 .scores .score-item {{ display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 6px; }}
 .scores .score-item input {{ width: 40px; padding: 3px; font-size: 13px; text-align: center; }}
 .scores .score-item label {{ font-size: 11px; color: #e5e7eb; }}
+.block.highlight-edge {{ box-shadow: 0 0 0 2px #38bdf8; background: #1f2933; }}
 .export {{ background: #38bdf8; color: #0f0f14; border: none; padding: 12px; cursor: pointer; border-radius: 8px; width: 100%; font-weight: 600; margin-top: 12px; font-size: 13px; }}
 .export:hover {{ background: #0ea5e9; }}
 .export-secondary {{ background: #3f3f46; margin-top: 8px; }}
@@ -265,9 +266,23 @@ function highlightPath() {{
         var pathEdges = parcoursPath.edges || [];
         var curNode = parcoursCurrent ? parcoursCurrent.node_id : null;
         nodesDS.getIds().forEach(function(nid) {{
+            var node = nodesDS.get(nid) || {{}};
+            var isRoot = !!node.is_root;
             var inPath = pathNodes.indexOf(nid) >= 0;
             var isCurrent = curNode === nid;
-            nodesDS.update({{ id: nid, color: {{ background: inPath ? "#166534" : "#27272a", border: isCurrent ? "#fbbf24" : (inPath ? "#22c55e" : "#38bdf8") }} }});
+            var bg;
+            var border;
+            if (inPath) {{
+                bg = "#166534";
+                border = isCurrent ? "#fbbf24" : "#22c55e";
+            }} else if (isRoot) {{
+                bg = "#451a1a";
+                border = "#f97373";
+            }} else {{
+                bg = "#27272a";
+                border = "#38bdf8";
+            }}
+            nodesDS.update({{ id: nid, color: {{ background: bg, border: border }} }});
         }});
         edgesDS.getIds().forEach(function(eid) {{
             var inPath = pathEdges.indexOf(eid) >= 0;
@@ -297,17 +312,31 @@ function showScene(idx) {{
     if (nodesDS && edgesDS) {{
         nodesDS.clear();
         edgesDS.clear();
-        s.nodes.forEach(function(n) {{ nodesDS.add(n); }});
+        s.nodes.forEach(function(n) {{
+            if (n.is_root) {{
+                n = Object.assign({{}}, n, {{ color: {{ background: "#451a1a", border: "#f97373" }} }});
+            }}
+            nodesDS.add(n);
+        }});
         s.edges.forEach(function(e) {{ edgesDS.add(e); }});
         setTimeout(function() {{ if (network) network.fit({{ animation: {{ duration: 300 }}, scale: 1.3 }}); }}, 200);
     }} else {{
-        nodesDS = new vis.DataSet(s.nodes);
+        var initNodes = s.nodes.map(function(n) {{
+            if (n.is_root) {{
+                return Object.assign({{}}, n, {{ color: {{ background: "#451a1a", border: "#f97373" }} }});
+            }}
+            return n;
+        }});
+        nodesDS = new vis.DataSet(initNodes);
         edgesDS = new vis.DataSet(s.edges);
         network = new vis.Network(container, {{ nodes: nodesDS, edges: edgesDS }}, opts);
         network.once("afterDrawing", function() {{ network.fit({{ animation: {{ duration: 400 }}, scale: 1.6 }}); }});
         setTimeout(function() {{ if (network) {{ network.redraw(); network.fit({{ scale: 1.6 }}); }} }}, 300);
         network.on("click", function(params) {{
-            if (params.nodes && params.nodes.length > 0) {{
+            if (params.edges && params.edges.length > 0) {{
+                var eid = String(params.edges[0]);
+                focusResponseByEdgeId(eid);
+            }} else if (params.nodes && params.nodes.length > 0) {{
                 var nid = String(params.nodes[0]);
                 var m = nid.match(/_I(\\d+)$/);
                 if (m) {{
@@ -332,6 +361,26 @@ function showScene(idx) {{
 function escapeHtml(s) {{
     if (!s) return '';
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}}
+
+function focusResponseByEdgeId(edgeId) {{
+    try {{
+        if (!edgeId) return;
+        var m = String(edgeId).match(/C\\d+_S\\d+_I(\\d+)_R(\\d+)_>/);
+        if (!m) return;
+        var iaId = m[1];
+        var rIdx = parseInt(m[2], 10);
+        var block = document.querySelector('.block[data-interaction-id="' + iaId + '"]');
+        if (!block) return;
+        var textarea = block.querySelector('textarea.edit[data-type="response"][data-r="' + rIdx + '"]');
+        if (!textarea) return;
+        textarea.scrollIntoView({{ behavior: "smooth", block: "center" }});
+        textarea.focus();
+        block.classList.add("highlight-edge");
+        setTimeout(function() {{ block.classList.remove("highlight-edge"); }}, 1500);
+    }} catch (e) {{
+        console.warn("focusResponseByEdgeId:", e);
+    }}
 }}
 
 function attachEditors(idx) {{
@@ -362,6 +411,23 @@ function attachEditors(idx) {{
             if (v < -3) v = -3;
             if (v > 3) v = 3;
             sc.Interactions[i].Responses[r][skill] = v;
+        }});
+    }});
+    document.querySelectorAll("#ed-content .next-id").forEach(function(el) {{
+        el.addEventListener("change", function() {{
+            var i = parseInt(this.dataset.i), r = parseInt(this.dataset.r);
+            var raw = (this.value || "").trim();
+            if (raw === "") {{
+                delete sc.Interactions[i].Responses[r].NextInteractionID;
+                return;
+            }}
+            var v = parseInt(raw, 10);
+            if (isNaN(v)) {{
+                this.value = "";
+                delete sc.Interactions[i].Responses[r].NextInteractionID;
+                return;
+            }}
+            sc.Interactions[i].Responses[r].NextInteractionID = v;
         }});
     }});
 }}

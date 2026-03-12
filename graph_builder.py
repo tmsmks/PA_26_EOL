@@ -92,7 +92,8 @@ def build_scene_graph(chapter_id: int, scene: dict) -> dict:
         text = ia.get("Text", "")
         name = ia.get("Name", text[:50])
         node_id = f"C{chapter_id}_S{scene['Id']}_I{ia['Id']}"
-        label = _truncate(name or text or "—", LABEL_MAX)
+        base_label = _truncate(name or text or "—", LABEL_MAX)
+        label = f"{ia['Id']} — {base_label}"
         title = f"[{actor_name}] {text}" if text else f"[{actor_name}] {name}"
 
         nodes.append({"id": node_id, "label": label, "title": title})
@@ -113,6 +114,16 @@ def build_scene_graph(chapter_id: int, scene: dict) -> dict:
                 "from": node_id,
                 "to": target_node_id,
             })
+
+    # Nœuds sans prédécesseur (sauf la toute première interaction de la scène) :
+    # marqués avec is_root=True pour la coloration côté client.
+    targets = {e["to"] for e in edges}
+    first_node_id = None
+    if interactions:
+        first_node_id = f"C{chapter_id}_S{scene['Id']}_I{interactions[0]['Id']}"
+    for n in nodes:
+        if n["id"] not in targets and n["id"] != first_node_id:
+            n["is_root"] = True
 
     # Distribution des courbures : évite la superposition des flèches multiples
     edges = _apply_edge_curves(edges)
@@ -150,8 +161,14 @@ def _build_editor_html(scene: dict) -> str:
         block += f'<textarea class="edit" data-type="text" data-i="{i}" rows="3">{_escape_html(text or "")}</textarea>'
         for r_idx, r in enumerate(ia.get("Responses", [])):
             rtext = r.get("Text", "")
+            next_id = r.get("NextInteractionID", "")
             block += f'<div class="resp"><label>Réponse {r_idx + 1} — Text</label>'
             block += f'<textarea class="edit" data-type="response" data-i="{i}" data-r="{r_idx}" rows="2">{_escape_html(rtext)}</textarea>'
+            block += '<label>Next Id</label>'
+            block += (
+                f'<input type="number" class="next-id" data-i="{i}" data-r="{r_idx}" '
+                f'value="{next_id if next_id is not None else ""}">'
+            )
             block += '<div class="scores">'
             for sk in SKILLS:
                 val = _get_score(r, sk)
