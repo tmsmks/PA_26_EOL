@@ -32,6 +32,26 @@ CHAPTERS_PATH = os.path.join(
     "Chapters_v3-4-c_emotional-illustration.json",
 )
 
+SOFT_SKILLS = [
+    "RespectAndDignity",
+    "Empathy",
+    "Compassion",
+    "EmotionalRegulation",
+    "CommunicationClarity",
+    "ProfessionalBoundaries",
+    "InterprofessionalCollaboration",
+]
+
+SOFT_SKILL_LABELS = {
+    "RespectAndDignity": "Respect et dignité",
+    "Empathy": "Empathie",
+    "Compassion": "Compassion",
+    "EmotionalRegulation": "Régulation émotionnelle",
+    "CommunicationClarity": "Clarté de communication",
+    "ProfessionalBoundaries": "Frontières professionnelles",
+    "InterprofessionalCollaboration": "Collaboration interprofessionnelle",
+}
+
 
 def _find_interaction(
     data: Dict[str, Any],
@@ -62,6 +82,7 @@ def get_interaction_context(
     chapter_id: int,
     scene_id: int,
     interaction_id: int,
+    next_interaction_id: int | None = None,
 ) -> Dict[str, Any]:
     """
     Construit le "contexte enrichissement" tel que défini en 4.2 :
@@ -71,6 +92,10 @@ def get_interaction_context(
     - Interaction (Texte + Name)
     - Profil acteur (Actor)
     - Réponses existantes (texte + scores si présents)
+
+    Si next_interaction_id est fourni (et différent de -1), ajoute un bloc
+    `next_interaction` décrivant l'interaction suivante vers laquelle la
+    réponse générée doit naturellement mener.
     """
     data = load_chapters(json_path)
     chapter, scene, interaction = _find_interaction(
@@ -99,7 +124,19 @@ def get_interaction_context(
             }
         )
 
-    return {
+    next_interaction_block: Dict[str, Any] | None = None
+    if next_interaction_id is not None and int(next_interaction_id) != -1:
+        for ia in scene.get("Interactions", []):
+            if ia.get("Id") == int(next_interaction_id):
+                next_interaction_block = {
+                    "Id": ia.get("Id"),
+                    "Name": ia.get("Name"),
+                    "Text": ia.get("Text"),
+                    "Actor": (ia.get("Actor") or {}).copy(),
+                }
+                break
+
+    result: Dict[str, Any] = {
         "chapter": {
             "Id": chapter.get("Id"),
             "Name": chapter.get("Name"),
@@ -118,6 +155,11 @@ def get_interaction_context(
         },
         "existing_responses": existing_responses,
     }
+    if next_interaction_block is not None:
+        result["next_interaction"] = next_interaction_block
+    elif next_interaction_id is not None and int(next_interaction_id) == -1:
+        result["next_interaction"] = {"Id": -1, "EndOfBranch": True}
+    return result
 
 
 def filter_duplicate_texts(
@@ -145,7 +187,91 @@ def filter_duplicate_texts(
     return filtered
 
 
-def call_llm_for_enrichment(context: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _format_orientation_instructions(
+    orientation: Dict[str, int] | None,
+    guidance: str | None,
+    n_proposals: int,
+    next_interaction: Dict[str, Any] | None = None,
+) -> str:
+    """
+    Formate l'orientation soft skills + consigne libre + bloc suivant
+    en instructions pour le LLM.
+
+    orientation      : {skill: target_score (-3..+3)} — partiel autorisé.
+    guidance         : texte libre (ex : "ton plus direct, moins paternaliste").
+    next_interaction : bloc vers lequel la réponse doit mener (ou {Id:-1} pour fin).
+    """
+    lines: List[str] = []
+    lines.append(
+        f"Nombre de propositions demandées : EXACTEMENT {max(1, int(n_proposals))}."
+    )
+
+    if next_interaction is not None:
+        if next_interaction.get("EndOfBranch") or next_interaction.get("Id") == -1:
+            lines.append("")
+            lines.append(
+                "SUITE NARRATIVE : la réponse générée est une FIN DE BRANCHE "
+                "(aucune interaction ne suit). Elle doit pouvoir clôturer "
+                "l'échange de manière cohérente."
+            )
+        else:
+            next_actor = (next_interaction.get("Actor") or {}).get("Name", "?")
+            next_text = next_interaction.get("Text") or ""
+            lines.append("")
+            lines.append(
+                "SUITE NARRATIVE (contrainte forte) : la réponse générée doit "
+                "mener NATURELLEMENT à l'interaction suivante ci-dessous, "
+                "c'est-à-dire provoquer / justifier / enchaîner de façon "
+                "crédible la prise de parole qui suit."
+            )
+            lines.append(
+                f"  - Interaction suivante #{next_interaction.get('Id')} "
+                f"[{next_actor}] : {next_text}"
+            )
+            lines.append(
+                "La réponse proposée NE DOIT PAS répéter ni spoiler ce texte, "
+                "mais l'amener logiquement."
+            )
+
+    if orientation:
+        targeted = {
+            k: int(v)
+            for k, v in orientation.items()
+            if k in SOFT_SKILLS and isinstance(v, (int, float))
+        }
+        if targeted:
+            lines.append("")
+            lines.append(
+                "ORIENTATION CIBLÉE (priorité forte) — la réponse proposée doit "
+                "ILLUSTRER le profil suivant sur l'échelle -3..+3 :"
+            )
+            for skill in SOFT_SKILLS:
+                if skill in targeted:
+                    v = max(-3, min(3, targeted[skill]))
+                    sign = "+" if v > 0 else ""
+                    label = SOFT_SKILL_LABELS.get(skill, skill)
+                    lines.append(f"  - {skill} ({label}) : cible = {sign}{v}")
+            lines.append(
+                "Les scores SoftSkillDimensions renvoyés DOIVENT correspondre "
+                "à ce profil (tolérance ±1 par dimension). Le texte de la "
+                "réplique doit concrètement traduire ces orientations."
+            )
+
+    if guidance and guidance.strip():
+        lines.append("")
+        lines.append("CONSIGNE AUTEUR (à respecter) :")
+        lines.append(guidance.strip())
+
+    return "\n".join(lines)
+
+
+def call_llm_for_enrichment(
+    context: Dict[str, Any],
+    orientation: Dict[str, int] | None = None,
+    guidance: str | None = None,
+    n_proposals: int = 1,
+    next_interaction: Dict[str, Any] | None = None,
+) -> List[Dict[str, Any]]:
     """
     Appelle un LLM réel pour proposer de nouvelles réponses.
 
@@ -153,35 +279,46 @@ def call_llm_for_enrichment(context: Dict[str, Any]) -> List[Dict[str, Any]]:
     - \"openai\" (par défaut) : API OpenAI officielle
     - \"ollama\"           : serveur local Ollama (compat. /v1/chat/completions)
 
-    OpenAI :
-    - Lit la clé dans OPENAI_API_KEY.
-    - Utilise par défaut le modèle ENRICH_OPENAI_MODEL ou 'gpt-4.1-mini'.
-    Ollama :
-    - Utilise ENRICH_OLLAMA_MODEL (par défaut 'llama3.1:8b').
-    - Suppose un serveur local sur http://localhost:11434.
-    - Retourne une liste de réponses déjà filtrées pour éviter les doublons.
+    Paramètres :
+    - orientation : dict partiel {skill: score -3..+3} pour guider le profil
+      soft skills de la réponse générée.
+    - guidance    : texte libre d'instructions auteur.
+    - n_proposals : nombre de propositions demandées (1 à 3).
     """
     backend = os.getenv("ENRICH_BACKEND", "openai").lower()
     system_msg = (
         "Tu es un assistant pédagogique spécialisé en communication en fin de vie.\n"
         "On te fournit le contexte complet d'une scène de simulation (EMS), "
         "une interaction précise et la liste des réponses déjà existantes.\n\n"
-        "Ta tâche : proposer de 1 à 3 nouvelles réponses plausibles que l'ACTEUR pourrait dire.\n"
+        "Ta tâche : proposer de nouvelles réponses plausibles que l'ACTEUR pourrait dire.\n"
         "Contraintes :\n"
         "- respecter la déontologie infirmière et les bonnes pratiques relationnelles ;\n"
         "- ne JAMAIS dupliquer les réponses déjà existantes (même sens, même tournure) ;\n"
         "- proposer pour chaque réponse :\n"
-        "  - le texte exact de la réplique (en français) ;\n"
+        "  - le texte exact de la réplique (en français, entre guillemets français « » si citation directe) ;\n"
         "  - une catégorie parmi : 'exemplaire', 'neutre', 'problématique' ;\n"
-        "  - des scores soft skills au format SoftSkillDimensions (RespectAndDignity, Empathy, etc.) ;\n"
-        "  - des scores LegacyDimensions (Authenticity, Respect, Compassion, Hope, Empathy), chacun de -3 à +3.\n\n"
+        "  - des scores SoftSkillDimensions OBLIGATOIRES couvrant les 7 dimensions :\n"
+        "    RespectAndDignity, Empathy, Compassion, EmotionalRegulation, "
+        "CommunicationClarity, ProfessionalBoundaries, InterprofessionalCollaboration ;\n"
+        "    chaque score est un entier de -3 à +3 ;\n"
+        "  - des scores LegacyDimensions (Authenticity, Respect, Compassion, Hope, Empathy), chacun de -3 à +3 ;\n"
+        "  - un champ Rationale (1–2 phrases) justifiant brièvement le choix et les scores.\n\n"
         "Réponds STRICTEMENT en JSON de la forme :\n"
-        "{ \"responses\": [ { \"Text\": ..., \"Category\": ..., "
-        "\"SoftSkillDimensions\": { ... }, \"LegacyDimensions\": { ... } } ] }"
+        "{ \"responses\": [ { \"Text\": ..., \"Category\": ..., \"Rationale\": ..., "
+        "\"SoftSkillDimensions\": { ... 7 dimensions ... }, "
+        "\"LegacyDimensions\": { ... } } ] }"
     )
 
-    user_msg = "Contexte JSON suivant :\n\n" + json.dumps(
-        context, ensure_ascii=False, indent=2
+    if next_interaction is None:
+        next_interaction = context.get("next_interaction")
+    orientation_block = _format_orientation_instructions(
+        orientation, guidance, n_proposals, next_interaction=next_interaction
+    )
+
+    user_msg = (
+        orientation_block
+        + "\n\nContexte JSON suivant :\n\n"
+        + json.dumps(context, ensure_ascii=False, indent=2)
     )
 
     if backend == "openai":
@@ -212,6 +349,10 @@ def call_llm_for_enrichment(context: Dict[str, Any]) -> List[Dict[str, Any]]:
     elif backend == "ollama":
         model = os.getenv("ENRICH_OLLAMA_MODEL", "llama3.1:8b")
         url = os.getenv("ENRICH_OLLAMA_URL", "http://localhost:11434/v1/chat/completions")
+        try:
+            timeout_s = float(os.getenv("ENRICH_OLLAMA_TIMEOUT", "300"))
+        except ValueError:
+            timeout_s = 300.0
         payload = {
             "model": model,
             "messages": [
@@ -221,7 +362,14 @@ def call_llm_for_enrichment(context: Dict[str, Any]) -> List[Dict[str, Any]]:
             "response_format": {"type": "json_object"},
         }
         try:
-            resp = requests.post(url, json=payload, timeout=60)
+            resp = requests.post(url, json=payload, timeout=timeout_s)
+        except requests.Timeout as exc:
+            raise RuntimeError(
+                f"Ollama a dépassé le timeout de {int(timeout_s)}s sur {url}. "
+                "Le premier appel peut être long (chargement du modèle). "
+                "Essayez de précharger le modèle avec `ollama run <modèle> ''` "
+                "ou augmentez ENRICH_OLLAMA_TIMEOUT."
+            ) from exc
         except requests.RequestException as exc:
             raise RuntimeError(
                 f"Impossible de joindre Ollama sur {url}. "
@@ -309,20 +457,57 @@ def _cli() -> None:
         action="store_true",
         help="Appelle le LLM OpenAI réel pour proposer de nouvelles réponses.",
     )
+    parser.add_argument(
+        "--n",
+        type=int,
+        default=1,
+        help="Nombre de propositions à demander au LLM (1 à 3).",
+    )
+    parser.add_argument(
+        "--guidance",
+        type=str,
+        default=None,
+        help="Consigne libre auteur (ex: 'ton plus direct').",
+    )
+    parser.add_argument(
+        "--next-id",
+        type=int,
+        default=None,
+        help="Id de l'interaction suivante vers laquelle la réponse doit mener (-1 = fin).",
+    )
+    for skill in SOFT_SKILLS:
+        parser.add_argument(
+            f"--{skill}",
+            type=int,
+            default=None,
+            help=f"Score cible -3..+3 pour la dimension {skill}.",
+        )
     args = parser.parse_args()
+
+    orientation = {
+        skill: getattr(args, skill)
+        for skill in SOFT_SKILLS
+        if getattr(args, skill) is not None
+    }
 
     ctx = get_interaction_context(
         json_path=args.json,
         chapter_id=args.chapter,
         scene_id=args.scene,
         interaction_id=args.interaction,
+        next_interaction_id=args.next_id,
     )
 
     out: Dict[str, Any] = {"context": ctx}
     if args.with_stub:
         out["proposed_responses_stub"] = propose_new_responses_stub(ctx)
     if args.with_llm:
-        out["proposed_responses_llm"] = call_llm_for_enrichment(ctx)
+        out["proposed_responses_llm"] = call_llm_for_enrichment(
+            ctx,
+            orientation=orientation or None,
+            guidance=args.guidance,
+            n_proposals=args.n,
+        )
 
     print(json.dumps(out, ensure_ascii=False, indent=2))
 

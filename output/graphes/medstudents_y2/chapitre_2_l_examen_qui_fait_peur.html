@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>End of Life — Chapitre 2 : L'examen qui fait peur</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #0f0f14; color: #e4e4e7; display: flex; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
+#network { -webkit-font-smoothing: antialiased; }
+.sidebar { width: 320px; background: #18181b; padding: 14px; border-right: 1px solid #27272a; display: flex; flex-direction: column; }
+.sidebar h3 { margin: 0 0 10px; font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.05em; }
+.home-link { display: inline-block; text-decoration: none; color: #a1a1aa; font-size: 12px; margin-bottom: 8px; padding: 4px 8px; border: 1px solid #3f3f46; border-radius: 6px; }
+.home-link:hover { color: #fff; border-color: #38bdf8; background: #1e293b; }
+.book-badge { display: inline-block; background: linear-gradient(90deg,#38bdf8,#a855f7); color: #0f0f14; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; margin: 0 0 14px 8px; vertical-align: middle; }
+.sidebar-top { flex: 1; min-height: 0; overflow-y: auto; }
+.sidebar-actions { border-top: 1px solid #27272a; margin-top: 10px; padding-top: 10px; }
+.chapter-select { width: 100%; padding: 8px 10px; margin-bottom: 12px; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; color: #fff; font-size: 12px; }
+.search { width: 100%; padding: 8px 10px; margin-bottom: 10px; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; color: #fff; font-size: 12px; }
+.search::placeholder { color: #71717a; }
+.scene-btn { display: block; width: 100%; background: transparent; color: #d4d4d8; border: none; padding: 9px 12px; margin-bottom: 2px; cursor: pointer; text-align: left; border-radius: 6px; font-size: 13px; }
+.scene-btn:hover { background: #27272a; color: #fff; }
+.scene-btn.active { background: #3f3f46; color: #38bdf8; font-weight: 500; }
+.sidebar.hidden-panel { display: none; }
+.main { flex: 1; position: relative; min-width: 0; min-height: 0; }
+#network { position: absolute; top: 0; left: 0; right: 0; bottom: 40px; width: 100%; background: #0f0f14; min-height: 350px; }
+.hint { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: #52525b; font-size: 11px; }
+.panel-toggles { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; z-index: 5; pointer-events: none; }
+.panel-toggle-btn { pointer-events: auto; border: 1px solid #3f3f46; background: rgba(24,24,27,0.9); color: #d4d4d8; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+.panel-toggle-btn:hover { color: #fff; border-color: #38bdf8; }
+.editor { width: 640px; background: #18181b; padding: 14px; border-left: 1px solid #27272a; overflow-y: auto; }
+.editor.hidden-panel { display: none; }
+.editor h3 { margin: 0 0 10px; font-size: 13px; color: #38bdf8; }
+.scene-intro { margin-bottom: 14px; }
+.scene-intro label { display: block; font-size: 10px; color: #71717a; margin-bottom: 4px; }
+.scene-intro textarea { width: 100%; padding: 10px; font-size: 14px; font-weight: 500; background: #27272a; color: #f9fafb; border: 1px solid #4b5563; border-radius: 8px; resize: vertical; }
+.block { margin-bottom: 18px; padding: 16px; background: #27272a; border-radius: 10px; border: 1px solid #3f3f46; }
+.block.active { border-color: #38bdf8; box-shadow: 0 0 0 1px #38bdf8 inset; }
+.block .header { margin-bottom: 8px; font-weight: 600; color: #38bdf8; font-size: 12px; }
+.block label { display: block; font-size: 10px; color: #71717a; margin: 6px 0 3px; }
+.block textarea { width: 100%; padding: 9px; font-size: 14px; font-weight: 500; background: #18181b; color: #f9fafb; border: 1px solid #4b5563; border-radius: 8px; resize: vertical; }
+.resp { margin: 10px 0; padding-left: 10px; border-left: 2px solid #3f3f46; }
+.scores { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 12px; row-gap: 8px; margin-top: 8px; }
+.scores .score-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 5px; }
+.scores .score-item input.score { display: none; }
+.scores .score-item label { font-size: 10px; color: #e5e7eb; margin: 0; white-space: nowrap; }
+.score-stepper { display: inline-flex; align-items: center; gap: 2px; justify-self: start; }
+.score-btn { width: 20px; height: 20px; border: 1px solid #4b5563; background: #18181b; color: #e5e7eb; border-radius: 6px; cursor: pointer; font-size: 12px; line-height: 1; padding: 0; }
+.score-btn:hover { border-color: #38bdf8; color: #38bdf8; }
+.score-value { min-width: 14px; text-align: center; font-size: 10px; color: #f9fafb; font-weight: 600; }
+.next-id-item { display: flex; align-items: center; justify-content: flex-start; gap: 6px; }
+.next-id-item label { margin: 0; color: #a1a1aa; font-size: 10px; }
+.next-id-item input.next-id { width: 64px; height: 22px; padding: 0 4px; font-size: 11px; text-align: center; background: #18181b; color: #f9fafb; border: 1px solid #4b5563; border-radius: 6px; }
+.block.highlight-edge { box-shadow: 0 0 0 2px #38bdf8; background: #1f2933; }
+.export { background: #38bdf8; color: #0f0f14; border: none; padding: 12px; cursor: pointer; border-radius: 8px; width: 100%; font-weight: 600; margin-top: 12px; font-size: 13px; }
+.export:hover { background: #0ea5e9; }
+.export-secondary { background: #3f3f46; margin-top: 8px; }
+.export-secondary:hover { background: #52525b; }
+.save-ok { margin-top: 10px; padding: 10px; background: #166534; border-radius: 6px; font-size: 12px; color: #22c55e; }
+.save-err { margin-top: 10px; padding: 10px; background: #7f1d1d; border-radius: 6px; font-size: 12px; color: #ef4444; }
+.validation { margin-top: 10px; padding: 10px; background: #1c1917; border-radius: 6px; font-size: 12px; color: #fbbf24; }
+.validation.ok { color: #22c55e; }
+.empty { color: #71717a; font-style: italic; padding: 24px; text-align: center; }
+.crud-btn { border: none; cursor: pointer; border-radius: 6px; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+.crud-delete-interaction { float: right; background: #7f1d1d; color: #fca5a5; padding: 3px 8px; }
+.crud-delete-interaction:hover { background: #991b1b; color: #fff; }
+.crud-delete-response { background: #7f1d1d; color: #fca5a5; padding: 2px 7px; font-size: 11px; }
+.crud-delete-response:hover { background: #991b1b; color: #fff; }
+.crud-add-response { display: block; width: 100%; background: #1e3a5f; color: #93c5fd; padding: 8px; margin-top: 10px; border: 1px dashed #3b82f6; }
+.crud-add-response:hover { background: #1e40af; color: #fff; border-style: solid; }
+.crud-add-interaction { display: block; width: 100%; background: #14532d; color: #86efac; padding: 10px; margin-top: 8px; border: 1px dashed #22c55e; font-size: 13px; }
+.crud-add-interaction:hover { background: #166534; color: #fff; border-style: solid; }
+.add-interaction-container { margin-top: 12px; }
+.resp-header { display: flex; justify-content: space-between; align-items: center; }
+.resp-header label { margin: 0; }
+.block .header { display: flex; justify-content: space-between; align-items: center; }
+.confirm-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.confirm-box { background: #27272a; border: 1px solid #3f3f46; border-radius: 10px; padding: 24px; max-width: 400px; text-align: center; }
+.confirm-box p { margin: 0 0 16px; font-size: 14px; color: #e4e4e7; }
+.confirm-box .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+.confirm-box button { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.confirm-box .confirm-yes { background: #dc2626; color: #fff; }
+.confirm-box .confirm-yes:hover { background: #ef4444; }
+.confirm-box .confirm-no { background: #3f3f46; color: #d4d4d8; }
+.confirm-box .confirm-no:hover { background: #52525b; }
+.mode-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.mode-tabs button { padding: 8px 14px; border: 1px solid #3f3f46; background: #27272a; color: #a1a1aa; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; }
+.mode-tabs button:hover { color: #fff; background: #3f3f46; }
+.mode-tabs button.active { background: #38bdf8; color: #0f0f14; border-color: #38bdf8; }
+.panel-edit { display: block; }
+.panel-parcours { display: none; flex-direction: column; }
+.panel-edit.hidden { display: none; }
+.panel-parcours.active { display: flex; }
+.parcours-card { background: #27272a; border-radius: 10px; padding: 16px; margin-bottom: 12px; border: 1px solid #3f3f46; }
+.parcours-card .parcours-image { width: 100%; max-width: 200px; height: auto; border-radius: 8px; margin-bottom: 12px; display: block; object-fit: cover; }
+.parcours-card .actor { display: inline-block; background: #38bdf8; color: #0f0f14; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-bottom: 10px; }
+.parcours-card .text { font-size: 14px; line-height: 1.5; margin-bottom: 16px; color: #e4e4e7; }
+.parcours-choice { display: block; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; background: #3f3f46; border: 1px solid #52525b; color: #e4e4e7; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+.parcours-choice:hover { background: #52525b; border-color: #38bdf8; }
+.parcours-end { color: #71717a; font-style: italic; padding: 20px; text-align: center; }
+.parcours-restart { background: #71717a; color: #fff; border: none; padding: 10px 14px; cursor: pointer; border-radius: 8px; font-size: 12px; margin-top: 8px; }
+.parcours-restart:hover { background: #52525b; }
+.parcours-totals { margin-top: 16px; padding: 14px; background: #18181b; border-radius: 8px; border: 1px solid #22c55e; }
+.parcours-totals h4 { margin: 0 0 10px; font-size: 12px; color: #22c55e; }
+.parcours-totals .score-line { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+.parcours-totals .score-line.positive { color: #22c55e; }
+.parcours-totals .score-line.negative { color: #ef4444; }
+.parcours-totals .score-line.zero { color: #71717a; }
+.crud-ai-response { display: block; width: 100%; background: #3b1361; color: #d8b4fe; padding: 8px; margin-top: 8px; border: 1px dashed #a855f7; }
+.crud-ai-response:hover { background: #581c87; color: #fff; border-style: solid; }
+.ai-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+.ai-modal { background: #18181b; border: 1px solid #3f3f46; border-radius: 12px; padding: 22px; width: 100%; max-width: 640px; max-height: 92vh; overflow-y: auto; color: #e4e4e7; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+.ai-modal h3 { margin: 0 0 6px; font-size: 16px; color: #c084fc; }
+.ai-modal .ai-sub { margin: 0 0 16px; font-size: 12px; color: #a1a1aa; }
+.ai-modal .ai-context { background: #27272a; border: 1px solid #3f3f46; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #d4d4d8; margin-bottom: 14px; }
+.ai-modal .ai-context strong { color: #a5b4fc; }
+.ai-section-title { margin: 10px 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #71717a; }
+.ai-orientation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; margin-bottom: 8px; }
+.ai-orientation .ai-ori-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 6px; padding: 4px 0; }
+.ai-orientation .ai-ori-item label { font-size: 11px; color: #e5e7eb; margin: 0; }
+.ai-orientation .score-stepper { justify-self: end; }
+.ai-modal textarea.ai-guidance { width: 100%; padding: 10px; font-size: 13px; background: #27272a; color: #f9fafb; border: 1px solid #4b5563; border-radius: 8px; resize: vertical; min-height: 60px; }
+.ai-modal select.ai-next { width: 100%; padding: 9px 10px; font-size: 13px; background: #27272a; color: #f9fafb; border: 1px solid #4b5563; border-radius: 8px; }
+.ai-next-hint { font-size: 11px; color: #71717a; margin-top: 4px; }
+.ai-modal .ai-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+.ai-modal .ai-btn { padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.ai-btn-primary { background: #a855f7; color: #fff; }
+.ai-btn-primary:hover { background: #9333ea; }
+.ai-btn-primary[disabled] { background: #52525b; cursor: not-allowed; opacity: 0.8; }
+.ai-btn-secondary { background: #3f3f46; color: #d4d4d8; }
+.ai-btn-secondary:hover { background: #52525b; color: #fff; }
+.ai-status { margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 12px; }
+.ai-status.loading { background: #1e293b; color: #93c5fd; border: 1px solid #1d4ed8; }
+.ai-status.err { background: #7f1d1d; color: #fecaca; border: 1px solid #b91c1c; }
+.ai-proposals { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.ai-proposal { background: #27272a; border: 1px solid #3f3f46; border-radius: 10px; padding: 12px; }
+.ai-proposal .ai-cat { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 999px; background: #1e3a5f; color: #93c5fd; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+.ai-proposal .ai-cat.exemplaire { background: #14532d; color: #86efac; }
+.ai-proposal .ai-cat.problematique { background: #7f1d1d; color: #fca5a5; }
+.ai-proposal .ai-text { font-size: 14px; line-height: 1.45; color: #f9fafb; margin-bottom: 8px; }
+.ai-proposal .ai-rationale { font-size: 11px; color: #a1a1aa; font-style: italic; margin-bottom: 8px; }
+.ai-proposal .ai-scores { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 14px; margin-bottom: 10px; font-size: 11px; }
+.ai-proposal .ai-scores .sc { display: flex; justify-content: space-between; color: #d4d4d8; }
+.ai-proposal .ai-scores .sc .v.pos { color: #22c55e; font-weight: 600; }
+.ai-proposal .ai-scores .sc .v.neg { color: #ef4444; font-weight: 600; }
+.ai-proposal .ai-scores .sc .v.zero { color: #71717a; }
+.ai-proposal .ai-accept { background: #16a34a; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+.ai-proposal .ai-accept:hover { background: #15803d; }
+</style>
+</head>
+<body>
+<div class="sidebar">
+    <div class="sidebar-top">
+        <a href="../index.html" class="home-link" title="Retour à la page d'accueil">← Accueil</a>
+        <div class="book-badge">MedStudents Y2</div>
+        <h3>Choix du chapitre</h3>
+        <select id="chapter-select" class="chapter-select">
+            <option value="chapitre_1_premier_jour_de_stage.html">Chapitre 1 — Premier jour de stage</option><option value="chapitre_2_l_examen_qui_fait_peur.html" selected>Chapitre 2 — L'examen qui fait peur</option><option value="chapitre_3_secret_m_dical_et_famille.html">Chapitre 3 — Secret médical et famille</option>
+        </select>
+        <h3>Scénarios du chapitre 2</h3>
+        <input type="text" class="search" id="search" placeholder="EG-3 : Recherche par texte">
+        <button class="scene-btn" data-idx="0">2.1 Avant la ponction lombaire</button>
+
+    </div>
+    <div class="sidebar-actions">
+        <button class="export" id="save-btn">Valider et sauvegarder dans MedStudents_Y2_v1.json</button>
+        <button class="export export-secondary" id="export-btn">Télécharger (JSON)</button>
+        <div id="save-status"></div>
+    </div>
+</div>
+<div class="main">
+    <div class="panel-toggles">
+        <button class="panel-toggle-btn" id="toggle-left-panel" type="button">Masquer</button>
+        <button class="panel-toggle-btn" id="toggle-right-panel" type="button">Masquer</button>
+    </div>
+    <div id="network"></div>
+    <div class="hint">Molette : zoom — Glisser : déplacer — Survol nœud : infobulle complète</div>
+</div>
+<div class="editor">
+    <div class="mode-tabs">
+        <button class="mode-btn active" data-mode="edit">Édition</button>
+        <button class="mode-btn" data-mode="parcours">Parcours joueur</button>
+    </div>
+    <div class="panel-edit" id="panel-edit">
+        <h3 id="ed-title">Sélectionnez un scénario</h3>
+        <div id="ed-content"><div class="empty">Cliquez sur un scénario à gauche.</div></div>
+        <div id="validation"></div>
+    </div>
+    <div class="panel-parcours" id="panel-parcours">
+        <h3 id="parcours-title">Parcours joueur</h3>
+        <div id="parcours-content">
+            <div class="parcours-card">
+                <div class="parcours-end">Sélectionnez un scénario puis choisissez vos réponses. Votre chemin s'affichera en vert sur le graphe.</div>
+            </div>
+        </div>
+        <button class="parcours-restart" id="parcours-restart" style="display:none">Recommencer</button>
+    </div>
+</div>
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" crossorigin="anonymous"></script>
+<script>
+var chapterId = "2";
+var bookSlug = "medstudents_y2";
+var chaptersData = {"Chapters":[]};
+var scenesData = [];
+try {
+    chaptersData = {"Chapters": [{"Id": 2, "Name": "L'examen qui fait peur", "Intro": "Madame Costa doit subir une ponction lombaire. Elle est très anxieuse. Objectif pédagogique : informer avec clarté, accueillir la peur, respecter le consentement et savoir solliciter l'équipe.", "Scenes": [{"Id": 1, "Title": "2.1 Avant la ponction lombaire", "SceneIntroduction": "Vous devez expliquer à Madame Costa, 54 ans, le déroulement d'une ponction lombaire prescrite pour explorer ses céphalées. Elle est visiblement angoissée.", "Min": 8, "Interactions": [{"Id": 1, "Name": "1. Madame Costa vous interpelle", "Actor": {"Id": 13, "Name": "Madame Costa", "Age": 54, "Role": "Patiente hospitalisée — céphalées investiguées par PL", "History": "Enseignante en école primaire, mariée, deux filles. Consulte pour des céphalées persistantes depuis deux semaines. Une ponction lombaire est prévue pour éliminer une méningite ou une hémorragie méningée. Phobie des aiguilles depuis l'enfance, très anxieuse à l'idée du geste. Cherche à comprendre et à se sentir rassurée.", "ImageName": "MmeCosta.png"}, "Text": "« Alex, c'est ça ? On m'a dit que vous alliez m'expliquer la ponction lombaire… j'ai une trouille bleue des aiguilles. »", "AgentFacialExpression": "MmeCosta_worried.png", "Responses": [{"Id": 1, "Name": "« Oui, c'est moi. Je comprends que ça fasse peur — prenons le temps qu'il faut. ", "Text": "« Oui, c'est moi. Je comprends que ça fasse peur — prenons le temps qu'il faut. Que savez-vous déjà du geste ? »", "SoftSkillDimensions": {"RespectAndDignity": 2, "Empathy": 3, "Compassion": 3, "EmotionalRegulation": 2, "CommunicationClarity": 2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, "NextInteractionID": 2, "LegacyDimensions": {"Authenticity": 2, "Respect": 0, "Compassion": 3, "Hope": 1, "Empathy": 3}}, {"Id": 2, "Name": "« Ne vous inquiétez pas, ça ne fait presque pas mal. »", "Text": "« Ne vous inquiétez pas, ça ne fait presque pas mal. »", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": -1, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": -1, "InterprofessionalCollaboration": 0}, "NextInteractionID": 3, "LegacyDimensions": {"Authenticity": -3, "Respect": 0, "Compassion": 0, "Hope": 1, "Empathy": -1}}, {"Id": 3, "Name": "« Alors, on va vous piquer dans le dos entre deux vertèbres pour prélever du liq", "Text": "« Alors, on va vous piquer dans le dos entre deux vertèbres pour prélever du liquide céphalo-rachidien. »", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": -2, "Compassion": -2, "EmotionalRegulation": 0, "CommunicationClarity": 0, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, "NextInteractionID": 3, "LegacyDimensions": {"Authenticity": 0, "Respect": 0, "Compassion": 0, "Hope": 0, "Empathy": -2}}]}, {"Id": 2, "Name": "2. Madame Costa se livre", "Actor": {"Id": 13, "Name": "Madame Costa", "Age": 54, "Role": "Patiente hospitalisée — céphalées investiguées par PL", "History": "Enseignante en école primaire, mariée, deux filles. Consulte pour des céphalées persistantes depuis deux semaines. Une ponction lombaire est prévue pour éliminer une méningite ou une hémorragie méningée. Phobie des aiguilles depuis l'enfance, très anxieuse à l'idée du geste. Cherche à comprendre et à se sentir rassurée.", "ImageName": "MmeCosta.png"}, "Text": "« J'ai déjà fait un malaise lors d'une prise de sang il y a 10 ans… j'ai peur que ça recommence. »", "AgentFacialExpression": "MmeCosta_sad.png", "Responses": [{"Id": 1, "Name": "« Merci de me le dire, c'est précieux. On va pouvoir prévenir : je vais en parle", "Text": "« Merci de me le dire, c'est précieux. On va pouvoir prévenir : je vais en parler à l'équipe, on peut vous installer allongée, avec quelqu'un à côté. Ça vous rassure ? »", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": 3, "Compassion": 2, "EmotionalRegulation": 0, "CommunicationClarity": 3, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 3}, "NextInteractionID": 4, "LegacyDimensions": {"Authenticity": 2, "Respect": 2, "Compassion": 0, "Hope": 2, "Empathy": 3}}, {"Id": 2, "Name": "« Ça n'arrivera sûrement pas aujourd'hui. »", "Text": "« Ça n'arrivera sûrement pas aujourd'hui. »", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": -1, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, "NextInteractionID": 4, "LegacyDimensions": {"Authenticity": -2, "Respect": 0, "Compassion": 0, "Hope": -1, "Empathy": 0}}, {"Id": 3, "Name": "« Il faudra essayer de respirer calmement et tout ira bien. »", "Text": "« Il faudra essayer de respirer calmement et tout ira bien. »", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 0, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, "NextInteractionID": 4, "LegacyDimensions": {"Authenticity": 0, "Respect": 0, "Compassion": 0, "Hope": 1, "Empathy": 0}}]}, {"Id": 3, "Name": "3. Madame Costa panique", "Actor": {"Id": 13, "Name": "Madame Costa", "Age": 54, "Role": "Patiente hospitalisée — céphalées investiguées par PL", "History": "Enseignante en école primaire, mariée, deux filles. Consulte pour des céphalées persistantes depuis deux semaines. Une ponction lombaire est prévue pour éliminer une méningite ou une hémorragie méningée. Phobie des aiguilles depuis l'enfance, très anxieuse à l'idée du geste. Cherche à comprendre et à se sentir rassurée.", "ImageName": "MmeCosta.png"}, "Text": "Sa voix tremble : « Attendez, je ne suis pas sûre de vouloir faire ça… »", "AgentFacialExpression": "MmeCosta_fear.png", "Responses": [{"Id": 1, "Name": "« Vous avez tout à fait le droit de ne pas être sûre. On peut en reparler ensemb", "Text": "« Vous avez tout à fait le droit de ne pas être sûre. On peut en reparler ensemble — qu'est-ce qui vous fait le plus peur ? »", "SoftSkillDimensions": {"RespectAndDignity": 3, "Empathy": 3, "Compassion": 2, "EmotionalRegulation": 2, "CommunicationClarity": 3, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, "NextInteractionID": 2, "LegacyDimensions": {"Authenticity": 3, "Respect": 3, "Compassion": 0, "Hope": 0, "Empathy": 3}}, {"Id": 2, "Name": "« Il le faut, le médecin l'a prescrit. »", "Text": "« Il le faut, le médecin l'a prescrit. »", "SoftSkillDimensions": {"RespectAndDignity": -3, "Empathy": -2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": -2, "InterprofessionalCollaboration": 0}, "NextInteractionID": 4, "LegacyDimensions": {"Authenticity": 0, "Respect": -3, "Compassion": 0, "Hope": 0, "Empathy": 0}}, {"Id": 3, "Name": "« Je vais chercher le Dr Moreau pour qu'il vous réexplique. »", "Text": "« Je vais chercher le Dr Moreau pour qu'il vous réexplique. »", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": 2, "CommunicationClarity": 0, "ProfessionalBoundaries": 3, "InterprofessionalCollaboration": 3}, "NextInteractionID": 5, "LegacyDimensions": {"Authenticity": 2, "Respect": 2, "Compassion": 0, "Hope": 0, "Empathy": 0}}]}, {"Id": 4, "Name": "4. Vous expliquez le déroulement", "Actor": {"Id": 10, "Name": "Alex", "Age": 21, "Role": "Étudiant·e en 2e année de médecine", "History": "Alex est en 2e année de médecine et effectue son premier stage d'immersion hospitalière. Passionné·e par la relation médecin-patient, il/elle a suivi les cours de sémiologie, d'éthique et de communication. Alex est motivé·e mais manque encore d'expérience clinique et craint de ne pas être à la hauteur face aux patients.", "ImageName": "Alex.png"}, "Text": "Comment présentez-vous concrètement le déroulement du geste ?", "AgentFacialExpression": "Alex_neutral.png", "Responses": [{"Id": 1, "Name": "« Je vous explique étape par étape, et à chaque moment vous pouvez me demander d", "Text": "« Je vous explique étape par étape, et à chaque moment vous pouvez me demander de m'arrêter. Ça vous va ? »", "SoftSkillDimensions": {"RespectAndDignity": 3, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 3, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 0}, "NextInteractionID": 6, "LegacyDimensions": {"Authenticity": 2, "Respect": 3, "Compassion": 0, "Hope": 1, "Empathy": 2}}, {"Id": 2, "Name": "« L'aiguille fait environ 9 centimètres, elle traverse plusieurs plans avant le ", "Text": "« L'aiguille fait environ 9 centimètres, elle traverse plusieurs plans avant le liquide. »", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": -2, "Compassion": 0, "EmotionalRegulation": -2, "CommunicationClarity": -1, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, "NextInteractionID": 3, "LegacyDimensions": {"Authenticity": 2, "Respect": 0, "Compassion": 0, "Hope": -2, "Empathy": -2}}]}, {"Id": 5, "Name": "5. Dr Moreau réinterroge le consentement", "Actor": {"Id": 11, "Name": "Dr Moreau", "Age": 42, "Role": "Médecin-chef, service de médecine interne", "History": "Médecin interniste depuis 15 ans, pédagogue reconnu·e. Dr Moreau encadre les étudiants en stage avec bienveillance mais exige rigueur et respect des règles déontologiques. Aime les questions pertinentes et valorise l'humilité professionnelle.", "ImageName": "DrMoreau.png"}, "Text": "« Madame Costa, Alex m'a alerté·e. On peut tout à fait reprogrammer l'examen ou trouver une alternative. Votre accord est indispensable. »", "AgentFacialExpression": "DrMoreau_smile.png", "Responses": [{"Id": 1, "Name": "Vous observez et complétez : « Madame Costa, je suis vraiment désolé·e si j'ai é", "Text": "Vous observez et complétez : « Madame Costa, je suis vraiment désolé·e si j'ai été maladroit·e. »", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 3, "CommunicationClarity": 2, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 2}, "NextInteractionID": 6, "LegacyDimensions": {"Authenticity": 3, "Respect": 2, "Compassion": 0, "Hope": 0, "Empathy": 2}}, {"Id": 2, "Name": "Vous quittez la pièce sans rien dire.", "Text": "Vous quittez la pièce sans rien dire.", "SoftSkillDimensions": {"RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": -2, "CommunicationClarity": 0, "ProfessionalBoundaries": -1, "InterprofessionalCollaboration": -1}, "NextInteractionID": 6, "LegacyDimensions": {"Authenticity": -1, "Respect": -1, "Compassion": 0, "Hope": 0, "Empathy": 0}}]}, {"Id": 6, "Name": "6. Madame Costa donne son accord", "Actor": {"Id": 13, "Name": "Madame Costa", "Age": 54, "Role": "Patiente hospitalisée — céphalées investiguées par PL", "History": "Enseignante en école primaire, mariée, deux filles. Consulte pour des céphalées persistantes depuis deux semaines. Une ponction lombaire est prévue pour éliminer une méningite ou une hémorragie méningée. Phobie des aiguilles depuis l'enfance, très anxieuse à l'idée du geste. Cherche à comprendre et à se sentir rassurée.", "ImageName": "MmeCosta.png"}, "Text": "Elle respire, sourit faiblement : « D'accord, je vous fais confiance. Merci de m'avoir écoutée. »", "AgentFacialExpression": "MmeCosta_relief.png", "Responses": [{"Id": 1, "Name": "« C'est moi qui vous remercie de votre confiance. »", "Text": "« C'est moi qui vous remercie de votre confiance. »", "SoftSkillDimensions": {"RespectAndDignity": 2, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, "NextInteractionID": -1, "LegacyDimensions": {"Authenticity": 2, "Respect": 2, "Compassion": 0, "Hope": 2, "Empathy": 2}}]}]}]}]};
+    scenesData = [{"title": "2.1 Avant la ponction lombaire", "scene_id": 1, "scene_intro": "Vous devez expliquer à Madame Costa, 54 ans, le déroulement d'une ponction lombaire prescrite pour explorer ses céphalées. Elle est visiblement angoissée.", "nodes": [{"id": "C2_S1_I1", "label": "1 — 1. Madame Costa vous interpelle", "title": "[Madame Costa] « Alex, c'est ça ? On m'a dit que vous alliez m'expliquer la ponction lombaire… j'ai une trouille bleue des aiguilles. »", "interaction_id": "1"}, {"id": "C2_S1_I2", "label": "2 — 2. Madame Costa se livre", "title": "[Madame Costa] « J'ai déjà fait un malaise lors d'une prise de sang il y a 10 ans… j'ai peur que ça recommence. »", "interaction_id": "2"}, {"id": "C2_S1_I3", "label": "3 — 3. Madame Costa panique", "title": "[Madame Costa] Sa voix tremble : « Attendez, je ne suis pas sûre de vouloir faire ça… »", "interaction_id": "3"}, {"id": "C2_S1_I4", "label": "4 — 4. Vous expliquez le déroulement", "title": "[Alex] Comment présentez-vous concrètement le déroulement du geste ?", "interaction_id": "4"}, {"id": "C2_S1_I5", "label": "5 — 5. Dr Moreau réinterroge le consentem…", "title": "[Dr Moreau] « Madame Costa, Alex m'a alerté·e. On peut tout à fait reprogrammer l'examen ou trouver une alternative. Votre accord est indispensable. »", "interaction_id": "5"}, {"id": "C2_S1_I6", "label": "6 — 6. Madame Costa donne son accord", "title": "[Madame Costa] Elle respire, sourit faiblement : « D'accord, je vous fais confiance. Merci de m'avoir écoutée. »", "interaction_id": "6"}], "edges": [{"id": "C2_S1_I1_R0_>C2_S1_I2", "from": "C2_S1_I1", "to": "C2_S1_I2", "label": "R1", "title": "Réponse 1 — « Oui, c'est moi. Je comprends que ça fasse peur — prenons le temps qu'il faut. Que savez-vous déjà du geste ? »", "smooth": {"type": "curvedCW", "roundness": 0.0}}, {"id": "C2_S1_I1_R1_>C2_S1_I3", "from": "C2_S1_I1", "to": "C2_S1_I3", "label": "R2", "title": "Réponse 2 — « Ne vous inquiétez pas, ça ne fait presque pas mal. »", "smooth": {"type": "curvedCW", "roundness": 0.22}}, {"id": "C2_S1_I1_R2_>C2_S1_I3", "from": "C2_S1_I1", "to": "C2_S1_I3", "label": "R3", "title": "Réponse 3 — « Alors, on va vous piquer dans le dos entre deux vertèbres pour prélever du liquide céphalo-rachidien. »", "smooth": {"type": "curvedCCW", "roundness": 0.22}}, {"id": "C2_S1_I2_R0_>C2_S1_I4", "from": "C2_S1_I2", "to": "C2_S1_I4", "label": "R1", "title": "Réponse 1 — « Merci de me le dire, c'est précieux. On va pouvoir prévenir : je vais en parler à l'équipe, on peut vous installer allongée, avec quelqu'un à côté. Ça vous rassure ? »", "smooth": {"type": "curvedCW", "roundness": 0.22}}, {"id": "C2_S1_I2_R1_>C2_S1_I4", "from": "C2_S1_I2", "to": "C2_S1_I4", "label": "R2", "title": "Réponse 2 — « Ça n'arrivera sûrement pas aujourd'hui. »", "smooth": {"type": "curvedCCW", "roundness": 0.22}}, {"id": "C2_S1_I2_R2_>C2_S1_I4", "from": "C2_S1_I2", "to": "C2_S1_I4", "label": "R3", "title": "Réponse 3 — « Il faudra essayer de respirer calmement et tout ira bien. »", "smooth": {"type": "curvedCW", "roundness": 0.33}}, {"id": "C2_S1_I3_R0_>C2_S1_I2", "from": "C2_S1_I3", "to": "C2_S1_I2", "label": "R1", "title": "Réponse 1 — « Vous avez tout à fait le droit de ne pas être sûre. On peut en reparler ensemble — qu'est-ce qui vous fait le plus peur ? »", "smooth": {"type": "curvedCCW", "roundness": 0.31000000000000005}}, {"id": "C2_S1_I3_R1_>C2_S1_I4", "from": "C2_S1_I3", "to": "C2_S1_I4", "label": "R2", "title": "Réponse 2 — « Il le faut, le médecin l'a prescrit. »", "smooth": {"type": "curvedCW", "roundness": 0.0}}, {"id": "C2_S1_I3_R2_>C2_S1_I5", "from": "C2_S1_I3", "to": "C2_S1_I5", "label": "R3", "title": "Réponse 3 — « Je vais chercher le Dr Moreau pour qu'il vous réexplique. »", "smooth": {"type": "curvedCW", "roundness": 0.31000000000000005}}, {"id": "C2_S1_I4_R0_>C2_S1_I6", "from": "C2_S1_I4", "to": "C2_S1_I6", "label": "R1", "title": "Réponse 1 — « Je vous explique étape par étape, et à chaque moment vous pouvez me demander de m'arrêter. Ça vous va ? »", "smooth": {"type": "curvedCCW", "roundness": 0.26}}, {"id": "C2_S1_I4_R1_>C2_S1_I3", "from": "C2_S1_I4", "to": "C2_S1_I3", "label": "R2", "title": "Réponse 2 — « L'aiguille fait environ 9 centimètres, elle traverse plusieurs plans avant le liquide. »", "smooth": {"type": "curvedCW", "roundness": 0.26}}, {"id": "C2_S1_I5_R0_>C2_S1_I6", "from": "C2_S1_I5", "to": "C2_S1_I6", "label": "R1", "title": "Réponse 1 — Vous observez et complétez : « Madame Costa, je suis vraiment désolé·e si j'ai été maladroit·e. »", "smooth": {"type": "curvedCW", "roundness": 0.22}}, {"id": "C2_S1_I5_R1_>C2_S1_I6", "from": "C2_S1_I5", "to": "C2_S1_I6", "label": "R2", "title": "Réponse 2 — Vous quittez la pièce sans rien dire.", "smooth": {"type": "curvedCCW", "roundness": 0.22}}], "editor": "<div class=\"block\" data-interaction-id=\"1\" data-i=\"0\"><div class=\"header\"><span>Interaction 1 — Madame Costa</span><button type=\"button\" class=\"crud-btn crud-delete-interaction\" data-i=\"0\" title=\"Supprimer cette interaction\">✕</button></div><label>EG-4 : Name</label><textarea class=\"edit\" data-type=\"name\" data-i=\"0\" rows=\"1\">1. Madame Costa vous interpelle</textarea><label>EG-4 : Text</label><textarea class=\"edit\" data-type=\"text\" data-i=\"0\" rows=\"3\">« Alex, c'est ça ? On m'a dit que vous alliez m'expliquer la ponction lombaire… j'ai une trouille bleue des aiguilles. »</textarea><div class=\"responses-container\" data-i=\"0\"><div class=\"resp\" data-i=\"0\" data-r=\"0\"><div class=\"resp-header\"><label>Réponse 1 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"0\" data-r=\"0\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"0\" data-r=\"0\" rows=\"2\">« Oui, c'est moi. Je comprends que ça fasse peur — prenons le temps qu'il faut. Que savez-vous déjà du geste ? »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"0\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"0\" data-skill=\"RespectAndDignity\" value=\"2\"><span class=\"score-value\" data-i=\"0\" data-r=\"0\" data-skill=\"RespectAndDignity\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"0\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"0\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"0\" data-skill=\"Empathy\" value=\"3\"><span class=\"score-value\" data-i=\"0\" data-r=\"0\" data-skill=\"Empathy\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"0\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"0\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"0\" data-skill=\"Compassion\" value=\"3\"><span class=\"score-value\" data-i=\"0\" data-r=\"0\" data-skill=\"Compassion\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"0\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"0\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"0\" data-skill=\"EmotionalRegulation\" value=\"2\"><span class=\"score-value\" data-i=\"0\" data-r=\"0\" data-skill=\"EmotionalRegulation\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"0\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"0\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"0\" data-skill=\"CommunicationClarity\" value=\"2\"><span class=\"score-value\" data-i=\"0\" data-r=\"0\" data-skill=\"CommunicationClarity\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"0\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"0\" data-r=\"0\" value=\"2\"></div></div></div><div class=\"resp\" data-i=\"0\" data-r=\"1\"><div class=\"resp-header\"><label>Réponse 2 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"0\" data-r=\"1\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"0\" data-r=\"1\" rows=\"2\">« Ne vous inquiétez pas, ça ne fait presque pas mal. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"1\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"1\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"1\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"1\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"1\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"1\" data-skill=\"Empathy\" value=\"-1\"><span class=\"score-value\" data-i=\"0\" data-r=\"1\" data-skill=\"Empathy\">-1</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"1\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"1\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"1\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"1\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"1\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"1\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"1\" data-skill=\"EmotionalRegulation\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"1\" data-skill=\"EmotionalRegulation\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"1\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"1\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"1\" data-skill=\"CommunicationClarity\" value=\"-2\"><span class=\"score-value\" data-i=\"0\" data-r=\"1\" data-skill=\"CommunicationClarity\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"1\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\" value=\"-1\"><span class=\"score-value\" data-i=\"0\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">-1</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"0\" data-r=\"1\" value=\"3\"></div></div></div><div class=\"resp\" data-i=\"0\" data-r=\"2\"><div class=\"resp-header\"><label>Réponse 3 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"0\" data-r=\"2\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"0\" data-r=\"2\" rows=\"2\">« Alors, on va vous piquer dans le dos entre deux vertèbres pour prélever du liquide céphalo-rachidien. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"2\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"2\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"2\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"2\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"2\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"2\" data-skill=\"Empathy\" value=\"-2\"><span class=\"score-value\" data-i=\"0\" data-r=\"2\" data-skill=\"Empathy\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"2\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"2\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"2\" data-skill=\"Compassion\" value=\"-2\"><span class=\"score-value\" data-i=\"0\" data-r=\"2\" data-skill=\"Compassion\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"2\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"2\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"2\" data-skill=\"EmotionalRegulation\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"2\" data-skill=\"EmotionalRegulation\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"2\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"2\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"2\" data-skill=\"CommunicationClarity\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"2\" data-skill=\"CommunicationClarity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"2\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"0\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"0\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"0\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"0\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"0\" data-r=\"2\" value=\"3\"></div></div></div></div><button type=\"button\" class=\"crud-btn crud-add-response\" data-i=\"0\">+ Ajouter une réponse</button></div><div class=\"block\" data-interaction-id=\"2\" data-i=\"1\"><div class=\"header\"><span>Interaction 2 — Madame Costa</span><button type=\"button\" class=\"crud-btn crud-delete-interaction\" data-i=\"1\" title=\"Supprimer cette interaction\">✕</button></div><label>EG-4 : Name</label><textarea class=\"edit\" data-type=\"name\" data-i=\"1\" rows=\"1\">2. Madame Costa se livre</textarea><label>EG-4 : Text</label><textarea class=\"edit\" data-type=\"text\" data-i=\"1\" rows=\"3\">« J'ai déjà fait un malaise lors d'une prise de sang il y a 10 ans… j'ai peur que ça recommence. »</textarea><div class=\"responses-container\" data-i=\"1\"><div class=\"resp\" data-i=\"1\" data-r=\"0\"><div class=\"resp-header\"><label>Réponse 1 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"1\" data-r=\"0\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"1\" data-r=\"0\" rows=\"2\">« Merci de me le dire, c'est précieux. On va pouvoir prévenir : je vais en parler à l'équipe, on peut vous installer allongée, avec quelqu'un à côté. Ça vous rassure ? »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"0\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"0\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"0\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"0\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"0\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"0\" data-skill=\"Empathy\" value=\"3\"><span class=\"score-value\" data-i=\"1\" data-r=\"0\" data-skill=\"Empathy\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"0\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"0\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"0\" data-skill=\"Compassion\" value=\"2\"><span class=\"score-value\" data-i=\"1\" data-r=\"0\" data-skill=\"Compassion\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"0\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"0\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"0\" data-skill=\"EmotionalRegulation\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"0\" data-skill=\"EmotionalRegulation\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"0\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"0\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"0\" data-skill=\"CommunicationClarity\" value=\"3\"><span class=\"score-value\" data-i=\"1\" data-r=\"0\" data-skill=\"CommunicationClarity\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"0\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\" value=\"2\"><span class=\"score-value\" data-i=\"1\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\" value=\"3\"><span class=\"score-value\" data-i=\"1\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"1\" data-r=\"0\" value=\"4\"></div></div></div><div class=\"resp\" data-i=\"1\" data-r=\"1\"><div class=\"resp-header\"><label>Réponse 2 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"1\" data-r=\"1\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"1\" data-r=\"1\" rows=\"2\">« Ça n'arrivera sûrement pas aujourd'hui. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"1\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"1\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"1\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"1\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"1\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"1\" data-skill=\"Empathy\" value=\"-1\"><span class=\"score-value\" data-i=\"1\" data-r=\"1\" data-skill=\"Empathy\">-1</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"1\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"1\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"1\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"1\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"1\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"1\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"1\" data-skill=\"EmotionalRegulation\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"1\" data-skill=\"EmotionalRegulation\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"1\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"1\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"1\" data-skill=\"CommunicationClarity\" value=\"-2\"><span class=\"score-value\" data-i=\"1\" data-r=\"1\" data-skill=\"CommunicationClarity\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"1\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"1\" data-r=\"1\" value=\"4\"></div></div></div><div class=\"resp\" data-i=\"1\" data-r=\"2\"><div class=\"resp-header\"><label>Réponse 3 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"1\" data-r=\"2\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"1\" data-r=\"2\" rows=\"2\">« Il faudra essayer de respirer calmement et tout ira bien. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"2\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"2\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"2\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"2\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"2\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"2\" data-skill=\"Empathy\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"2\" data-skill=\"Empathy\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"2\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"2\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"2\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"2\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"2\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"2\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"2\" data-skill=\"EmotionalRegulation\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"2\" data-skill=\"EmotionalRegulation\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"2\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"2\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"2\" data-skill=\"CommunicationClarity\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"2\" data-skill=\"CommunicationClarity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"2\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"1\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"1\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"1\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"1\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"1\" data-r=\"2\" value=\"4\"></div></div></div></div><button type=\"button\" class=\"crud-btn crud-add-response\" data-i=\"1\">+ Ajouter une réponse</button></div><div class=\"block\" data-interaction-id=\"3\" data-i=\"2\"><div class=\"header\"><span>Interaction 3 — Madame Costa</span><button type=\"button\" class=\"crud-btn crud-delete-interaction\" data-i=\"2\" title=\"Supprimer cette interaction\">✕</button></div><label>EG-4 : Name</label><textarea class=\"edit\" data-type=\"name\" data-i=\"2\" rows=\"1\">3. Madame Costa panique</textarea><label>EG-4 : Text</label><textarea class=\"edit\" data-type=\"text\" data-i=\"2\" rows=\"3\">Sa voix tremble : « Attendez, je ne suis pas sûre de vouloir faire ça… »</textarea><div class=\"responses-container\" data-i=\"2\"><div class=\"resp\" data-i=\"2\" data-r=\"0\"><div class=\"resp-header\"><label>Réponse 1 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"2\" data-r=\"0\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"2\" data-r=\"0\" rows=\"2\">« Vous avez tout à fait le droit de ne pas être sûre. On peut en reparler ensemble — qu'est-ce qui vous fait le plus peur ? »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"0\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"0\" data-skill=\"RespectAndDignity\" value=\"3\"><span class=\"score-value\" data-i=\"2\" data-r=\"0\" data-skill=\"RespectAndDignity\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"0\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"0\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"0\" data-skill=\"Empathy\" value=\"3\"><span class=\"score-value\" data-i=\"2\" data-r=\"0\" data-skill=\"Empathy\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"0\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"0\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"0\" data-skill=\"Compassion\" value=\"2\"><span class=\"score-value\" data-i=\"2\" data-r=\"0\" data-skill=\"Compassion\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"0\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"0\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"0\" data-skill=\"EmotionalRegulation\" value=\"2\"><span class=\"score-value\" data-i=\"2\" data-r=\"0\" data-skill=\"EmotionalRegulation\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"0\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"0\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"0\" data-skill=\"CommunicationClarity\" value=\"3\"><span class=\"score-value\" data-i=\"2\" data-r=\"0\" data-skill=\"CommunicationClarity\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"0\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"2\" data-r=\"0\" value=\"2\"></div></div></div><div class=\"resp\" data-i=\"2\" data-r=\"1\"><div class=\"resp-header\"><label>Réponse 2 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"2\" data-r=\"1\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"2\" data-r=\"1\" rows=\"2\">« Il le faut, le médecin l'a prescrit. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"1\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"1\" data-skill=\"RespectAndDignity\" value=\"-3\"><span class=\"score-value\" data-i=\"2\" data-r=\"1\" data-skill=\"RespectAndDignity\">-3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"1\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"1\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"1\" data-skill=\"Empathy\" value=\"-2\"><span class=\"score-value\" data-i=\"2\" data-r=\"1\" data-skill=\"Empathy\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"1\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"1\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"1\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"1\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"1\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"1\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"1\" data-skill=\"EmotionalRegulation\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"1\" data-skill=\"EmotionalRegulation\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"1\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"1\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"1\" data-skill=\"CommunicationClarity\" value=\"-2\"><span class=\"score-value\" data-i=\"2\" data-r=\"1\" data-skill=\"CommunicationClarity\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"1\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\" value=\"-2\"><span class=\"score-value\" data-i=\"2\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"2\" data-r=\"1\" value=\"4\"></div></div></div><div class=\"resp\" data-i=\"2\" data-r=\"2\"><div class=\"resp-header\"><label>Réponse 3 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"2\" data-r=\"2\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"2\" data-r=\"2\" rows=\"2\">« Je vais chercher le Dr Moreau pour qu'il vous réexplique. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"2\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"2\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"2\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"2\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"2\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"2\" data-skill=\"Empathy\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"2\" data-skill=\"Empathy\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"2\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"2\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"2\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"2\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"2\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"2\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"2\" data-skill=\"EmotionalRegulation\" value=\"2\"><span class=\"score-value\" data-i=\"2\" data-r=\"2\" data-skill=\"EmotionalRegulation\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"2\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"2\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"2\" data-skill=\"CommunicationClarity\" value=\"0\"><span class=\"score-value\" data-i=\"2\" data-r=\"2\" data-skill=\"CommunicationClarity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"2\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\" value=\"3\"><span class=\"score-value\" data-i=\"2\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"2\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"2\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"2\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\" value=\"3\"><span class=\"score-value\" data-i=\"2\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"2\" data-r=\"2\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"2\" data-r=\"2\" value=\"5\"></div></div></div></div><button type=\"button\" class=\"crud-btn crud-add-response\" data-i=\"2\">+ Ajouter une réponse</button></div><div class=\"block\" data-interaction-id=\"4\" data-i=\"3\"><div class=\"header\"><span>Interaction 4 — Alex</span><button type=\"button\" class=\"crud-btn crud-delete-interaction\" data-i=\"3\" title=\"Supprimer cette interaction\">✕</button></div><label>EG-4 : Name</label><textarea class=\"edit\" data-type=\"name\" data-i=\"3\" rows=\"1\">4. Vous expliquez le déroulement</textarea><label>EG-4 : Text</label><textarea class=\"edit\" data-type=\"text\" data-i=\"3\" rows=\"3\">Comment présentez-vous concrètement le déroulement du geste ?</textarea><div class=\"responses-container\" data-i=\"3\"><div class=\"resp\" data-i=\"3\" data-r=\"0\"><div class=\"resp-header\"><label>Réponse 1 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"3\" data-r=\"0\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"3\" data-r=\"0\" rows=\"2\">« Je vous explique étape par étape, et à chaque moment vous pouvez me demander de m'arrêter. Ça vous va ? »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"0\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"0\" data-skill=\"RespectAndDignity\" value=\"3\"><span class=\"score-value\" data-i=\"3\" data-r=\"0\" data-skill=\"RespectAndDignity\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"0\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"0\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"0\" data-skill=\"Empathy\" value=\"2\"><span class=\"score-value\" data-i=\"3\" data-r=\"0\" data-skill=\"Empathy\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"0\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"0\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"0\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"3\" data-r=\"0\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"0\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"0\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"0\" data-skill=\"EmotionalRegulation\" value=\"0\"><span class=\"score-value\" data-i=\"3\" data-r=\"0\" data-skill=\"EmotionalRegulation\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"0\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"0\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"0\" data-skill=\"CommunicationClarity\" value=\"3\"><span class=\"score-value\" data-i=\"3\" data-r=\"0\" data-skill=\"CommunicationClarity\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"0\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\" value=\"2\"><span class=\"score-value\" data-i=\"3\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"3\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"3\" data-r=\"0\" value=\"6\"></div></div></div><div class=\"resp\" data-i=\"3\" data-r=\"1\"><div class=\"resp-header\"><label>Réponse 2 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"3\" data-r=\"1\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"3\" data-r=\"1\" rows=\"2\">« L'aiguille fait environ 9 centimètres, elle traverse plusieurs plans avant le liquide. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"1\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"1\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"3\" data-r=\"1\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"1\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"1\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"1\" data-skill=\"Empathy\" value=\"-2\"><span class=\"score-value\" data-i=\"3\" data-r=\"1\" data-skill=\"Empathy\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"1\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"1\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"1\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"3\" data-r=\"1\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"1\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"1\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"1\" data-skill=\"EmotionalRegulation\" value=\"-2\"><span class=\"score-value\" data-i=\"3\" data-r=\"1\" data-skill=\"EmotionalRegulation\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"1\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"1\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"1\" data-skill=\"CommunicationClarity\" value=\"-1\"><span class=\"score-value\" data-i=\"3\" data-r=\"1\" data-skill=\"CommunicationClarity\">-1</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"1\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\" value=\"0\"><span class=\"score-value\" data-i=\"3\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"3\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"3\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"3\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"3\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"3\" data-r=\"1\" value=\"3\"></div></div></div></div><button type=\"button\" class=\"crud-btn crud-add-response\" data-i=\"3\">+ Ajouter une réponse</button></div><div class=\"block\" data-interaction-id=\"5\" data-i=\"4\"><div class=\"header\"><span>Interaction 5 — Dr Moreau</span><button type=\"button\" class=\"crud-btn crud-delete-interaction\" data-i=\"4\" title=\"Supprimer cette interaction\">✕</button></div><label>EG-4 : Name</label><textarea class=\"edit\" data-type=\"name\" data-i=\"4\" rows=\"1\">5. Dr Moreau réinterroge le consentement</textarea><label>EG-4 : Text</label><textarea class=\"edit\" data-type=\"text\" data-i=\"4\" rows=\"3\">« Madame Costa, Alex m'a alerté·e. On peut tout à fait reprogrammer l'examen ou trouver une alternative. Votre accord est indispensable. »</textarea><div class=\"responses-container\" data-i=\"4\"><div class=\"resp\" data-i=\"4\" data-r=\"0\"><div class=\"resp-header\"><label>Réponse 1 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"4\" data-r=\"0\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"4\" data-r=\"0\" rows=\"2\">Vous observez et complétez : « Madame Costa, je suis vraiment désolé·e si j'ai été maladroit·e. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"0\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"0\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"4\" data-r=\"0\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"0\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"0\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"0\" data-skill=\"Empathy\" value=\"2\"><span class=\"score-value\" data-i=\"4\" data-r=\"0\" data-skill=\"Empathy\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"0\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"0\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"0\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"4\" data-r=\"0\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"0\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"0\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"0\" data-skill=\"EmotionalRegulation\" value=\"3\"><span class=\"score-value\" data-i=\"4\" data-r=\"0\" data-skill=\"EmotionalRegulation\">3</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"0\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"0\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"0\" data-skill=\"CommunicationClarity\" value=\"2\"><span class=\"score-value\" data-i=\"4\" data-r=\"0\" data-skill=\"CommunicationClarity\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"0\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\" value=\"2\"><span class=\"score-value\" data-i=\"4\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\" value=\"2\"><span class=\"score-value\" data-i=\"4\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"4\" data-r=\"0\" value=\"6\"></div></div></div><div class=\"resp\" data-i=\"4\" data-r=\"1\"><div class=\"resp-header\"><label>Réponse 2 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"4\" data-r=\"1\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"4\" data-r=\"1\" rows=\"2\">Vous quittez la pièce sans rien dire.</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"1\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"1\" data-skill=\"RespectAndDignity\" value=\"0\"><span class=\"score-value\" data-i=\"4\" data-r=\"1\" data-skill=\"RespectAndDignity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"1\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"1\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"1\" data-skill=\"Empathy\" value=\"0\"><span class=\"score-value\" data-i=\"4\" data-r=\"1\" data-skill=\"Empathy\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"1\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"1\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"1\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"4\" data-r=\"1\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"1\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"1\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"1\" data-skill=\"EmotionalRegulation\" value=\"-2\"><span class=\"score-value\" data-i=\"4\" data-r=\"1\" data-skill=\"EmotionalRegulation\">-2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"1\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"1\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"1\" data-skill=\"CommunicationClarity\" value=\"0\"><span class=\"score-value\" data-i=\"4\" data-r=\"1\" data-skill=\"CommunicationClarity\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"1\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\" value=\"-1\"><span class=\"score-value\" data-i=\"4\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">-1</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"1\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"4\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"4\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\" value=\"-1\"><span class=\"score-value\" data-i=\"4\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">-1</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"4\" data-r=\"1\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"4\" data-r=\"1\" value=\"6\"></div></div></div></div><button type=\"button\" class=\"crud-btn crud-add-response\" data-i=\"4\">+ Ajouter une réponse</button></div><div class=\"block\" data-interaction-id=\"6\" data-i=\"5\"><div class=\"header\"><span>Interaction 6 — Madame Costa</span><button type=\"button\" class=\"crud-btn crud-delete-interaction\" data-i=\"5\" title=\"Supprimer cette interaction\">✕</button></div><label>EG-4 : Name</label><textarea class=\"edit\" data-type=\"name\" data-i=\"5\" rows=\"1\">6. Madame Costa donne son accord</textarea><label>EG-4 : Text</label><textarea class=\"edit\" data-type=\"text\" data-i=\"5\" rows=\"3\">Elle respire, sourit faiblement : « D'accord, je vous fais confiance. Merci de m'avoir écoutée. »</textarea><div class=\"responses-container\" data-i=\"5\"><div class=\"resp\" data-i=\"5\" data-r=\"0\"><div class=\"resp-header\"><label>Réponse 1 — Text</label><button type=\"button\" class=\"crud-btn crud-delete-response\" data-i=\"5\" data-r=\"0\" title=\"Supprimer cette réponse\">✕</button></div><textarea class=\"edit\" data-type=\"response\" data-i=\"5\" data-r=\"0\" rows=\"2\">« C'est moi qui vous remercie de votre confiance. »</textarea><div class=\"scores\"><div class=\"score-item\"><label>RespectAndDignity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"5\" data-r=\"0\" data-skill=\"RespectAndDignity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"5\" data-r=\"0\" data-skill=\"RespectAndDignity\" value=\"2\"><span class=\"score-value\" data-i=\"5\" data-r=\"0\" data-skill=\"RespectAndDignity\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"5\" data-r=\"0\" data-skill=\"RespectAndDignity\">+</button></div></div><div class=\"score-item\"><label>Empathy</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"5\" data-r=\"0\" data-skill=\"Empathy\">-</button><input type=\"hidden\" class=\"score\" data-i=\"5\" data-r=\"0\" data-skill=\"Empathy\" value=\"2\"><span class=\"score-value\" data-i=\"5\" data-r=\"0\" data-skill=\"Empathy\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"5\" data-r=\"0\" data-skill=\"Empathy\">+</button></div></div><div class=\"score-item\"><label>Compassion</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"5\" data-r=\"0\" data-skill=\"Compassion\">-</button><input type=\"hidden\" class=\"score\" data-i=\"5\" data-r=\"0\" data-skill=\"Compassion\" value=\"0\"><span class=\"score-value\" data-i=\"5\" data-r=\"0\" data-skill=\"Compassion\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"5\" data-r=\"0\" data-skill=\"Compassion\">+</button></div></div><div class=\"score-item\"><label>EmotionalRegulation</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"5\" data-r=\"0\" data-skill=\"EmotionalRegulation\">-</button><input type=\"hidden\" class=\"score\" data-i=\"5\" data-r=\"0\" data-skill=\"EmotionalRegulation\" value=\"0\"><span class=\"score-value\" data-i=\"5\" data-r=\"0\" data-skill=\"EmotionalRegulation\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"5\" data-r=\"0\" data-skill=\"EmotionalRegulation\">+</button></div></div><div class=\"score-item\"><label>CommunicationClarity</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"5\" data-r=\"0\" data-skill=\"CommunicationClarity\">-</button><input type=\"hidden\" class=\"score\" data-i=\"5\" data-r=\"0\" data-skill=\"CommunicationClarity\" value=\"2\"><span class=\"score-value\" data-i=\"5\" data-r=\"0\" data-skill=\"CommunicationClarity\">2</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"5\" data-r=\"0\" data-skill=\"CommunicationClarity\">+</button></div></div><div class=\"score-item\"><label>ProfessionalBoundaries</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"5\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">-</button><input type=\"hidden\" class=\"score\" data-i=\"5\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\" value=\"0\"><span class=\"score-value\" data-i=\"5\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"5\" data-r=\"0\" data-skill=\"ProfessionalBoundaries\">+</button></div></div><div class=\"score-item\"><label>InterprofessionalCollaboration</label><div class=\"score-stepper\"><button type=\"button\" class=\"score-btn score-minus\" data-i=\"5\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">-</button><input type=\"hidden\" class=\"score\" data-i=\"5\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\" value=\"0\"><span class=\"score-value\" data-i=\"5\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">0</span><button type=\"button\" class=\"score-btn score-plus\" data-i=\"5\" data-r=\"0\" data-skill=\"InterprofessionalCollaboration\">+</button></div></div><div class=\"score-item next-id-item\"><label>Next Id</label><input type=\"number\" class=\"next-id\" data-i=\"5\" data-r=\"0\" value=\"-1\"></div></div></div></div><button type=\"button\" class=\"crud-btn crud-add-response\" data-i=\"5\">+ Ajouter une réponse</button></div><div class=\"add-interaction-container\"><button type=\"button\" class=\"crud-btn crud-add-interaction\">+ Ajouter une interaction</button></div>", "parcours": [{"node_id": "C2_S1_I1", "actor": "Madame Costa", "text": "« Alex, c'est ça ? On m'a dit que vous alliez m'expliquer la ponction lombaire… j'ai une trouille bleue des aiguilles. »", "image": "MmeCosta_worried.png", "responses": [{"text": "« Oui, c'est moi. Je comprends que ça fasse peur — prenons le temps qu'il faut. Que savez-vous déjà du geste ? »", "next_id": "2", "target_node_id": "C2_S1_I2", "edge_id": "C2_S1_I1_R0_>C2_S1_I2", "RespectAndDignity": 2, "Empathy": 3, "Compassion": 3, "EmotionalRegulation": 2, "CommunicationClarity": 2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, {"text": "« Ne vous inquiétez pas, ça ne fait presque pas mal. »", "next_id": "3", "target_node_id": "C2_S1_I3", "edge_id": "C2_S1_I1_R1_>C2_S1_I3", "RespectAndDignity": 0, "Empathy": -1, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": -1, "InterprofessionalCollaboration": 0}, {"text": "« Alors, on va vous piquer dans le dos entre deux vertèbres pour prélever du liquide céphalo-rachidien. »", "next_id": "3", "target_node_id": "C2_S1_I3", "edge_id": "C2_S1_I1_R2_>C2_S1_I3", "RespectAndDignity": 0, "Empathy": -2, "Compassion": -2, "EmotionalRegulation": 0, "CommunicationClarity": 0, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}]}, {"node_id": "C2_S1_I2", "actor": "Madame Costa", "text": "« J'ai déjà fait un malaise lors d'une prise de sang il y a 10 ans… j'ai peur que ça recommence. »", "image": "MmeCosta_sad.png", "responses": [{"text": "« Merci de me le dire, c'est précieux. On va pouvoir prévenir : je vais en parler à l'équipe, on peut vous installer allongée, avec quelqu'un à côté. Ça vous rassure ? »", "next_id": "4", "target_node_id": "C2_S1_I4", "edge_id": "C2_S1_I2_R0_>C2_S1_I4", "RespectAndDignity": 0, "Empathy": 3, "Compassion": 2, "EmotionalRegulation": 0, "CommunicationClarity": 3, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 3}, {"text": "« Ça n'arrivera sûrement pas aujourd'hui. »", "next_id": "4", "target_node_id": "C2_S1_I4", "edge_id": "C2_S1_I2_R1_>C2_S1_I4", "RespectAndDignity": 0, "Empathy": -1, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, {"text": "« Il faudra essayer de respirer calmement et tout ira bien. »", "next_id": "4", "target_node_id": "C2_S1_I4", "edge_id": "C2_S1_I2_R2_>C2_S1_I4", "RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 0, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}]}, {"node_id": "C2_S1_I4", "actor": "Alex", "text": "Comment présentez-vous concrètement le déroulement du geste ?", "image": "Alex_neutral.png", "responses": [{"text": "« Je vous explique étape par étape, et à chaque moment vous pouvez me demander de m'arrêter. Ça vous va ? »", "next_id": "6", "target_node_id": "C2_S1_I6", "edge_id": "C2_S1_I4_R0_>C2_S1_I6", "RespectAndDignity": 3, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 3, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 0}, {"text": "« L'aiguille fait environ 9 centimètres, elle traverse plusieurs plans avant le liquide. »", "next_id": "3", "target_node_id": "C2_S1_I3", "edge_id": "C2_S1_I4_R1_>C2_S1_I3", "RespectAndDignity": 0, "Empathy": -2, "Compassion": 0, "EmotionalRegulation": -2, "CommunicationClarity": -1, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}]}, {"node_id": "C2_S1_I6", "actor": "Madame Costa", "text": "Elle respire, sourit faiblement : « D'accord, je vous fais confiance. Merci de m'avoir écoutée. »", "image": "MmeCosta_relief.png", "responses": [{"text": "« C'est moi qui vous remercie de votre confiance. »", "next_id": "-1", "target_node_id": "", "edge_id": "", "RespectAndDignity": 2, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}]}, {"node_id": "C2_S1_I3", "actor": "Madame Costa", "text": "Sa voix tremble : « Attendez, je ne suis pas sûre de vouloir faire ça… »", "image": "MmeCosta_fear.png", "responses": [{"text": "« Vous avez tout à fait le droit de ne pas être sûre. On peut en reparler ensemble — qu'est-ce qui vous fait le plus peur ? »", "next_id": "2", "target_node_id": "C2_S1_I2", "edge_id": "C2_S1_I3_R0_>C2_S1_I2", "RespectAndDignity": 3, "Empathy": 3, "Compassion": 2, "EmotionalRegulation": 2, "CommunicationClarity": 3, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, {"text": "« Il le faut, le médecin l'a prescrit. »", "next_id": "4", "target_node_id": "C2_S1_I4", "edge_id": "C2_S1_I3_R1_>C2_S1_I4", "RespectAndDignity": -3, "Empathy": -2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": -2, "InterprofessionalCollaboration": 0}, {"text": "« Je vais chercher le Dr Moreau pour qu'il vous réexplique. »", "next_id": "5", "target_node_id": "C2_S1_I5", "edge_id": "C2_S1_I3_R2_>C2_S1_I5", "RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": 2, "CommunicationClarity": 0, "ProfessionalBoundaries": 3, "InterprofessionalCollaboration": 3}]}, {"node_id": "C2_S1_I5", "actor": "Dr Moreau", "text": "« Madame Costa, Alex m'a alerté·e. On peut tout à fait reprogrammer l'examen ou trouver une alternative. Votre accord est indispensable. »", "image": "DrMoreau_smile.png", "responses": [{"text": "Vous observez et complétez : « Madame Costa, je suis vraiment désolé·e si j'ai été maladroit·e. »", "next_id": "6", "target_node_id": "C2_S1_I6", "edge_id": "C2_S1_I5_R0_>C2_S1_I6", "RespectAndDignity": 0, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 3, "CommunicationClarity": 2, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 2}, {"text": "Vous quittez la pièce sans rien dire.", "next_id": "6", "target_node_id": "C2_S1_I6", "edge_id": "C2_S1_I5_R1_>C2_S1_I6", "RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": -2, "CommunicationClarity": 0, "ProfessionalBoundaries": -1, "InterprofessionalCollaboration": -1}]}], "id_to_parcours": {"1": {"node_id": "C2_S1_I1", "actor": "Madame Costa", "text": "« Alex, c'est ça ? On m'a dit que vous alliez m'expliquer la ponction lombaire… j'ai une trouille bleue des aiguilles. »", "image": "MmeCosta_worried.png", "responses": [{"text": "« Oui, c'est moi. Je comprends que ça fasse peur — prenons le temps qu'il faut. Que savez-vous déjà du geste ? »", "next_id": "2", "target_node_id": "C2_S1_I2", "edge_id": "C2_S1_I1_R0_>C2_S1_I2", "RespectAndDignity": 2, "Empathy": 3, "Compassion": 3, "EmotionalRegulation": 2, "CommunicationClarity": 2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, {"text": "« Ne vous inquiétez pas, ça ne fait presque pas mal. »", "next_id": "3", "target_node_id": "C2_S1_I3", "edge_id": "C2_S1_I1_R1_>C2_S1_I3", "RespectAndDignity": 0, "Empathy": -1, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": -1, "InterprofessionalCollaboration": 0}, {"text": "« Alors, on va vous piquer dans le dos entre deux vertèbres pour prélever du liquide céphalo-rachidien. »", "next_id": "3", "target_node_id": "C2_S1_I3", "edge_id": "C2_S1_I1_R2_>C2_S1_I3", "RespectAndDignity": 0, "Empathy": -2, "Compassion": -2, "EmotionalRegulation": 0, "CommunicationClarity": 0, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}]}, "2": {"node_id": "C2_S1_I2", "actor": "Madame Costa", "text": "« J'ai déjà fait un malaise lors d'une prise de sang il y a 10 ans… j'ai peur que ça recommence. »", "image": "MmeCosta_sad.png", "responses": [{"text": "« Merci de me le dire, c'est précieux. On va pouvoir prévenir : je vais en parler à l'équipe, on peut vous installer allongée, avec quelqu'un à côté. Ça vous rassure ? »", "next_id": "4", "target_node_id": "C2_S1_I4", "edge_id": "C2_S1_I2_R0_>C2_S1_I4", "RespectAndDignity": 0, "Empathy": 3, "Compassion": 2, "EmotionalRegulation": 0, "CommunicationClarity": 3, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 3}, {"text": "« Ça n'arrivera sûrement pas aujourd'hui. »", "next_id": "4", "target_node_id": "C2_S1_I4", "edge_id": "C2_S1_I2_R1_>C2_S1_I4", "RespectAndDignity": 0, "Empathy": -1, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, {"text": "« Il faudra essayer de respirer calmement et tout ira bien. »", "next_id": "4", "target_node_id": "C2_S1_I4", "edge_id": "C2_S1_I2_R2_>C2_S1_I4", "RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 0, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}]}, "4": {"node_id": "C2_S1_I4", "actor": "Alex", "text": "Comment présentez-vous concrètement le déroulement du geste ?", "image": "Alex_neutral.png", "responses": [{"text": "« Je vous explique étape par étape, et à chaque moment vous pouvez me demander de m'arrêter. Ça vous va ? »", "next_id": "6", "target_node_id": "C2_S1_I6", "edge_id": "C2_S1_I4_R0_>C2_S1_I6", "RespectAndDignity": 3, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 3, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 0}, {"text": "« L'aiguille fait environ 9 centimètres, elle traverse plusieurs plans avant le liquide. »", "next_id": "3", "target_node_id": "C2_S1_I3", "edge_id": "C2_S1_I4_R1_>C2_S1_I3", "RespectAndDignity": 0, "Empathy": -2, "Compassion": 0, "EmotionalRegulation": -2, "CommunicationClarity": -1, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}]}, "6": {"node_id": "C2_S1_I6", "actor": "Madame Costa", "text": "Elle respire, sourit faiblement : « D'accord, je vous fais confiance. Merci de m'avoir écoutée. »", "image": "MmeCosta_relief.png", "responses": [{"text": "« C'est moi qui vous remercie de votre confiance. »", "next_id": "-1", "target_node_id": "", "edge_id": "", "RespectAndDignity": 2, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": 2, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}]}, "3": {"node_id": "C2_S1_I3", "actor": "Madame Costa", "text": "Sa voix tremble : « Attendez, je ne suis pas sûre de vouloir faire ça… »", "image": "MmeCosta_fear.png", "responses": [{"text": "« Vous avez tout à fait le droit de ne pas être sûre. On peut en reparler ensemble — qu'est-ce qui vous fait le plus peur ? »", "next_id": "2", "target_node_id": "C2_S1_I2", "edge_id": "C2_S1_I3_R0_>C2_S1_I2", "RespectAndDignity": 3, "Empathy": 3, "Compassion": 2, "EmotionalRegulation": 2, "CommunicationClarity": 3, "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0}, {"text": "« Il le faut, le médecin l'a prescrit. »", "next_id": "4", "target_node_id": "C2_S1_I4", "edge_id": "C2_S1_I3_R1_>C2_S1_I4", "RespectAndDignity": -3, "Empathy": -2, "Compassion": 0, "EmotionalRegulation": 0, "CommunicationClarity": -2, "ProfessionalBoundaries": -2, "InterprofessionalCollaboration": 0}, {"text": "« Je vais chercher le Dr Moreau pour qu'il vous réexplique. »", "next_id": "5", "target_node_id": "C2_S1_I5", "edge_id": "C2_S1_I3_R2_>C2_S1_I5", "RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": 2, "CommunicationClarity": 0, "ProfessionalBoundaries": 3, "InterprofessionalCollaboration": 3}]}, "5": {"node_id": "C2_S1_I5", "actor": "Dr Moreau", "text": "« Madame Costa, Alex m'a alerté·e. On peut tout à fait reprogrammer l'examen ou trouver une alternative. Votre accord est indispensable. »", "image": "DrMoreau_smile.png", "responses": [{"text": "Vous observez et complétez : « Madame Costa, je suis vraiment désolé·e si j'ai été maladroit·e. »", "next_id": "6", "target_node_id": "C2_S1_I6", "edge_id": "C2_S1_I5_R0_>C2_S1_I6", "RespectAndDignity": 0, "Empathy": 2, "Compassion": 0, "EmotionalRegulation": 3, "CommunicationClarity": 2, "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 2}, {"text": "Vous quittez la pièce sans rien dire.", "next_id": "6", "target_node_id": "C2_S1_I6", "edge_id": "C2_S1_I5_R1_>C2_S1_I6", "RespectAndDignity": 0, "Empathy": 0, "Compassion": 0, "EmotionalRegulation": -2, "CommunicationClarity": 0, "ProfessionalBoundaries": -1, "InterprofessionalCollaboration": -1}]}}}];
+} catch (e) {
+    console.error("Erreur chargement données:", e);
+}
+var container = document.getElementById("network");
+var network = null;
+var nodesDS = null;
+var edgesDS = null;
+var currentSceneIdx = 0;
+var currentMode = "edit";
+var leftPanelHidden = false;
+var rightPanelHidden = false;
+var sceneNodePositions = {};
+var cacheSaveTimer = null;
+var cacheKey = "eol_graph_cache_v4_book_" + String(bookSlug || "default") + "_chapter_" + String(chapterId || "");
+var SCORE_SKILLS = ["RespectAndDignity", "Empathy", "Compassion", "EmotionalRegulation", "CommunicationClarity", "ProfessionalBoundaries", "InterprofessionalCollaboration"];
+var parcoursPath = { nodes: [], edges: [] };
+var parcoursCurrent = null;
+var parcoursScores = { RespectAndDignity: 0, Empathy: 0, Compassion: 0, EmotionalRegulation: 0, CommunicationClarity: 0, ProfessionalBoundaries: 0, InterprofessionalCollaboration: 0 };
+
+function getScenePositionKey(idx) {
+    var s = scenesData[idx];
+    if (!s) return String(idx || 0);
+    return s.scene_id != null ? String(s.scene_id) : String(idx || 0);
+}
+
+function scheduleCacheSave() {
+    if (cacheSaveTimer) clearTimeout(cacheSaveTimer);
+    cacheSaveTimer = setTimeout(function() {
+        saveCacheToLocalStorage();
+    }, 120);
+}
+
+function saveCacheToLocalStorage() {
+    try {
+        var payload = {
+            version: 1,
+            chapterId: chapterId,
+            currentSceneIdx: currentSceneIdx,
+            currentMode: currentMode,
+            leftPanelHidden: leftPanelHidden,
+            rightPanelHidden: rightPanelHidden,
+            chaptersData: chaptersData,
+            sceneNodePositions: sceneNodePositions
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(payload));
+    } catch (err) {
+        console.warn("saveCacheToLocalStorage:", err);
+    }
+}
+
+function restoreCacheFromLocalStorage() {
+    try {
+        var raw = localStorage.getItem(cacheKey);
+        if (!raw) return;
+        var parsed = JSON.parse(raw);
+        if (!parsed || parsed.chapterId !== chapterId) return;
+        if (parsed.chaptersData && parsed.chaptersData.Chapters && parsed.chaptersData.Chapters.length > 0) {
+            chaptersData = parsed.chaptersData;
+        }
+        if (parsed.sceneNodePositions && typeof parsed.sceneNodePositions === "object") {
+            sceneNodePositions = parsed.sceneNodePositions;
+        }
+        if (typeof parsed.currentSceneIdx === "number") {
+            currentSceneIdx = parsed.currentSceneIdx;
+        }
+        if (parsed.currentMode === "edit" || parsed.currentMode === "parcours") {
+            currentMode = parsed.currentMode;
+        }
+        leftPanelHidden = !!parsed.leftPanelHidden;
+        rightPanelHidden = !!parsed.rightPanelHidden;
+    } catch (err) {
+        console.warn("restoreCacheFromLocalStorage:", err);
+    }
+}
+
+function saveCurrentScenePositions() {
+    try {
+        if (!network || !nodesDS) return;
+        var ids = nodesDS.getIds();
+        if (!ids || ids.length === 0) return;
+        var key = getScenePositionKey(currentSceneIdx);
+        sceneNodePositions[key] = network.getPositions(ids);
+        scheduleCacheSave();
+    } catch (err) {
+        console.warn("saveCurrentScenePositions:", err);
+    }
+}
+
+function applyCurrentScenePositions(idx) {
+    try {
+        if (!network || !nodesDS) return;
+        var key = getScenePositionKey(idx);
+        var pos = sceneNodePositions[key];
+        if (!pos) return;
+        Object.keys(pos).forEach(function(nodeId) {
+            var p = pos[nodeId];
+            if (p && typeof p.x === "number" && typeof p.y === "number") {
+                network.moveNode(nodeId, p.x, p.y);
+            }
+        });
+    } catch (err) {
+        console.warn("applyCurrentScenePositions:", err);
+    }
+}
+
+function updatePanelToggleButtons() {
+    var leftBtn = document.getElementById("toggle-left-panel");
+    var rightBtn = document.getElementById("toggle-right-panel");
+    if (leftBtn) leftBtn.textContent = leftPanelHidden ? "Afficher" : "Masquer";
+    if (rightBtn) rightBtn.textContent = rightPanelHidden ? "Afficher" : "Masquer";
+}
+
+function applyPanelVisibility() {
+    var sidebar = document.querySelector(".sidebar");
+    var editor = document.querySelector(".editor");
+    if (sidebar) sidebar.classList.toggle("hidden-panel", leftPanelHidden);
+    if (editor) editor.classList.toggle("hidden-panel", rightPanelHidden);
+    updatePanelToggleButtons();
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll(".mode-btn").forEach(function(b) { b.classList.toggle("active", b.dataset.mode === mode); });
+    document.getElementById("panel-edit").classList.toggle("hidden", mode !== "edit");
+    document.getElementById("panel-parcours").classList.toggle("active", mode === "parcours");
+    if (mode === "parcours" && scenesData.length > 0) {
+        parcoursPath = { nodes: [], edges: [] };
+        parcoursCurrent = null;
+        parcoursScores = { RespectAndDignity: 0, Empathy: 0, Compassion: 0, EmotionalRegulation: 0, CommunicationClarity: 0, ProfessionalBoundaries: 0, InterprofessionalCollaboration: 0 };
+        showParcoursScene(currentSceneIdx);
+    } else {
+        parcoursPath = { nodes: [], edges: [] };
+        parcoursCurrent = null;
+        if (nodesDS && edgesDS) highlightPath();
+    }
+    scheduleCacheSave();
+}
+
+function showParcoursScene(idx) {
+    var s = scenesData[idx];
+    document.getElementById("parcours-title").textContent = s.title + " — Parcours joueur";
+    if (!s.parcours || s.parcours.length === 0) {
+        document.getElementById("parcours-content").innerHTML = '<div class="parcours-card"><div class="parcours-end">Aucune interaction dans ce scénario.</div></div>';
+        document.getElementById("parcours-restart").style.display = "none";
+        return;
+    }
+    parcoursPath = { nodes: [], edges: [] };
+    parcoursScores = { RespectAndDignity: 0, Empathy: 0, Compassion: 0, EmotionalRegulation: 0, CommunicationClarity: 0, ProfessionalBoundaries: 0, InterprofessionalCollaboration: 0 };
+    parcoursCurrent = s.parcours[0];
+    renderParcours(s);
+    highlightPath();
+}
+
+function esc(s) { if (!s) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function renderParcours(s) {
+    var ia = parcoursCurrent;
+    if (!ia) {
+        var totalsHtml = '<div class="parcours-card"><div class="parcours-end">Fin de cette branche.</div>';
+        if (parcoursPath.nodes.length > 0) {
+            totalsHtml += '<div class="parcours-totals"><h4>Score total du parcours</h4>';
+            var labels = { RespectAndDignity: "Respect et dignité", Empathy: "Empathie", Compassion: "Compassion", EmotionalRegulation: "Régulation émotionnelle", CommunicationClarity: "Clarté communication", ProfessionalBoundaries: "Frontières pro.", InterprofessionalCollaboration: "Collab. interpro." };
+            for (var k in parcoursScores) {
+                var v = parcoursScores[k];
+                var cls = v > 0 ? "positive" : (v < 0 ? "negative" : "zero");
+                totalsHtml += '<div class="score-line ' + cls + '">' + (labels[k] || k) + ': ' + (v >= 0 ? '+' : '') + v + '</div>';
+            }
+            totalsHtml += '</div>';
+        }
+        totalsHtml += '</div>';
+        document.getElementById("parcours-content").innerHTML = totalsHtml;
+        document.getElementById("parcours-restart").style.display = parcoursPath.nodes.length > 0 ? "block" : "none";
+        return;
+    }
+    var imgHtml = (ia.image) ? '<img class="parcours-image" src="/api/data/images/' + esc(ia.image) + '" alt="" />' : '';
+    var html = '<div class="parcours-card">' + imgHtml + '<span class="actor">' + esc(ia.actor) + '</span><div class="text">' + esc(ia.text || "—") + '</div>';
+    if (ia.responses && ia.responses.length > 0) {
+        ia.responses.forEach(function(r, i) {
+            var label = r.text || ("→ I" + r.next_id);
+            var scores = { RespectAndDignity: r.RespectAndDignity||0, Empathy: r.Empathy||0, Compassion: r.Compassion||0, EmotionalRegulation: r.EmotionalRegulation||0, CommunicationClarity: r.CommunicationClarity||0, ProfessionalBoundaries: r.ProfessionalBoundaries||0, InterprofessionalCollaboration: r.InterprofessionalCollaboration||0 };
+            html += '<button class="parcours-choice" data-next="' + r.next_id + '" data-target="' + esc(r.target_node_id || "") + '" data-edge="' + esc(r.edge_id || "") + '" data-scores="' + esc(JSON.stringify(scores)) + '">' + esc(label) + '</button>';
+        });
+    } else {
+        html += '<div class="parcours-end">Fin de cette branche.</div>';
+    }
+    html += '</div>';
+
+    // Affichage du score courant du parcours (mise à jour en direct)
+    var labels = { RespectAndDignity: "Respect et dignité", Empathy: "Empathie", Compassion: "Compassion", EmotionalRegulation: "Régulation émotionnelle", CommunicationClarity: "Clarté communication", ProfessionalBoundaries: "Frontières pro.", InterprofessionalCollaboration: "Collab. interpro." };
+    var liveTotals = '<div class="parcours-totals"><h4>Score courant du parcours</h4>';
+    for (var k in parcoursScores) {
+        var v = parcoursScores[k] || 0;
+        var cls = v > 0 ? "positive" : (v < 0 ? "negative" : "zero");
+        liveTotals += '<div class="score-line ' + cls + '">' + (labels[k] || k) + ': ' + (v >= 0 ? '+' : '') + v + '</div>';
+    }
+    liveTotals += '</div>';
+    html += liveTotals;
+    document.getElementById("parcours-content").innerHTML = html;
+    document.getElementById("parcours-restart").style.display = parcoursPath.nodes.length > 0 ? "block" : "none";
+    document.querySelectorAll(".parcours-choice").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            var scores = JSON.parse(this.dataset.scores || "{}");
+            for (var k in scores) parcoursScores[k] = (parcoursScores[k] || 0) + (parseInt(scores[k]) || 0);
+            var nextId = this.dataset.next;
+            var edgeId = this.dataset.edge;
+            if (parcoursCurrent && parcoursCurrent.node_id) parcoursPath.nodes.push(parcoursCurrent.node_id);
+            if (edgeId) parcoursPath.edges.push(edgeId);
+            parcoursCurrent = s.id_to_parcours && nextId !== "-1" && nextId !== "" ? s.id_to_parcours[nextId] : null;
+            if (parcoursCurrent) parcoursPath.nodes.push(parcoursCurrent.node_id);
+            renderParcours(s);
+            highlightPath();
+        });
+    });
+}
+
+function highlightPath() {
+    try {
+        if (!nodesDS || !edgesDS) return;
+        var pathNodes = parcoursPath.nodes || [];
+        var pathEdges = parcoursPath.edges || [];
+        var curNode = parcoursCurrent ? parcoursCurrent.node_id : null;
+        nodesDS.getIds().forEach(function(nid) {
+            var node = nodesDS.get(nid) || {};
+            var isRoot = !!node.is_root;
+            var inPath = pathNodes.indexOf(nid) >= 0;
+            var isCurrent = curNode === nid;
+            var bg;
+            var border;
+            if (inPath) {
+                bg = "#166534";
+                border = isCurrent ? "#fbbf24" : "#22c55e";
+            } else if (isRoot) {
+                bg = "#451a1a";
+                border = "#f97373";
+            } else {
+                bg = "#27272a";
+                border = "#38bdf8";
+            }
+            nodesDS.update({ id: nid, color: { background: bg, border: border } });
+        });
+        edgesDS.getIds().forEach(function(eid) {
+            var inPath = pathEdges.indexOf(eid) >= 0;
+            edgesDS.update({ id: eid, color: inPath ? "#4ade80" : "#9ca3af" });
+        });
+    } catch (err) { console.warn("highlightPath:", err); }
+}
+
+function showOnlySelectedBlock(interactionId) {
+    var blocks = Array.prototype.slice.call(document.querySelectorAll("#ed-content .block"));
+    if (!blocks.length) return;
+    var target = interactionId ? String(interactionId) : "";
+    var selected = null;
+    blocks.forEach(function(block) {
+        var isMatch = target && block.dataset.interactionId === target;
+        block.style.display = isMatch ? "block" : "none";
+        block.classList.toggle("active", isMatch);
+        if (isMatch) selected = block;
+    });
+    if (!selected) {
+        selected = blocks[0];
+        selected.style.display = "block";
+        selected.classList.add("active");
+    }
+}
+
+function getInteractionIdFromNodeId(nodeId) {
+    if (!nodeId || !nodesDS) return "";
+    var node = nodesDS.get(nodeId);
+    if (node && node.interaction_id != null) return String(node.interaction_id);
+    var raw = String(nodeId);
+    var pos = raw.lastIndexOf("_I");
+    if (pos >= 0) return raw.substring(pos + 2);
+    return "";
+}
+
+function showScene(idx) {
+    if (idx < 0 || idx >= scenesData.length) return;
+    if (network && nodesDS && idx !== currentSceneIdx) saveCurrentScenePositions();
+    currentSceneIdx = idx;
+    scheduleCacheSave();
+    document.querySelectorAll(".scene-btn").forEach(function(b) {
+        b.classList.toggle("active", parseInt(b.dataset.idx) === idx);
+    });
+    var s = scenesData[idx];
+    document.getElementById("ed-title").textContent = s.title;
+
+    rebuildSceneGraph(idx);
+    rebuildEditorHtml(idx);
+    showOnlySelectedBlock(null);
+
+    var opts = {
+        nodes: { font: { size: 38, color: "#f9fafb", face: "system-ui, -apple-system, sans-serif", bold: true }, shape: "box", color: { background: "#18181b", border: "#38bdf8" }, margin: 32, borderWidth: 2, widthConstraint: { minimum: 260, maximum: 360 } },
+        edges: {
+            arrows: "to",
+            width: 2,
+            hoverWidth: 3,
+            selectionWidth: 5,
+            smooth: { enabled: true, type: "dynamic", roundness: 0.35 },
+            color: "#9ca3af",
+            font: {
+                color: "#a5b4fc",
+                size: 14,
+                align: "top",
+                face: "system-ui, sans-serif",
+                strokeWidth: 0
+            }
+        },
+        layout: { hierarchical: { enabled: true, direction: "UD", sortMethod: "directed", levelSeparation: 420, nodeSpacing: 560, treeSpacing: 520, blockShifting: true, edgeMinimization: true, parentCentralization: true } },
+        physics: { enabled: false },
+        interaction: { zoomView: true, dragView: true, zoomSpeed: 0.35 }
+    };
+
+    if (!network) {
+        nodesDS = new vis.DataSet(scenesData[idx].nodes);
+        edgesDS = new vis.DataSet(scenesData[idx].edges);
+        network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, opts);
+        network.once("afterDrawing", function() { network.fit({ animation: { duration: 400 }, scale: 1.6 }); });
+        setTimeout(function() { if (network) { network.redraw(); network.fit({ scale: 1.6 }); } }, 300);
+        setTimeout(function() { applyCurrentScenePositions(idx); }, 360);
+        network.on("click", function(params) {
+            if (params.nodes && params.nodes.length > 0) {
+                var nid = String(params.nodes[0]);
+                var iaId = getInteractionIdFromNodeId(nid);
+                if (iaId) {
+                    showOnlySelectedBlock(iaId);
+                    var block = document.querySelector('.block[data-interaction-id="' + iaId + '"]');
+                    if (block) {
+                        block.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                }
+            } else if (params.edges && params.edges.length > 0) {
+                var eid = String(params.edges[0]);
+                focusResponseByEdgeId(eid);
+            }
+        });
+        network.on("dragEnd", function(params) {
+            if (params && params.nodes && params.nodes.length > 0) saveCurrentScenePositions();
+        });
+    } else {
+        setTimeout(function() {
+            if (network) {
+                network.fit({ animation: { duration: 300 }, scale: 1.3 });
+                applyCurrentScenePositions(idx);
+            }
+        }, 220);
+    }
+
+    updateValidation();
+    if (document.getElementById("panel-parcours").classList.contains("active")) {
+        parcoursPath = { nodes: [], edges: [] };
+        parcoursCurrent = null;
+        showParcoursScene(idx);
+    } else {
+        highlightPath();
+    }
+}
+
+function hydrateEditorFieldsFromData(idx) {
+    var chapter = (chaptersData && chaptersData.Chapters && chaptersData.Chapters[0]) ? chaptersData.Chapters[0] : null;
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[idx]) return;
+    var sc = chapter.Scenes[idx];
+    var intro = document.querySelector('#ed-content textarea.edit[data-type="intro"]');
+    if (intro) intro.value = sc.SceneIntroduction || "";
+    (sc.Interactions || []).forEach(function(ia, i) {
+        var nameEl = document.querySelector('#ed-content textarea.edit[data-type="name"][data-i="' + i + '"]');
+        if (nameEl) nameEl.value = ia.Name || "";
+        var textEl = document.querySelector('#ed-content textarea.edit[data-type="text"][data-i="' + i + '"]');
+        if (textEl) textEl.value = ia.Text || "";
+        (ia.Responses || []).forEach(function(r, rIdx) {
+            var respEl = document.querySelector('#ed-content textarea.edit[data-type="response"][data-i="' + i + '"][data-r="' + rIdx + '"]');
+            if (respEl) respEl.value = r.Text || "";
+            var nextEl = document.querySelector('#ed-content .next-id[data-i="' + i + '"][data-r="' + rIdx + '"]');
+            if (nextEl) {
+                var nextVal = r.NextInteractionID;
+                nextEl.value = (nextVal == null) ? "" : String(nextVal);
+            }
+            SCORE_SKILLS.forEach(function(skill) {
+                var v = parseInt(r[skill], 10);
+                if (isNaN(v)) v = 0;
+                var hidden = document.querySelector('#ed-content .score[data-i="' + i + '"][data-r="' + rIdx + '"][data-skill="' + skill + '"]');
+                if (hidden) hidden.value = String(v);
+                var valueEl = document.querySelector('#ed-content .score-value[data-i="' + i + '"][data-r="' + rIdx + '"][data-skill="' + skill + '"]');
+                if (valueEl) valueEl.textContent = String(v);
+            });
+        });
+    });
+}
+
+function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function focusResponseByEdgeId(edgeId) {
+    try {
+        if (!edgeId) return;
+        var edge = edgesDS ? edgesDS.get(edgeId) : null;
+        if (!edge) return;
+        var iaId = getInteractionIdFromNodeId(edge.from);
+        var m = String(edgeId).match(/_R(\d+)_>/);
+        var rIdx = m ? parseInt(m[1], 10) : -1;
+        if (!iaId || rIdx < 0) return;
+        showOnlySelectedBlock(iaId);
+        var block = document.querySelector('.block[data-interaction-id="' + iaId + '"]');
+        if (!block) return;
+        var textarea = block.querySelector('textarea.edit[data-type="response"][data-r="' + rIdx + '"]');
+        if (!textarea) return;
+        textarea.scrollIntoView({ behavior: "smooth", block: "center" });
+        textarea.focus();
+        block.classList.add("highlight-edge");
+        setTimeout(function() { block.classList.remove("highlight-edge"); }, 1500);
+    } catch (e) {
+        console.warn("focusResponseByEdgeId:", e);
+    }
+}
+
+function attachEditors(idx) {
+    var ch = chaptersData.Chapters[0];
+    var sc = ch.Scenes[idx];
+    document.querySelectorAll("#ed-content .edit").forEach(function(el) {
+        el.addEventListener("input", function() {
+            var type = this.dataset.type;
+            var i = parseInt(this.dataset.i);
+            if (type === "intro") {
+                sc.SceneIntroduction = this.value;
+            } else if (type === "name") {
+                sc.Interactions[i].Name = this.value;
+            } else if (type === "text") {
+                sc.Interactions[i].Text = this.value;
+                sc.Interactions[i].Name = this.value.substring(0, 50);
+            } else if (type === "response") {
+                var r = parseInt(this.dataset.r);
+                sc.Interactions[i].Responses[r].Text = this.value;
+                sc.Interactions[i].Responses[r].Name = this.value.substring(0, 80);
+            }
+            scheduleCacheSave();
+        });
+    });
+    document.querySelectorAll("#ed-content .score-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            var i = parseInt(this.dataset.i), r = parseInt(this.dataset.r), skill = this.dataset.skill;
+            var hidden = document.querySelector('.score[data-i="' + i + '"][data-r="' + r + '"][data-skill="' + skill + '"]');
+            var valueEl = document.querySelector('.score-value[data-i="' + i + '"][data-r="' + r + '"][data-skill="' + skill + '"]');
+            if (!hidden || !valueEl) return;
+            var v = parseInt(hidden.value) || 0;
+            v += this.classList.contains("score-plus") ? 1 : -1;
+            if (v < -3) v = -3;
+            if (v > 3) v = 3;
+            hidden.value = String(v);
+            valueEl.textContent = String(v);
+            var resp = sc.Interactions[i].Responses[r];
+            resp[skill] = v;
+            if (resp.SoftSkillDimensions) resp.SoftSkillDimensions[skill] = v;
+            scheduleCacheSave();
+        });
+    });
+    document.querySelectorAll("#ed-content .next-id").forEach(function(el) {
+        el.addEventListener("change", function() {
+            var i = parseInt(this.dataset.i), r = parseInt(this.dataset.r);
+            var raw = (this.value || "").trim();
+            if (raw === "") {
+                delete sc.Interactions[i].Responses[r].NextInteractionID;
+                scheduleCacheSave();
+                return;
+            }
+            var v = parseInt(raw, 10);
+            if (isNaN(v)) {
+                this.value = "";
+                delete sc.Interactions[i].Responses[r].NextInteractionID;
+                scheduleCacheSave();
+                return;
+            }
+            sc.Interactions[i].Responses[r].NextInteractionID = v;
+            scheduleCacheSave();
+        });
+    });
+}
+
+function updateValidation() {
+    var errs = [];
+    var ch = chaptersData.Chapters[0];
+    ch.Scenes.forEach(function(sc) {
+        var ids = {};
+        sc.Interactions.forEach(function(ia) { ids[ia.Id] = true; });
+        sc.Interactions.forEach(function(ia) {
+            (ia.Responses || []).forEach(function(r) {
+                var nid = r.NextInteractionID;
+                if (nid != null && nid !== -1 && !ids[nid]) errs.push("EG-7: NextInteractionID " + nid + " invalide (scène " + sc.Title + ")");
+            });
+        });
+    });
+    var div = document.getElementById("validation");
+    if (errs.length > 0) {
+        div.className = "validation";
+        div.textContent = errs.join(" ; ");
+    } else {
+        div.className = "validation ok";
+        div.textContent = "EG-7 : Validation OK — NextInteractionID valides.";
+    }
+}
+
+document.querySelectorAll(".scene-btn").forEach(function(b) {
+    b.addEventListener("click", function() { showScene(parseInt(this.dataset.idx)); });
+});
+
+document.getElementById("chapter-select").addEventListener("change", function() {
+    var target = (this.value || "").trim();
+    if (target) {
+        saveCurrentScenePositions();
+        saveCacheToLocalStorage();
+        window.location.href = target;
+    }
+});
+
+document.querySelectorAll(".mode-btn").forEach(function(b) {
+    b.addEventListener("click", function() { setMode(this.dataset.mode); });
+});
+
+document.getElementById("toggle-left-panel").addEventListener("click", function() {
+    leftPanelHidden = !leftPanelHidden;
+    applyPanelVisibility();
+    scheduleCacheSave();
+});
+
+document.getElementById("toggle-right-panel").addEventListener("click", function() {
+    rightPanelHidden = !rightPanelHidden;
+    applyPanelVisibility();
+    scheduleCacheSave();
+});
+
+document.getElementById("parcours-restart").addEventListener("click", function() {
+    if (scenesData.length > 0) showParcoursScene(currentSceneIdx);
+});
+
+document.getElementById("search").addEventListener("input", function() {
+    var q = (this.value || "").toLowerCase();
+    document.querySelectorAll(".scene-btn").forEach(function(b) {
+        b.style.display = q && b.textContent.toLowerCase().indexOf(q) < 0 ? "none" : "block";
+    });
+    if (scenesData && scenesData.length > 0) {
+        var vis = (this.value || "").toLowerCase();
+        if (vis && nodesDS && edgesDS) {
+            var nodeIds = nodesDS.getIds();
+            nodeIds.forEach(function(nid) {
+                var node = nodesDS.get(nid);
+                var match = (node.label && node.label.toLowerCase().indexOf(vis) >= 0) || (node.title && node.title.toLowerCase().indexOf(vis) >= 0);
+                nodesDS.update({ id: nid, hidden: !match });
+            });
+        } else if (nodesDS) {
+            nodesDS.getIds().forEach(function(nid) { nodesDS.update({ id: nid, hidden: false }); });
+        }
+    }
+});
+
+window.addEventListener("beforeunload", function() {
+    saveCurrentScenePositions();
+    saveCacheToLocalStorage();
+});
+
+document.getElementById("save-btn").addEventListener("click", function() {
+    var btn = this;
+    var statusEl = document.getElementById("save-status");
+    btn.disabled = true;
+    statusEl.className = "";
+    statusEl.textContent = "Enregistrement…";
+    fetch("/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ book_slug: bookSlug, Chapters: chaptersData.Chapters })
+    }).then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+        btn.disabled = false;
+        if (result.ok) {
+            statusEl.className = "save-ok";
+            statusEl.textContent = result.data.message || "Sauvegardé.";
+        } else {
+            statusEl.className = "save-err";
+            statusEl.textContent = result.data.error || "Erreur. Utilisez python app.py pour activer la sauvegarde directe.";
+        }
+    }).catch(function(err) {
+        btn.disabled = false;
+        statusEl.className = "save-err";
+        statusEl.textContent = "Erreur réseau. Lancez python app.py puis ouvrez http://localhost:8765";
+    });
+});
+
+document.getElementById("export-btn").addEventListener("click", function() {
+    var blob = new Blob([JSON.stringify(chaptersData, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Chapitre_" + chapterId + "_modified.json";
+    a.click();
+});
+
+function confirmDialog(msg) {
+    return new Promise(function(resolve) {
+        var ov = document.createElement("div");
+        ov.className = "confirm-overlay";
+        ov.innerHTML = '<div class="confirm-box"><p>' + escapeHtml(msg) + '</p><div class="confirm-actions"><button class="confirm-yes">Supprimer</button><button class="confirm-no">Annuler</button></div></div>';
+        document.body.appendChild(ov);
+        ov.querySelector(".confirm-yes").addEventListener("click", function() { document.body.removeChild(ov); resolve(true); });
+        ov.querySelector(".confirm-no").addEventListener("click", function() { document.body.removeChild(ov); resolve(false); });
+    });
+}
+
+function getNextInteractionId(sc) {
+    var maxId = 0;
+    (sc.Interactions || []).forEach(function(ia) { if (ia.Id > maxId) maxId = ia.Id; });
+    return maxId + 1;
+}
+
+function getNextResponseId(ia) {
+    var maxId = 0;
+    (ia.Responses || []).forEach(function(r) { if (r.Id > maxId) maxId = r.Id; });
+    return maxId + 1;
+}
+
+function rebuildSceneGraph(idx) {
+    var chapter = chaptersData.Chapters[0];
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[idx]) return;
+    var sc = chapter.Scenes[idx];
+    var chId = chapter.Id;
+    var interactions = sc.Interactions || [];
+    var idToIa = {};
+    interactions.forEach(function(ia) { idToIa[ia.Id] = ia; });
+
+    var newNodes = [];
+    var newEdges = [];
+    interactions.forEach(function(ia) {
+        var actorName = (ia.Actor || {}).Name || "?";
+        var text = ia.Text || "";
+        var name = ia.Name || text.substring(0, 50);
+        var nodeId = "C" + chId + "_S" + sc.Id + "_I" + ia.Id;
+        var baseLabel = name || text || "—";
+        if (baseLabel.length > 38) baseLabel = baseLabel.substring(0, 37) + "…";
+        var label = ia.Id + " — " + baseLabel;
+        var title = "[" + actorName + "] " + (text || name);
+        newNodes.push({ id: nodeId, label: label, title: title, interaction_id: String(ia.Id) });
+        var respList = ia.Responses || [];
+        var respCount = respList.length;
+        respList.forEach(function(r, rIdx) {
+            var nextId = r.NextInteractionID;
+            if (nextId == null || nextId === -1) return;
+            if (!idToIa[nextId]) return;
+            var targetNodeId = "C" + chId + "_S" + sc.Id + "_I" + nextId;
+            var edgeId = nodeId + "_R" + rIdx + "_>" + targetNodeId;
+            var rText = (r.Text || "").trim();
+            var edgeTitle = "Réponse " + (rIdx + 1);
+            if (rText) edgeTitle += " — " + rText;
+
+            // Courbure latérale par flèche : on alterne curvedCW / curvedCCW
+            // et on fait croître le rayon avec l'index de la réponse, pour que
+            // plusieurs flèches partant du même bloc (ou allant vers la même
+            // cible) soient visuellement séparées au lieu de se superposer.
+            var direction = (rIdx % 2 === 0) ? "curvedCW" : "curvedCCW";
+            var roundness;
+            if (respCount <= 1) {
+                roundness = 0.2;
+            } else {
+                // 0.20, 0.35, 0.50, 0.65... plafonné à 0.85
+                roundness = 0.20 + (Math.floor(rIdx / 2) * 0.15);
+                if (roundness > 0.85) roundness = 0.85;
+            }
+            // Boucle arrière ou latérale (cible <= source) : on force un rayon
+            // plus grand pour que la flèche passe franchement sur le côté.
+            var isBackOrLateral = parseInt(nextId, 10) <= parseInt(ia.Id, 10);
+            if (isBackOrLateral) {
+                roundness = Math.max(roundness, 0.55 + (rIdx * 0.1));
+                if (roundness > 0.95) roundness = 0.95;
+            }
+
+            newEdges.push({
+                id: edgeId,
+                from: nodeId,
+                to: targetNodeId,
+                label: "R" + (rIdx + 1),
+                title: edgeTitle,
+                smooth: { enabled: true, type: direction, roundness: roundness }
+            });
+        });
+    });
+
+    var targets = {};
+    newEdges.forEach(function(e) { targets[e.to] = true; });
+    var firstNodeId = interactions.length > 0 ? "C" + chId + "_S" + sc.Id + "_I" + interactions[0].Id : null;
+    newNodes.forEach(function(n) {
+        if (!targets[n.id] && n.id !== firstNodeId) {
+            n.is_root = true;
+            n.color = { background: "#451a1a", border: "#f97373" };
+        } else {
+            n.color = { background: "#27272a", border: "#38bdf8" };
+        }
+    });
+
+    scenesData[idx].nodes = newNodes;
+    scenesData[idx].edges = newEdges;
+
+    if (nodesDS && edgesDS) {
+        nodesDS.clear();
+        edgesDS.clear();
+        newNodes.forEach(function(n) { nodesDS.add(n); });
+        newEdges.forEach(function(e) { edgesDS.add(e); });
+    }
+    highlightPath();
+    updateValidation();
+}
+
+function rebuildEditorHtml(idx) {
+    var chapter = chaptersData.Chapters[0];
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[idx]) return;
+    var sc = chapter.Scenes[idx];
+
+    var introValue = sc.SceneIntroduction || "";
+    var introHtml = '<div class="scene-intro"><label>EG-4 : SceneIntroduction</label><textarea class="edit" data-type="intro" rows="3">' + escapeHtml(introValue) + '</textarea></div>';
+
+    var blocksHtml = "";
+    var skills = SCORE_SKILLS;
+    (sc.Interactions || []).forEach(function(ia, i) {
+        var actor = (ia.Actor || {}).Name || "";
+        var text = ia.Text || "";
+        var name = ia.Name || text.substring(0, 50);
+        var b = '<div class="block" data-interaction-id="' + ia.Id + '" data-i="' + i + '">';
+        b += '<div class="header"><span>Interaction ' + ia.Id + ' — ' + escapeHtml(actor) + '</span>';
+        b += '<button type="button" class="crud-btn crud-delete-interaction" data-i="' + i + '" title="Supprimer cette interaction">✕</button></div>';
+        b += '<label>EG-4 : Name</label>';
+        b += '<textarea class="edit" data-type="name" data-i="' + i + '" rows="1">' + escapeHtml(name) + '</textarea>';
+        b += '<label>EG-4 : Text</label>';
+        b += '<textarea class="edit" data-type="text" data-i="' + i + '" rows="3">' + escapeHtml(text) + '</textarea>';
+        b += '<div class="responses-container" data-i="' + i + '">';
+        (ia.Responses || []).forEach(function(r, rIdx) {
+            var rtext = r.Text || "";
+            var nextId = r.NextInteractionID;
+            b += '<div class="resp" data-i="' + i + '" data-r="' + rIdx + '">';
+            b += '<div class="resp-header"><label>Réponse ' + (rIdx + 1) + ' — Text</label>';
+            b += '<button type="button" class="crud-btn crud-delete-response" data-i="' + i + '" data-r="' + rIdx + '" title="Supprimer cette réponse">✕</button></div>';
+            b += '<textarea class="edit" data-type="response" data-i="' + i + '" data-r="' + rIdx + '" rows="2">' + escapeHtml(rtext) + '</textarea>';
+            b += '<div class="scores">';
+            skills.forEach(function(sk) {
+                var dims = r.SoftSkillDimensions || {};
+                var val = dims[sk] != null ? dims[sk] : (r[sk] != null ? r[sk] : 0);
+                b += '<div class="score-item"><label>' + sk + '</label>';
+                b += '<div class="score-stepper">';
+                b += '<button type="button" class="score-btn score-minus" data-i="' + i + '" data-r="' + rIdx + '" data-skill="' + sk + '">-</button>';
+                b += '<input type="hidden" class="score" data-i="' + i + '" data-r="' + rIdx + '" data-skill="' + sk + '" value="' + val + '">';
+                b += '<span class="score-value" data-i="' + i + '" data-r="' + rIdx + '" data-skill="' + sk + '">' + val + '</span>';
+                b += '<button type="button" class="score-btn score-plus" data-i="' + i + '" data-r="' + rIdx + '" data-skill="' + sk + '">+</button>';
+                b += '</div></div>';
+            });
+            b += '<div class="score-item next-id-item"><label>Next Id</label>';
+            b += '<input type="number" class="next-id" data-i="' + i + '" data-r="' + rIdx + '" value="' + (nextId != null ? nextId : "") + '"></div>';
+            b += '</div></div>';
+        });
+        b += '</div>';
+        b += '<button type="button" class="crud-btn crud-add-response" data-i="' + i + '">+ Ajouter une réponse</button>';
+        b += '<button type="button" class="crud-btn crud-ai-response" data-i="' + i + '" data-ia-id="' + ia.Id + '">✨ Proposer une réponse avec IA</button>';
+        b += '</div>';
+        blocksHtml += b;
+    });
+    blocksHtml += '<div class="add-interaction-container"><button type="button" class="crud-btn crud-add-interaction">+ Ajouter une interaction</button></div>';
+
+    document.getElementById("ed-content").innerHTML = introHtml + blocksHtml;
+    scenesData[idx].editor = blocksHtml;
+    attachEditors(idx);
+    attachCrudHandlers(idx);
+}
+
+function addInteraction(idx) {
+    var chapter = chaptersData.Chapters[0];
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[idx]) return;
+    var sc = chapter.Scenes[idx];
+    var newId = getNextInteractionId(sc);
+    var firstActor = (sc.Interactions && sc.Interactions.length > 0 && sc.Interactions[0].Actor)
+        ? JSON.parse(JSON.stringify(sc.Interactions[0].Actor)) : { Id: 0, Name: "Nouveau" };
+    var newIa = {
+        Id: newId,
+        Name: "Nouvelle interaction " + newId,
+        Actor: firstActor,
+        Text: "",
+        AgentFacialExpression: "",
+        Responses: []
+    };
+    sc.Interactions.push(newIa);
+    scheduleCacheSave();
+    rebuildEditorHtml(idx);
+    rebuildSceneGraph(idx);
+    showOnlySelectedBlock(String(newId));
+    var block = document.querySelector('.block[data-interaction-id="' + newId + '"]');
+    if (block) block.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function deleteInteraction(idx, iIdx) {
+    var chapter = chaptersData.Chapters[0];
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[idx]) return;
+    var sc = chapter.Scenes[idx];
+    var ia = sc.Interactions[iIdx];
+    if (!ia) return;
+    var deletedId = ia.Id;
+    confirmDialog("Supprimer l'interaction " + deletedId + " et toutes ses réponses ?").then(function(ok) {
+        if (!ok) return;
+        sc.Interactions.splice(iIdx, 1);
+        sc.Interactions.forEach(function(otherIa) {
+            (otherIa.Responses || []).forEach(function(r) {
+                if (r.NextInteractionID === deletedId) {
+                    r.NextInteractionID = -1;
+                }
+            });
+        });
+        scheduleCacheSave();
+        rebuildEditorHtml(idx);
+        rebuildSceneGraph(idx);
+        showOnlySelectedBlock(null);
+    });
+}
+
+function addResponse(idx, iIdx) {
+    var chapter = chaptersData.Chapters[0];
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[idx]) return;
+    var sc = chapter.Scenes[idx];
+    var ia = sc.Interactions[iIdx];
+    if (!ia) return;
+    if (!ia.Responses) ia.Responses = [];
+    var newRespId = getNextResponseId(ia);
+    var newResp = {
+        Id: newRespId,
+        Name: "",
+        Text: "",
+        NextInteractionID: -1,
+        SoftSkillDimensions: { RespectAndDignity: 0, Empathy: 0, Compassion: 0, EmotionalRegulation: 0, CommunicationClarity: 0, ProfessionalBoundaries: 0, InterprofessionalCollaboration: 0 }
+    };
+    SCORE_SKILLS.forEach(function(sk) { newResp[sk] = 0; });
+    ia.Responses.push(newResp);
+    scheduleCacheSave();
+    rebuildEditorHtml(idx);
+    rebuildSceneGraph(idx);
+    showOnlySelectedBlock(String(ia.Id));
+}
+
+function deleteResponse(idx, iIdx, rIdx) {
+    var chapter = chaptersData.Chapters[0];
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[idx]) return;
+    var sc = chapter.Scenes[idx];
+    var ia = sc.Interactions[iIdx];
+    if (!ia || !ia.Responses || !ia.Responses[rIdx]) return;
+    confirmDialog("Supprimer la réponse " + (rIdx + 1) + " de l'interaction " + ia.Id + " ?").then(function(ok) {
+        if (!ok) return;
+        ia.Responses.splice(rIdx, 1);
+        scheduleCacheSave();
+        rebuildEditorHtml(idx);
+        rebuildSceneGraph(idx);
+        showOnlySelectedBlock(String(ia.Id));
+    });
+}
+
+var SKILL_LABELS_FR = {
+    RespectAndDignity: "Respect et dignité",
+    Empathy: "Empathie",
+    Compassion: "Compassion",
+    EmotionalRegulation: "Régulation émotionnelle",
+    CommunicationClarity: "Clarté communication",
+    ProfessionalBoundaries: "Frontières pro.",
+    InterprofessionalCollaboration: "Collab. interpro."
+};
+
+function buildOrientationStepper(skill) {
+    var html = '<div class="ai-ori-item">';
+    html += '<label>' + (SKILL_LABELS_FR[skill] || skill) + '</label>';
+    html += '<div class="score-stepper">';
+    html += '<button type="button" class="score-btn ai-ori-minus" data-skill="' + skill + '">-</button>';
+    html += '<input type="hidden" class="ai-ori" data-skill="' + skill + '" value="0">';
+    html += '<span class="score-value ai-ori-value" data-skill="' + skill + '">0</span>';
+    html += '<button type="button" class="score-btn ai-ori-plus" data-skill="' + skill + '">+</button>';
+    html += '</div></div>';
+    return html;
+}
+
+function renderAiProposalCard(p) {
+    var cat = (p.Category || "").toLowerCase();
+    var catClass = cat === "exemplaire" ? "exemplaire" : (cat === "problématique" || cat === "problematique" ? "problematique" : "neutre");
+    var catLabel = p.Category || "neutre";
+    var dims = p.SoftSkillDimensions || {};
+    var html = '<div class="ai-proposal">';
+    html += '<span class="ai-cat ' + catClass + '">' + escapeHtml(catLabel) + '</span>';
+    html += '<div class="ai-text">' + escapeHtml(p.Text || "") + '</div>';
+    if (p.Rationale) {
+        html += '<div class="ai-rationale">' + escapeHtml(p.Rationale) + '</div>';
+    }
+    html += '<div class="ai-scores">';
+    SCORE_SKILLS.forEach(function(sk) {
+        var v = parseInt(dims[sk], 10);
+        if (isNaN(v)) v = 0;
+        var vcls = v > 0 ? "pos" : (v < 0 ? "neg" : "zero");
+        var sign = v > 0 ? "+" : "";
+        html += '<div class="sc"><span>' + (SKILL_LABELS_FR[sk] || sk) + '</span><span class="v ' + vcls + '">' + sign + v + '</span></div>';
+    });
+    html += '</div>';
+    html += '<button type="button" class="ai-accept">Accepter et ajouter comme nouvelle réponse</button>';
+    html += '</div>';
+    return html;
+}
+
+function openAiProposalModal(sceneIdx, iIdx) {
+    var chapter = chaptersData.Chapters[0];
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[sceneIdx]) return;
+    var sc = chapter.Scenes[sceneIdx];
+    var ia = sc.Interactions[iIdx];
+    if (!ia) return;
+
+    var actorName = (ia.Actor || {}).Name || "?";
+    var orientationHtml = '';
+    SCORE_SKILLS.forEach(function(sk) { orientationHtml += buildOrientationStepper(sk); });
+
+    var nextOptionsHtml = '<option value="-1">-1 — Fin de branche (aucune suite)</option>';
+    (sc.Interactions || []).forEach(function(otherIa) {
+        if (otherIa.Id === ia.Id) return;
+        var preview = (otherIa.Text || otherIa.Name || "").substring(0, 80);
+        var otherActor = (otherIa.Actor || {}).Name || "?";
+        nextOptionsHtml += '<option value="' + otherIa.Id + '">#' + otherIa.Id + ' [' + escapeHtml(otherActor) + '] ' + escapeHtml(preview) + (otherIa.Text && otherIa.Text.length > 80 ? "…" : "") + '</option>';
+    });
+
+    var ov = document.createElement("div");
+    ov.className = "ai-overlay";
+    ov.innerHTML =
+        '<div class="ai-modal">' +
+            '<h3>✨ Proposer une réponse avec IA</h3>' +
+            '<p class="ai-sub">Le LLM analyse le contexte et propose une nouvelle réplique de l\'acteur, orientée selon vos choix. Aucune insertion n\'est faite tant que vous n\'avez pas cliqué sur « Accepter ».</p>' +
+            '<div class="ai-context">' +
+                '<div><strong>Scène</strong> : ' + escapeHtml(sc.Title || "") + '</div>' +
+                '<div><strong>Interaction</strong> #' + ia.Id + ' (' + escapeHtml(actorName) + ') : ' + escapeHtml((ia.Text || "").substring(0, 140)) + (ia.Text && ia.Text.length > 140 ? "…" : "") + '</div>' +
+            '</div>' +
+            '<div class="ai-section-title">Prochain bloc (NextInteractionID)</div>' +
+            '<select class="ai-next">' + nextOptionsHtml + '</select>' +
+            '<div class="ai-next-hint">La réponse générée sera rédigée pour mener naturellement à ce bloc, et sera liée à lui une fois acceptée.</div>' +
+            '<div class="ai-section-title">Orientation soft skills (-3 à +3)</div>' +
+            '<div class="ai-orientation">' + orientationHtml + '</div>' +
+            '<div class="ai-section-title">Consigne libre (optionnel)</div>' +
+            '<textarea class="ai-guidance" placeholder="Ex : « Ton plus direct, pas de paternalisme »"></textarea>' +
+            '<div class="ai-actions">' +
+                '<button type="button" class="ai-btn ai-btn-secondary ai-cancel">Fermer</button>' +
+                '<button type="button" class="ai-btn ai-btn-primary ai-generate">Générer avec IA</button>' +
+            '</div>' +
+            '<div class="ai-status" style="display:none"></div>' +
+            '<div class="ai-proposals"></div>' +
+        '</div>';
+    document.body.appendChild(ov);
+
+    function closeModal() { if (ov.parentNode) ov.parentNode.removeChild(ov); }
+
+    ov.querySelector(".ai-cancel").addEventListener("click", closeModal);
+    ov.addEventListener("click", function(e) { if (e.target === ov) closeModal(); });
+
+    ov.querySelectorAll(".ai-ori-minus, .ai-ori-plus").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            var skill = this.dataset.skill;
+            var hidden = ov.querySelector('.ai-ori[data-skill="' + skill + '"]');
+            var valueEl = ov.querySelector('.ai-ori-value[data-skill="' + skill + '"]');
+            if (!hidden || !valueEl) return;
+            var v = parseInt(hidden.value) || 0;
+            v += this.classList.contains("ai-ori-plus") ? 1 : -1;
+            if (v < -3) v = -3;
+            if (v > 3) v = 3;
+            hidden.value = String(v);
+            valueEl.textContent = (v > 0 ? "+" : "") + String(v);
+        });
+    });
+
+    ov.querySelector(".ai-generate").addEventListener("click", function() {
+        var genBtn = this;
+        var statusEl = ov.querySelector(".ai-status");
+        var proposalsEl = ov.querySelector(".ai-proposals");
+        proposalsEl.innerHTML = "";
+
+        var orientation = {};
+        ov.querySelectorAll(".ai-ori").forEach(function(inp) {
+            var v = parseInt(inp.value, 10);
+            if (!isNaN(v) && v !== 0) orientation[inp.dataset.skill] = v;
+        });
+        var guidance = (ov.querySelector(".ai-guidance").value || "").trim();
+        var nextSelect = ov.querySelector(".ai-next");
+        var nextId = nextSelect ? parseInt(nextSelect.value, 10) : -1;
+        if (isNaN(nextId)) nextId = -1;
+
+        var payload = {
+            book_slug: bookSlug,
+            chapter_id: parseInt(chapterId, 10),
+            scene_id: sc.Id,
+            interaction_id: ia.Id,
+            orientation: orientation,
+            guidance: guidance,
+            n: 1,
+            next_interaction_id: nextId
+        };
+
+        genBtn.disabled = true;
+        statusEl.style.display = "block";
+        statusEl.className = "ai-status loading";
+        statusEl.textContent = "Appel du LLM en cours… (cela peut prendre quelques secondes)";
+
+        fetch("/api/enrich", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+        .then(function(result) {
+            genBtn.disabled = false;
+            if (!result.ok) {
+                statusEl.className = "ai-status err";
+                statusEl.textContent = (result.data && result.data.error) ? result.data.error : "Erreur lors de l'appel IA.";
+                return;
+            }
+            var proposals = (result.data && result.data.proposals) || [];
+            if (proposals.length === 0) {
+                statusEl.className = "ai-status err";
+                statusEl.textContent = "Aucune proposition (tout a été filtré comme doublon ?).";
+                return;
+            }
+            statusEl.style.display = "none";
+            proposals.forEach(function(p, pIdx) {
+                var card = document.createElement("div");
+                card.innerHTML = renderAiProposalCard(p);
+                var node = card.firstChild;
+                proposalsEl.appendChild(node);
+                node.querySelector(".ai-accept").addEventListener("click", function() {
+                    acceptAiProposal(sceneIdx, iIdx, p, nextId);
+                    closeModal();
+                });
+            });
+        }).catch(function(err) {
+            genBtn.disabled = false;
+            statusEl.className = "ai-status err";
+            statusEl.textContent = "Erreur réseau. Vérifiez que `python app.py` est lancé.";
+        });
+    });
+}
+
+function acceptAiProposal(sceneIdx, iIdx, proposal, nextInteractionId) {
+    var chapter = chaptersData.Chapters[0];
+    if (!chapter || !chapter.Scenes || !chapter.Scenes[sceneIdx]) return;
+    var sc = chapter.Scenes[sceneIdx];
+    var ia = sc.Interactions[iIdx];
+    if (!ia) return;
+    if (!ia.Responses) ia.Responses = [];
+    var newRespId = getNextResponseId(ia);
+    var dims = proposal.SoftSkillDimensions || {};
+    var nextId = (nextInteractionId == null || isNaN(parseInt(nextInteractionId, 10))) ? -1 : parseInt(nextInteractionId, 10);
+    var newResp = {
+        Id: newRespId,
+        Name: (proposal.Text || "").substring(0, 80),
+        Text: proposal.Text || "",
+        NextInteractionID: nextId,
+        Category: proposal.Category || "neutre",
+        Rationale: proposal.Rationale || "",
+        GeneratedByAI: true,
+        SoftSkillDimensions: {},
+        LegacyDimensions: proposal.LegacyDimensions || {}
+    };
+    SCORE_SKILLS.forEach(function(sk) {
+        var v = parseInt(dims[sk], 10);
+        if (isNaN(v)) v = 0;
+        if (v < -3) v = -3;
+        if (v > 3) v = 3;
+        newResp[sk] = v;
+        newResp.SoftSkillDimensions[sk] = v;
+    });
+    ia.Responses.push(newResp);
+    scheduleCacheSave();
+    rebuildEditorHtml(sceneIdx);
+    rebuildSceneGraph(sceneIdx);
+    showOnlySelectedBlock(String(ia.Id));
+    var block = document.querySelector('.block[data-interaction-id="' + ia.Id + '"]');
+    if (block) block.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function attachCrudHandlers(idx) {
+    document.querySelectorAll("#ed-content .crud-add-interaction").forEach(function(btn) {
+        btn.addEventListener("click", function() { addInteraction(idx); });
+    });
+    document.querySelectorAll("#ed-content .crud-add-response").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            addResponse(idx, parseInt(this.dataset.i));
+        });
+    });
+    document.querySelectorAll("#ed-content .crud-delete-interaction").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            deleteInteraction(idx, parseInt(this.dataset.i));
+        });
+    });
+    document.querySelectorAll("#ed-content .crud-delete-response").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            deleteResponse(idx, parseInt(this.dataset.i), parseInt(this.dataset.r));
+        });
+    });
+    document.querySelectorAll("#ed-content .crud-ai-response").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            openAiProposalModal(idx, parseInt(this.dataset.i));
+        });
+    });
+}
+
+function init() {
+    if (typeof vis === "undefined") {
+        container.innerHTML = "<p style='color:#ef4444;padding:20px'>vis-network non chargé. Vérifiez votre connexion et rechargez.</p>";
+        return;
+    }
+    restoreCacheFromLocalStorage();
+    applyPanelVisibility();
+    if (scenesData && scenesData.length > 0) {
+        if (currentSceneIdx < 0 || currentSceneIdx >= scenesData.length) currentSceneIdx = 0;
+        try {
+            showScene(currentSceneIdx);
+            setMode(currentMode);
+        } catch (err) {
+            console.error("showScene:", err);
+            container.innerHTML = "<p style='color:#ef4444;padding:20px'>Erreur: " + String(err.message || err) + "</p>";
+        }
+    } else {
+        document.getElementById("ed-content").innerHTML = "<div class='empty'>Aucune donnée (erreur de chargement?).</div>";
+    }
+}
+function runInit() {
+    if (typeof vis !== "undefined") { init(); return; }
+    var n = 0;
+    var t = setInterval(function() {
+        n++;
+        if (typeof vis !== "undefined") { clearInterval(t); init(); }
+        else if (n > 60) { clearInterval(t); container.innerHTML = "<p style='color:#ef4444;padding:20px'>vis-network timeout.</p>"; }
+    }, 100);
+}
+window.addEventListener("load", function() { setTimeout(runInit, 80); });
+</script>
+</body>
+</html>

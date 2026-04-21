@@ -57,21 +57,44 @@ def _escape_html(s: str) -> str:
 def _apply_edge_curves(edges: list) -> list:
     """
     Répartit les courbures des arêtes pour éviter la superposition.
-    Pour chaque nœud source avec N arêtes sortantes, répartit roundness de -max à +max.
+    1) Sépare d'abord les arêtes parallèles (même source et même cible).
+    2) Évente ensuite les autres arêtes sortantes par nœud source.
     """
+    by_pair: dict[tuple[str, str], list] = defaultdict(list)
+    for e in edges:
+        by_pair[(e["from"], e["to"])].append(e)
+
+    locked_ids = set()
+    for _, pair_edges in by_pair.items():
+        n = len(pair_edges)
+        if n <= 1:
+            continue
+        for i, e in enumerate(pair_edges):
+            # Alterne CW/CCW pour détacher visuellement les arêtes parallèles.
+            step = i // 2 + 1
+            sign = -1 if i % 2 else 1
+            roundness = min(1.0, 0.22 + (step - 1) * 0.11)
+            curve_type = "curvedCW" if sign > 0 else "curvedCCW"
+            e["smooth"] = {"type": curve_type, "roundness": roundness}
+            locked_ids.add(e["id"])
+
     by_source: dict[str, list] = defaultdict(list)
     for e in edges:
         by_source[e["from"]].append(e)
 
-    for source, out_edges in by_source.items():
-        n = len(out_edges)
-        max_roundness = min(1.0, 0.35 + 0.06 * n)  # plus de flèches = courbure plus forte
-        for i, e in enumerate(out_edges):
+    for _, out_edges in by_source.items():
+        free_edges = [e for e in out_edges if e["id"] not in locked_ids]
+        n = len(free_edges)
+        if n == 0:
+            continue
+        max_roundness = min(0.65, 0.16 + 0.05 * n)
+        for i, e in enumerate(free_edges):
             if n == 1:
-                roundness = 0
+                roundness = 0.0
             else:
                 roundness = -max_roundness + (2 * max_roundness * i) / (n - 1)
-            e["smooth"] = {"type": "curvedCW", "roundness": roundness}
+            curve_type = "curvedCW" if roundness >= 0 else "curvedCCW"
+            e["smooth"] = {"type": curve_type, "roundness": abs(roundness)}
 
     return edges
 
@@ -96,7 +119,12 @@ def build_scene_graph(chapter_id: int, scene: dict) -> dict:
         label = f"{ia['Id']} — {base_label}"
         title = f"[{actor_name}] {text}" if text else f"[{actor_name}] {name}"
 
-        nodes.append({"id": node_id, "label": label, "title": title})
+        nodes.append({
+            "id": node_id,
+            "label": label,
+            "title": title,
+            "interaction_id": str(ia["Id"]),
+        })
 
         for r_idx, r in enumerate(ia.get("Responses", [])):
             next_id = r.get("NextInteractionID")
@@ -109,10 +137,16 @@ def build_scene_graph(chapter_id: int, scene: dict) -> dict:
                 continue
             target_node_id = f"C{chapter_id}_S{scene['Id']}_I{next_id}"
             edge_id = f"{node_id}_R{r_idx}_>{target_node_id}"
+            r_text = (r.get("Text") or "").strip()
+            edge_title = f"Réponse {r_idx + 1}"
+            if r_text:
+                edge_title += f" — {r_text}"
             edges.append({
                 "id": edge_id,
                 "from": node_id,
                 "to": target_node_id,
+                "label": f"R{r_idx + 1}",
+                "title": edge_title,
             })
 
     # Nœuds sans prédécesseur (sauf la toute première interaction de la scène) :
@@ -147,40 +181,69 @@ def build_scene_graph(chapter_id: int, scene: dict) -> dict:
 
 
 def _build_editor_html(scene: dict) -> str:
-    """Génère le HTML du panneau d'édition (EG-4)."""
+    """Génère le HTML du panneau d'édition (EG-4) avec ajout/suppression."""
     parts = []
     for i, ia in enumerate(scene.get("Interactions", [])):
         actor = (ia.get("Actor") or {}).get("Name", "")
         text = ia.get("Text", "")
         name = ia.get("Name", text[:50])
-        block = f'<div class="block" data-interaction-id="{ia["Id"]}">'
-        block += f'<div class="header">Interaction {ia["Id"]} — {_escape_html(actor)}</div>'
+        block = f'<div class="block" data-interaction-id="{ia["Id"]}" data-i="{i}">'
+        block += (
+            f'<div class="header">'
+            f'<span>Interaction {ia["Id"]} — {_escape_html(actor)}</span>'
+            f'<button type="button" class="crud-btn crud-delete-interaction" data-i="{i}" '
+            f'title="Supprimer cette interaction">✕</button>'
+            f'</div>'
+        )
         block += '<label>EG-4 : Name</label>'
         block += f'<textarea class="edit" data-type="name" data-i="{i}" rows="1">{_escape_html(name or "")}</textarea>'
         block += '<label>EG-4 : Text</label>'
         block += f'<textarea class="edit" data-type="text" data-i="{i}" rows="3">{_escape_html(text or "")}</textarea>'
+        block += f'<div class="responses-container" data-i="{i}">'
         for r_idx, r in enumerate(ia.get("Responses", [])):
             rtext = r.get("Text", "")
             next_id = r.get("NextInteractionID", "")
-            block += f'<div class="resp"><label>Réponse {r_idx + 1} — Text</label>'
-            block += f'<textarea class="edit" data-type="response" data-i="{i}" data-r="{r_idx}" rows="2">{_escape_html(rtext)}</textarea>'
-            block += '<label>Next Id</label>'
             block += (
-                f'<input type="number" class="next-id" data-i="{i}" data-r="{r_idx}" '
-                f'value="{next_id if next_id is not None else ""}">'
+                f'<div class="resp" data-i="{i}" data-r="{r_idx}">'
+                f'<div class="resp-header">'
+                f'<label>Réponse {r_idx + 1} — Text</label>'
+                f'<button type="button" class="crud-btn crud-delete-response" data-i="{i}" data-r="{r_idx}" '
+                f'title="Supprimer cette réponse">✕</button>'
+                f'</div>'
             )
+            block += f'<textarea class="edit" data-type="response" data-i="{i}" data-r="{r_idx}" rows="2">{_escape_html(rtext)}</textarea>'
             block += '<div class="scores">'
             for sk in SKILLS:
                 val = _get_score(r, sk)
                 block += (
                     f'<div class="score-item">'
                     f'<label>{sk}</label>'
-                    f'<input type="number" class="score" data-i="{i}" data-r="{r_idx}" '
-                    f'data-skill="{sk}" value="{val}" min="-3" max="3"></div>'
+                    f'<div class="score-stepper">'
+                    f'<button type="button" class="score-btn score-minus" data-i="{i}" data-r="{r_idx}" data-skill="{sk}">-</button>'
+                    f'<input type="hidden" class="score" data-i="{i}" data-r="{r_idx}" data-skill="{sk}" value="{val}">'
+                    f'<span class="score-value" data-i="{i}" data-r="{r_idx}" data-skill="{sk}">{val}</span>'
+                    f'<button type="button" class="score-btn score-plus" data-i="{i}" data-r="{r_idx}" data-skill="{sk}">+</button>'
+                    f'</div></div>'
                 )
+            block += (
+                f'<div class="score-item next-id-item">'
+                f'<label>Next Id</label>'
+                f'<input type="number" class="next-id" data-i="{i}" data-r="{r_idx}" '
+                f'value="{next_id if next_id is not None else ""}"></div>'
+            )
             block += "</div></div>"
+        block += '</div>'
+        block += (
+            f'<button type="button" class="crud-btn crud-add-response" data-i="{i}">'
+            f'+ Ajouter une réponse</button>'
+        )
         block += "</div>"
         parts.append(block)
+    parts.append(
+        '<div class="add-interaction-container">'
+        '<button type="button" class="crud-btn crud-add-interaction">'
+        '+ Ajouter une interaction</button></div>'
+    )
     return "".join(parts)
 
 
