@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>End of Life — Chapitre {{ chapter.Id }} : {{ chapter.Name }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='chapter.css') }}">
+</head>
+<body>
+<div class="sidebar">
+    <div class="sidebar-top">
+        <a href="{{ url_for('pages.landing') }}" class="home-link" title="Retour à la page d'accueil">← Accueil</a>
+        <div class="book-badge">{{ book.title }}</div>
+        <h3>Choix du chapitre</h3>
+        <select id="chapter-select" class="chapter-select">
+        {%- for item in chapter_links %}
+            <option value="{{ url_for('pages.chapter_page', book_slug=book.slug, chapter_id=item.id) }}"{% if item.id == current_chapter_id %} selected{% endif %}>Chapitre {{ item.id }} — {{ item.name }}</option>
+        {%- endfor %}
+        </select>
+        <h3>Scénarios du chapitre {{ chapter.Id }}</h3>
+        <input type="text" class="search" id="search" placeholder="EG-3 : Recherche par texte">
+        {%- for sd in scenes_data %}
+        <button class="scene-btn" data-idx="{{ loop.index0 }}">{{ sd.title }}</button>
+        {%- endfor %}
+    </div>
+    <div class="sidebar-actions">
+        <button class="export" id="save-btn">Valider et sauvegarder dans {{ book.json }}</button>
+        <button class="export export-secondary" id="export-btn">Télécharger (JSON)</button>
+        <div id="save-status"></div>
+    </div>
+</div>
+<div class="main">
+    <div class="panel-toggles">
+        <button class="panel-toggle-btn" id="toggle-left-panel" type="button">Masquer</button>
+        <button class="panel-toggle-btn" id="toggle-right-panel" type="button">Masquer</button>
+    </div>
+    <div id="network"></div>
+    <div class="hint">Molette : zoom — Glisser : déplacer — Survol nœud : infobulle complète</div>
+</div>
+<div class="editor">
+    <div class="mode-tabs">
+        <button class="mode-btn active" data-mode="edit">Édition</button>
+        <button class="mode-btn" data-mode="parcours">Parcours joueur</button>
+    </div>
+    <div class="panel-edit" id="panel-edit">
+        <h3 id="ed-title">Sélectionnez un scénario</h3>
+        <div id="ed-content"><div class="empty">Cliquez sur un scénario à gauche.</div></div>
+        <div id="validation"></div>
+    </div>
+    <div class="panel-parcours" id="panel-parcours">
+        <h3 id="parcours-title">Parcours joueur</h3>
+        <div id="parcours-content">
+            <div class="parcours-card">
+                <div class="parcours-end">Sélectionnez un scénario puis choisissez vos réponses. Votre chemin s'affichera en vert sur le graphe.</div>
+            </div>
+        </div>
+        <button class="parcours-restart" id="parcours-restart" style="display:none">Recommencer</button>
+    </div>
+</div>
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" crossorigin="anonymous"></script>
+<script>
+window.PA_INIT = {
+    chapterId: {{ chapter.Id | tojson }},
+    bookSlug: {{ book.slug | tojson }},
+    chaptersData: {{ chapters_payload | tojson }},
+    scenesData: {{ scenes_data | tojson }},
+    apiSaveUrl: {{ url_for('api.api_save') | tojson }},
+    apiEnrichUrl: {{ url_for('api.api_enrich') | tojson }},
+    imagesBaseUrl: {{ url_for('api.serve_images', filename='') | tojson }}
+};
+</script>
+<script type="module" src="{{ url_for('static', filename='chapter/main.js') }}"></script>
+</body>
+</html>

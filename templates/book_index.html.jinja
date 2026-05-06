@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>{{ book.title }} — Chapitres</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='book_index.css') }}">
+</head>
+<body>
+<a class="back" href="{{ url_for('pages.landing') }}">← Page d'accueil</a>
+<h1>{{ book.title }}</h1>
+<p class="sub">{{ book.subtitle }}</p>
+<ul>
+{%- for ch in chapters %}
+    <li><a href="{{ url_for('pages.chapter_page', book_slug=book.slug, chapter_id=ch.Id) }}">Chapitre {{ ch.Id }} — {{ ch.Name }}</a></li>
+{%- endfor %}
+</ul>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Graphes End of Life
+# Graphes — End of Life
 
 Structure des scénarios — Généré à partir de Chapters_v3-4-c_emotional-illustration.json
 
@@ -66,7 +66,7 @@ flowchart TD
     I9 -->|"J’imagine que ça va…"| I13
     I9 -->|"Si vous ne répondez…"| I10
     I10 -->|"Je peux bien imagin…"| I11
-    I10 -->|"J’imagine qu’à votr…"| I11
+    I10 -->|"J’imagine qu’à votr…"| I12
     I10 -->|"J’imagine que c’est…"| I14
     I11 -->|"C’est vrai. Et si u…"| I16
     I11 -->|"Ce n’est pas parce …"| I18
