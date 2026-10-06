@@ -1,5 +1,6 @@
 // Persistance : localStorage (positions de nœuds, mode courant) et /api/save.
 
+import { jsonHeaders } from "../shared/http.js";
 import { config, state } from "./store.js";
 
 export function scheduleCacheSave() {
@@ -12,6 +13,7 @@ export function saveCacheToLocalStorage() {
         const payload = {
             version: 1,
             chapterId: config.chapterId,
+            bookSource: config.bookSource,
             currentSceneIdx: state.currentSceneIdx,
             currentMode: state.currentMode,
             leftPanelHidden: state.leftPanelHidden,
@@ -25,12 +27,29 @@ export function saveCacheToLocalStorage() {
     }
 }
 
+function sceneTitles(data) {
+    const ch = data && data.Chapters && data.Chapters[0];
+    return ((ch && ch.Scenes) || []).map((s) => s.Title).join("\n");
+}
+
+/**
+ * Le cache contient tout le chapitre et le réapplique par-dessus les données du
+ * serveur : on l'ignore s'il vient d'une autre version du livre (fichier JSON
+ * différent). Les caches antérieurs, sans `bookSource`, ne sont repris que si
+ * les scènes portent les mêmes titres que celles du serveur.
+ */
+function isSameSource(parsed) {
+    if (parsed.bookSource) return parsed.bookSource === config.bookSource;
+    return sceneTitles(parsed.chaptersData) === sceneTitles(state.chaptersData);
+}
+
 export function restoreCacheFromLocalStorage() {
     try {
         const raw = localStorage.getItem(state.cacheKey);
         if (!raw) return;
         const parsed = JSON.parse(raw);
         if (!parsed || parsed.chapterId !== config.chapterId) return;
+        if (!isSameSource(parsed)) return;
         if (
             parsed.chaptersData &&
             parsed.chaptersData.Chapters &&
@@ -96,7 +115,7 @@ export function applyCurrentScenePositions(idx) {
 export function postSave() {
     return fetch(config.apiSaveUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: jsonHeaders(),
         body: JSON.stringify({
             book_slug: config.bookSlug,
             Chapters: state.chaptersData.Chapters,

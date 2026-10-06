@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>Bilan session {{ bs.number }} — {{ book.title }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='play.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
+</head>
+<body class="play-menu">
+{% include "_userbar.html.jinja" %}
+{%- set labels = report.labels %}
+{%- set prev = report.previous %}
+{%- set bookp = report.book %}
+<main class="acc-wrap">
+    <nav class="acc-crumbs">
+        {%- if is_own %}
+        <a href="{{ url_for('account.my_history') }}">← Mon parcours</a>
+        {%- else %}
+        <a href="{{ url_for('account.trainer_participant', user_id=owner.id) }}">← Parcours de {{ owner.display_name }}</a>
+        {%- endif %}
+        <a href="{{ url_for('pages.play_book', book_slug=book.slug) }}">Sommaire du livre</a>
+    </nav>
+
+    <header class="acc-header">
+        <p class="eyebrow">Bilan · Session {{ bs.number }}</p>
+        <h1>{{ book.title }}</h1>
+        <p class="acc-sub">
+            {%- if not is_own %}{{ owner.display_name }} · {% endif %}
+            {%- if bs.is_completed %}
+            Livre terminé le {{ bs.completed_at | date_fr }} · {{ results.n_scenes }} scénarios notés
+            {%- else %}
+            <span class="acc-badge is-live">Session en cours · résultats provisoires</span>
+            {{ (bs.completed_chapters or []) | length }} chapitre(s) terminé(s) · {{ results.n_scenes }} scénarios notés
+            {%- endif %}
+        </p>
+    </header>
+
+    <section class="kpi-row" aria-label="Chiffres clés">
+        <div class="kpi">
+            <span class="kpi-label">Note de la session</span>
+            <span class="kpi-value">{{ results.global | note }}<small> /100</small></span>
+            <span class="kpi-foot">
+            {%- if prev and prev.global is not none and results.global is not none %}
+                {%- set d = (results.global - prev.global) | round | int %}
+                <span class="{{ 'delta-up' if d > 0 else ('delta-down' if d < 0 else '') }}">{{ '▲ +' if d > 0 else ('▼ −' if d < 0 else '± ') }}{{ d | abs }}</span> par rapport à la session {{ prev.number }}
+            {%- else %}
+                Qualité des choix, toutes compétences confondues
+            {%- endif %}
+            </span>
+        </div>
+        <div class="kpi">
+            <span class="kpi-label">Note du livre</span>
+            {%- if bookp and bookp.global is not none %}
+            <span class="kpi-value">{{ bookp.global | note(1) }}<small> /100</small></span>
+            <span class="kpi-foot">Niveaux de tous les passages notés · {{ bookp.n_evaluated }}/{{ bookp.n_chapters }} chapitres évalués</span>
+            {%- else %}
+            <span class="kpi-value">—</span>
+            <span class="kpi-foot">Dès le premier chapitre terminé</span>
+            {%- endif %}
+        </div>
+        <div class="kpi">
+            <span class="kpi-label">Point fort principal</span>
+            <span class="kpi-value is-text">{{ labels[results.strengths[0]] if results.strengths else '—' }}</span>
+            {%- if results.strengths %}<span class="kpi-foot">{{ results.scores[results.strengths[0]] | note }}/100</span>{% endif %}
+        </div>
+        <div class="kpi">
+            <span class="kpi-label">À travailler en priorité</span>
+            <span class="kpi-value is-text">{{ labels[results.weaknesses[0]] if results.weaknesses else '—' }}</span>
+            {%- if results.weaknesses %}<span class="kpi-foot">{{ results.scores[results.weaknesses[0]] | note }}/100</span>{% endif %}
+        </div>
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-profile">
+        <h2 id="h-profile">Profil de compétences</h2>
+        <p class="acc-hint">Qualité de vos choix par compétence, sur 100 : chaque réponse est comparée aux réponses proposées au même moment. 100 = la meilleure réponse à chaque fois, 0 = la pire ; répondre au hasard donne environ 50.</p>
+        <div class="chart-legend">
+            <span><i class="key-bar" aria-hidden="true"></i>Session {{ bs.number }}</span>
+            {%- if prev %}<span><i class="key-tick" aria-hidden="true"></i>Session {{ prev.number }}</span>{% endif %}
+        </div>
+        <div id="skills-chart"></div>
+        <details class="acc-table-view">
+            <summary>Voir les valeurs en tableau</summary>
+            <div class="acc-table-wrap">
+            <table class="acc-table">
+                <thead><tr><th>Compétence</th><th class="num">Session {{ bs.number }}</th>{% if prev %}<th class="num">Session {{ prev.number }}</th><th class="num">Écart</th>{% endif %}{% if bookp and bookp.global is not none %}<th class="num">Livre</th>{% endif %}</tr></thead>
+                <tbody>
+                {%- for k in report.skills %}
+                <tr>
+                    <td>{{ labels[k] }}</td>
+                    <td class="num">{{ results.scores[k] | note }}</td>
+                    {%- if prev %}
+                    <td class="num">{{ prev.scores[k] | note }}</td>
+                    <td class="num">{% if results.scores[k] is not none and prev.scores[k] is not none %}{{ '%+d' % ((results.scores[k] - prev.scores[k]) | round | int) }}{% else %}—{% endif %}</td>
+                    {%- endif %}
+                    {%- if bookp and bookp.global is not none %}<td class="num">{{ bookp.scores[k] | note(1) }}</td>{% endif %}
+                </tr>
+                {%- endfor %}
+                </tbody>
+            </table>
+            </div>
+        </details>
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-feedback">
+        <h2 id="h-feedback">Feedback personnalisé</h2>
+        <div id="feedback-body" class="fb-body" aria-live="polite">
+            {%- if bs.is_completed %}
+            <p class="fb-loading"><span class="fb-spinner" aria-hidden="true"></span>Analyse de votre parcours{% if prev %} et de vos sessions précédentes{% endif %}…</p>
+            {%- else %}
+            <p class="acc-empty">Le feedback général sera rédigé à la fin du livre, quand tous les chapitres de la session seront terminés.</p>
+            {%- endif %}
+        </div>
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-heat">
+        <h2 id="h-heat">Carte des chapitres</h2>
+        <p class="acc-hint">Qualité des choix par compétence, chapitre par chapitre (dernier passage de chaque chapitre dans cette session). Plus la case est foncée, meilleur est le score.</p>
+        <div id="heatmap"></div>
+    </section>
+
+    {%- set moments = results.moments or {} %}
+    {%- if moments.missed or moments.good %}
+    <section class="acc-card" aria-labelledby="h-moments">
+        <h2 id="h-moments">Moments clés</h2>
+        <div class="acc-grid-2">
+            <div>
+                <h3>Occasions manquées</h3>
+                {%- if moments.missed %}
+                <ul class="moments">
+                {%- for m in moments.missed[:4] %}
+                    <li class="moment">
+                        <span class="moment-where">Chapitre {{ m.chapter_id }} · {{ m.scene_title }}</span>
+                        <p class="moment-prompt">{% if m.actor %}{{ m.actor }} : {% endif %}{{ m.prompt | truncate(220) | quoted }}</p>
+                        <p class="moment-line"><span class="who">Votre réponse</span><span>{{ m.choice.text | truncate(200) | quoted }}</span><span class="pts {{ 'pos' if m.choice.total > 0 else ('neg' if m.choice.total < 0 else '') }}">{{ '%+d' % m.choice.total }}</span></p>
+                        <p class="moment-line"><span class="who">Plus ajustée</span><span>{{ m.best.text | truncate(200) | quoted }}</span><span class="pts pos">{{ '%+d' % m.best.total }}</span></p>
+                    </li>
+                {%- endfor %}
+                </ul>
+                {%- else %}
+                <p class="acc-empty">Aucun écart important : vos choix étaient proches des meilleures réponses.</p>
+                {%- endif %}
+            </div>
+            <div>
+                <h3>Réussites</h3>
+                {%- if moments.good %}
+                <ul class="moments">
+                {%- for m in moments.good[:3] %}
+                    <li class="moment">
+                        <span class="moment-where">Chapitre {{ m.chapter_id }} · {{ m.scene_title }}</span>
+                        <p class="moment-prompt">{% if m.actor %}{{ m.actor }} : {% endif %}{{ m.prompt | truncate(220) | quoted }}</p>
+                        <p class="moment-line"><span class="who">Votre réponse</span><span>{{ m.choice.text | truncate(200) | quoted }}</span><span class="pts pos">{{ '%+d' % m.choice.total }}</span></p>
+                    </li>
+                {%- endfor %}
+                </ul>
+                {%- else %}
+                <p class="acc-empty">Pas encore de réponse exemplaire relevée.</p>
+                {%- endif %}
+            </div>
+        </div>
+    </section>
+    {%- endif %}
+
+    {%- if report.points | length > 1 %}
+    <section class="acc-card" aria-labelledby="h-trend">
+        <h2 id="h-trend">Évolution de la note globale</h2>
+        <div id="trend"></div>
+    </section>
+    {%- endif %}
+</main>
+
+<script>
+window.PA_REPORT = {{ report | tojson }};
+</script>
+<script type="module" src="{{ url_for('static', filename='account/report.js') }}"></script>
+</body>
+</html>

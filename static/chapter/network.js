@@ -1,6 +1,6 @@
 // Module Network — vis-network setup, rebuild, highlight, panels.
 
-import { state } from "./store.js";
+import { SCORE_SKILLS, state } from "./store.js";
 import {
     applyCurrentScenePositions,
     saveCurrentScenePositions,
@@ -11,8 +11,8 @@ import { getInteractionIdFromNodeId } from "./utils.js";
 export function updatePanelToggleButtons() {
     const leftBtn = document.getElementById("toggle-left-panel");
     const rightBtn = document.getElementById("toggle-right-panel");
-    if (leftBtn) leftBtn.textContent = state.leftPanelHidden ? "Afficher" : "Masquer";
-    if (rightBtn) rightBtn.textContent = state.rightPanelHidden ? "Afficher" : "Masquer";
+    if (leftBtn) leftBtn.textContent = state.leftPanelHidden ? "› Afficher la liste" : "‹ Masquer la liste";
+    if (rightBtn) rightBtn.textContent = state.rightPanelHidden ? "Afficher l'éditeur ‹" : "Masquer l'éditeur ›";
 }
 
 export function applyPanelVisibility() {
@@ -36,24 +36,118 @@ export function highlightPath() {
             const isCurrent = curNode === nid;
             let bg, border;
             if (inPath) {
-                bg = "#166534";
-                border = isCurrent ? "#fbbf24" : "#22c55e";
+                bg = "#e3f6e6";
+                border = isCurrent ? "#ab4400" : "#007e2a";
+            } else if (node.is_entry) {
+                // Point d'entrée alternatif (états narratifs), pas un orphelin.
+                bg = "#fcf0f5";
+                border = "#9a0050";
             } else if (isRoot) {
-                bg = "#451a1a";
-                border = "#f97373";
+                bg = "#ffeae8";
+                border = "#b50000";
             } else {
-                bg = "#27272a";
-                border = "#38bdf8";
+                bg = "#ffffff";
+                border = "#0040bb";
             }
             state.nodesDS.update({ id: nid, color: { background: bg, border: border } });
         }
         for (const eid of state.edgesDS.getIds()) {
             const inPath = pathEdges.indexOf(eid) >= 0;
-            state.edgesDS.update({ id: eid, color: inPath ? "#4ade80" : "#9ca3af" });
+            state.edgesDS.update({ id: eid, color: inPath ? "#007e2a" : "#989fa8" });
         }
     } catch (err) {
         console.warn("highlightPath:", err);
     }
+}
+
+function getNodeId(chapterId, sceneId, interactionId) {
+    return "C" + chapterId + "_S" + sceneId + "_I" + interactionId;
+}
+
+function getEdgeId(nodeId, responseIdx, targetNodeId) {
+    return nodeId + "_R" + responseIdx + "_>" + targetNodeId;
+}
+
+function responseScore(response, skill) {
+    const dims = response.SoftSkillDimensions || {};
+    const raw = dims[skill] != null ? dims[skill] : response[skill];
+    const value = parseInt(raw, 10);
+    return isNaN(value) ? 0 : value;
+}
+
+function buildParcoursPayload(chapterId, scene, idToIa) {
+    const interactions = scene.Interactions || [];
+    let starts = interactions.map((ia) => ia.Id);
+
+    for (const ia of interactions) {
+        for (const r of ia.Responses || []) {
+            const nextId = r.NextInteractionID;
+            if (nextId != null && nextId !== -1) {
+                starts = starts.filter((id) => id !== nextId);
+            }
+        }
+    }
+    if (starts.length === 0 && interactions.length > 0) {
+        starts = [interactions[0].Id];
+    }
+
+    const parcours = [];
+    const visited = {};
+
+    function addEntry(interactionId) {
+        if (visited[interactionId]) return;
+        visited[interactionId] = true;
+        const ia = idToIa[interactionId];
+        if (!ia) return;
+
+        const nodeId = getNodeId(chapterId, scene.Id, ia.Id);
+        const responses = [];
+        (ia.Responses || []).forEach((r, rIdx) => {
+            const nextId = r.NextInteractionID;
+            const payload = {
+                text: r.Text || "",
+                next_id: nextId != null ? String(nextId) : "-1",
+            };
+            for (const skill of SCORE_SKILLS) {
+                payload[skill] = responseScore(r, skill);
+            }
+            if (nextId != null && nextId !== -1) {
+                const targetNodeId = getNodeId(chapterId, scene.Id, nextId);
+                payload.target_node_id = targetNodeId;
+                payload.edge_id = getEdgeId(nodeId, rIdx, targetNodeId);
+            } else {
+                payload.target_node_id = "";
+                payload.edge_id = "";
+            }
+            responses.push(payload);
+        });
+
+        parcours.push({
+            node_id: nodeId,
+            actor: (ia.Actor || {}).Name || "",
+            text: ia.Text || "",
+            image: ia.AgentFacialExpression || "",
+            responses,
+        });
+
+        for (const r of ia.Responses || []) {
+            const nextId = r.NextInteractionID;
+            if (nextId != null && nextId !== -1 && !visited[nextId]) {
+                addEntry(nextId);
+            }
+        }
+    }
+
+    starts.sort((a, b) => a - b).forEach(addEntry);
+    for (const ia of interactions) {
+        if (!visited[ia.Id]) addEntry(ia.Id);
+    }
+
+    const idToParcours = {};
+    for (const entry of parcours) {
+        idToParcours[String(getInteractionIdFromNodeId(entry.node_id, null))] = entry;
+    }
+    return { parcours, idToParcours };
 }
 
 export function rebuildSceneGraph(idx) {
@@ -71,7 +165,7 @@ export function rebuildSceneGraph(idx) {
         const actorName = (ia.Actor || {}).Name || "?";
         const text = ia.Text || "";
         const name = ia.Name || text.substring(0, 50);
-        const nodeId = "C" + chId + "_S" + sc.Id + "_I" + ia.Id;
+        const nodeId = getNodeId(chId, sc.Id, ia.Id);
         let baseLabel = name || text || "—";
         if (baseLabel.length > 38) baseLabel = baseLabel.substring(0, 37) + "…";
         const label = ia.Id + " — " + baseLabel;
@@ -84,8 +178,8 @@ export function rebuildSceneGraph(idx) {
             const nextId = r.NextInteractionID;
             if (nextId == null || nextId === -1) return;
             if (!idToIa[nextId]) return;
-            const targetNodeId = "C" + chId + "_S" + sc.Id + "_I" + nextId;
-            const edgeId = nodeId + "_R" + rIdx + "_>" + targetNodeId;
+            const targetNodeId = getNodeId(chId, sc.Id, nextId);
+            const edgeId = getEdgeId(nodeId, rIdx, targetNodeId);
             const rText = (r.Text || "").trim();
             let edgeTitle = "Réponse " + (rIdx + 1);
             if (rText) edgeTitle += " — " + rText;
@@ -117,19 +211,30 @@ export function rebuildSceneGraph(idx) {
     const targets = {};
     for (const e of newEdges) targets[e.to] = true;
     const firstNodeId = interactions.length > 0
-        ? "C" + chId + "_S" + sc.Id + "_I" + interactions[0].Id
+        ? getNodeId(chId, sc.Id, interactions[0].Id)
         : null;
+    const entryIds = {};
+    for (const ep of sc.EntryPoints || []) {
+        entryIds[getNodeId(chId, sc.Id, ep.InteractionId)] = true;
+    }
     for (const n of newNodes) {
-        if (!targets[n.id] && n.id !== firstNodeId) {
+        if (entryIds[n.id]) {
+            n.is_entry = true;
+            n.color = { background: "#fcf0f5", border: "#9a0050" };
+        } else if (!targets[n.id] && n.id !== firstNodeId) {
             n.is_root = true;
-            n.color = { background: "#451a1a", border: "#f97373" };
+            n.color = { background: "#ffeae8", border: "#b50000" };
         } else {
-            n.color = { background: "#27272a", border: "#38bdf8" };
+            n.color = { background: "#ffffff", border: "#0040bb" };
         }
     }
 
     state.scenesData[idx].nodes = newNodes;
     state.scenesData[idx].edges = newEdges;
+    state.scenesData[idx].scene_intro = sc.SceneIntroduction || "";
+    const parcoursPayload = buildParcoursPayload(chId, sc, idToIa);
+    state.scenesData[idx].parcours = parcoursPayload.parcours;
+    state.scenesData[idx].id_to_parcours = parcoursPayload.idToParcours;
 
     if (state.nodesDS && state.edgesDS) {
         state.nodesDS.clear();
@@ -183,12 +288,12 @@ export function showScene(idx) {
         nodes: {
             font: {
                 size: 38,
-                color: "#f9fafb",
+                color: "#192230",
                 face: "system-ui, -apple-system, sans-serif",
                 bold: true,
             },
             shape: "box",
-            color: { background: "#18181b", border: "#38bdf8" },
+            color: { background: "#ffffff", border: "#0040bb" },
             margin: 32,
             borderWidth: 2,
             widthConstraint: { minimum: 260, maximum: 360 },
@@ -199,9 +304,9 @@ export function showScene(idx) {
             hoverWidth: 3,
             selectionWidth: 5,
             smooth: { enabled: true, type: "dynamic", roundness: 0.35 },
-            color: "#9ca3af",
+            color: "#989fa8",
             font: {
-                color: "#a5b4fc",
+                color: "#47505e",
                 size: 14,
                 align: "top",
                 face: "system-ui, sans-serif",

@@ -56,8 +56,9 @@ def test_chapter_roundtrip_preserves_unknown_scene_extras():
 
 
 @pytest.mark.parametrize("filename", [
-    "Chapters_v3-4-c_emotional-illustration.json",
+    "chapter.json",
     "MedStudents_Y2_v1.json",
+    "MedStudents_Y2_v2.json",
 ])
 def test_real_books_full_roundtrip(filename):
     """Round-trip exact sur les vrais fichiers JSON livrés."""

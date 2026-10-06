@@ -1,0 +1,267 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Médecine en Suisse romande et à Zurich</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --paper: #f5f7fa;
+  --surface: #ffffff;
+  --ink: #17212c;
+  --ink-2: #4a5866;
+  --ink-3: #7b8896;
+  --line: #dde3ea;
+  --accent: #1f4e8c;
+  --accent-soft: #e4ecf7;
+  --b1: #dce9f8; --b2: #c3d9f3; --b3: #a6c5ec;
+  --m1: #d6efe6; --m2: #b5e2d1; --m3: #92d3bb;
+  --chip-ink: #17212c;
+  --hit: #1f4e8c;
+  --hit-ink: #ffffff;
+  font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #10161d; --surface: #17202a; --ink: #e6ecf2; --ink-2: #aab6c3; --ink-3: #7d8a98;
+    --line: #2a3643; --accent: #8db4ea; --accent-soft: #1d2b3c;
+    --b1: #1f3552; --b2: #27446a; --b3: #2f5584;
+    --m1: #1b3a31; --m2: #214b3e; --m3: #285d4c;
+    --chip-ink: #e6ecf2; --hit: #8db4ea; --hit-ink: #0e1620;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #10161d; --surface: #17202a; --ink: #e6ecf2; --ink-2: #aab6c3; --ink-3: #7d8a98;
+  --line: #2a3643; --accent: #8db4ea; --accent-soft: #1d2b3c;
+  --b1: #1f3552; --b2: #27446a; --b3: #2f5584;
+  --m1: #1b3a31; --m2: #214b3e; --m3: #285d4c;
+  --chip-ink: #e6ecf2; --hit: #8db4ea; --hit-ink: #0e1620;
+}
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--ink); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; display: grid; gap: 22px; }
+header { display: grid; gap: 10px; }
+.eyebrow { font: 500 12px/1 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-size: clamp(24px, 3.4vw, 34px); line-height: 1.15; font-weight: 700; text-wrap: balance; }
+.lede { margin: 0; color: var(--ink-2); max-width: 70ch; }
+.timeline { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; max-width: 620px; }
+.timeline div { border-radius: 6px; padding: 6px 8px; display: grid; gap: 1px; color: var(--chip-ink); }
+.timeline b { font: 500 13px/1.1 "IBM Plex Mono", ui-monospace, monospace; }
+.timeline span { font-size: 12px; color: var(--ink-2); }
+.phase { display: flex; gap: 4px; max-width: 620px; font-size: 12px; color: var(--ink-3); }
+.phase span { flex: 1; border-top: 2px solid var(--line); padding-top: 4px; }
+.notes { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 13.5px; display: grid; gap: 4px; max-width: 90ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+@media (min-width: 900px) { .controls { position: sticky; top: 0; z-index: 2; } }
+.tabs { display: flex; gap: 4px; background: var(--accent-soft); border-radius: 8px; padding: 3px; }
+.tabs button { border: 0; background: transparent; color: var(--ink-2); font: inherit; font-weight: 600; font-size: 14px; padding: 7px 12px; border-radius: 6px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+input[type="search"], select { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 7px; padding: 7px 10px; }
+input[type="search"] { flex: 1 1 200px; min-width: 0; }
+label.toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.count { margin-left: auto; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.tablebox { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; min-width: 720px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+thead th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; background: var(--surface); position: sticky; top: 0; }
+th.uni, td.uni { width: 22%; }
+tr.cat td .chip { margin-right: 4px; }
+tr.cat td { background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; letter-spacing: .03em; padding-block: 6px; }
+td.name { font-weight: 500; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { font: 500 12.5px/1 "IBM Plex Mono", ui-monospace, monospace; padding: 5px 7px; border-radius: 5px; color: var(--chip-ink); font-variant-numeric: tabular-nums; }
+.chip.implicit { background: transparent !important; border: 1px dashed var(--ink-3); color: var(--ink-2); }
+.chip.hit { outline: 2px solid var(--hit); outline-offset: -2px; }
+.none { color: var(--ink-3); }
+.src { margin-top: 6px; display: grid; gap: 3px; font-size: 12.5px; color: var(--ink-2); }
+.src b { font: 500 11.5px "IBM Plex Mono", ui-monospace, monospace; color: var(--ink-3); margin-right: 4px; }
+.hide-src .src { display: none; }
+.y-B1 { background: var(--b1); } .y-B2 { background: var(--b2); } .y-B3 { background: var(--b3); }
+.y-M1 { background: var(--m1); } .y-M2 { background: var(--m2); } .y-M3 { background: var(--m3); }
+.commonyear { font: 600 13px "IBM Plex Mono", ui-monospace, monospace; white-space: nowrap; }
+.summary { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.summary div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
+.summary b { font: 600 24px/1.1 "IBM Plex Sans", sans-serif; font-variant-numeric: tabular-nums; }
+.summary span { font-size: 12.5px; color: var(--ink-2); }
+.summary .tag { font: 500 12px "IBM Plex Mono", monospace; color: var(--ink-3); }
+.panel { display: grid; gap: 14px; }
+.foot { font-size: 12.5px; color: var(--ink-3); }
+@media (max-width: 720px) {
+  .summary, .timeline { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .count { margin-left: 0; width: 100%; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Plans d'études 2025-2026 · UNIL · UNIGE · UZH</p>
+    <h1>Qui enseigne quoi, et en quelle année ?</h1>
+    <p class="lede">Les matières des trois facultés de médecine, rangées par année d'études. Le cursus dure six ans partout : trois ans de Bachelor puis trois ans de Master.</p>
+    <div class="timeline" aria-label="Correspondance des codes et des années">
+      <div class="y-B1"><b>B1</b><span>1ʳᵉ année</span></div>
+      <div class="y-B2"><b>B2</b><span>2ᵉ année</span></div>
+      <div class="y-B3"><b>B3</b><span>3ᵉ année</span></div>
+      <div class="y-M1"><b>M1</b><span>4ᵉ année</span></div>
+      <div class="y-M2"><b>M2</b><span>5ᵉ année</span></div>
+      <div class="y-M3"><b>M3</b><span>6ᵉ année</span></div>
+    </div>
+    <div class="phase"><span>Bachelor</span><span>Master</span></div>
+    <ul class="notes">
+      <li>Pastille en pointillé : matière intégrée dans un bloc plus large, sans être nommée dans le document.</li>
+      <li>« — » : pas identifiée comme enseignement distinct dans le plan d'études (elle peut être abordée ailleurs).</li>
+      <li>UZH : l'année à option couvre le 2ᵉ semestre de la 5ᵉ année et le 1ᵉʳ de la 6ᵉ ; elle apparaît en M2 et M3.</li>
+    </ul>
+  </header>
+
+  <div class="controls" role="search">
+    <div class="tabs" role="tablist">
+      <button id="tab-all" role="tab" aria-selected="true" aria-controls="panel-all">Toutes les matières</button>
+      <button id="tab-common" role="tab" aria-selected="false" aria-controls="panel-common">Même année dans les 3</button>
+    </div>
+    <input id="q" type="search" placeholder="Rechercher une matière ou un module" aria-label="Rechercher">
+    <select id="cat" aria-label="Catégorie"><option value="">Toutes les catégories</option></select>
+    <label class="toggle" id="srctoggle"><input id="showsrc" type="checkbox"> Afficher les modules</label>
+    <span class="count" id="count"></span>
+  </div>
+
+  <section class="panel" id="panel-all" role="tabpanel" aria-labelledby="tab-all">
+    <div class="tablebox hide-src" id="box-all">
+      <table>
+        <thead><tr><th>Matière</th><th class="uni">UNIL</th><th class="uni">UNIGE</th><th class="uni">UZH</th></tr></thead>
+        <tbody id="tbody-all"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-common" role="tabpanel" aria-labelledby="tab-common" hidden>
+    <div class="summary" id="summary"></div>
+    <div class="tablebox" id="box-common">
+      <table>
+        <thead><tr><th>Matière</th><th class="uni">UNIL</th><th class="uni">UNIGE</th><th class="uni">UZH</th></tr></thead>
+        <tbody id="tbody-common"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="foot">Sources : plans d'études UNIL (par année, 2025-2026), UNIGE (plans d'études Bachelor 2025 et Master 2025-2026, contenu des matières de 1ʳᵉ année, présentation des années Master), UZH (brochures d'information par année d'études, état au 01.08.2026). Pour UNIGE, le détail des matières de 2ᵉ et 3ᵉ années n'est pas public : seules les unités du plan d'études sont reprises.</p>
+</div>
+
+<script>
+const DATA = [{"cat": "Sciences de base", "name": "Physique", "u": [[{"y": "B1", "s": "BMed1.1 Matière – Physique", "i": false}], [{"y": "B1", "s": "SFO – Physique", "i": false}], [{"y": "B1", "s": "Naturwiss. u. anat. Grundlagen – Physik ; Physikpraktikum", "i": false}]]}, {"cat": "Sciences de base", "name": "Chimie générale", "u": [[{"y": "B1", "s": "BMed1.1 Matière – Chimie générale", "i": false}], [{"y": "B1", "s": "SFO – Chimie générale", "i": false}], [{"y": "B1", "s": "Allgemeine Chemie ; Praktikum allgemeine Chemie", "i": false}]]}, {"cat": "Sciences de base", "name": "Chimie organique", "u": [[{"y": "B1", "s": "BMed1.1 Matière – Chimie organique", "i": false}], [{"y": "B1", "s": "SFO – Chimie organique", "i": false}], []]}, {"cat": "Sciences de base", "name": "Biologie cellulaire et moléculaire", "u": [[{"y": "B1", "s": "BMed1.2 Cellule et tissus – Biologie des cellules", "i": false}], [{"y": "B1", "s": "SMB – De l'ADN à la protéine ; Construction d'une cellule", "i": false}, {"y": "B2", "s": "Unité Croissance et vieillissement cellulaire", "i": false}], [{"y": "B1", "s": "Molekulare Zellbiologie I–II + Praktikum", "i": false}]]}, {"cat": "Sciences de base", "name": "Biochimie et métabolisme", "u": [[{"y": "B2", "s": "BMed2.5 – Voies métaboliques ; TP biochimie (BMed2.10)", "i": false}], [{"y": "B1", "s": "SMB – Biochimie et métabolisme ; Métabolisme lipidique", "i": false}, {"y": "B2", "s": "Unité Nutrition, digestion et métabolisme", "i": false}], [{"y": "B1", "s": "Molekulare Zellbiologie (partie biochimie)", "i": false}, {"y": "B2", "s": "Praktikum Biochemie I+II", "i": false}]]}, {"cat": "Sciences de base", "name": "Génétique", "u": [[{"y": "B1", "s": "BMed1.3 Développement et génétique", "i": false}, {"y": "M2", "s": "MMed2.2 – Génétique médicale", "i": false}], [{"y": "B1", "s": "SMB – Génétique et génomique humaine", "i": false}], [{"y": "B1", "s": "Gentechnik", "i": false}, {"y": "B2", "s": "Vorlesung Funktionelle Genomik", "i": false}]]}, {"cat": "Sciences de base", "name": "Embryologie et développement", "u": [[{"y": "B1", "s": "BMed1.3 – Embryologie humaine et animale", "i": false}], [{"y": "B1", "s": "SMB – Mécanismes du développement", "i": false}], [{"y": "B1", "s": "Embryologie", "i": false}]]}, {"cat": "Sciences de base", "name": "Histologie", "u": [[{"y": "B1", "s": "BMed1.2 – Biologie des tissus", "i": false}, {"y": "B2", "s": "BMed2.10 – TP histologie", "i": false}], [{"y": "B1", "s": "SMB – Organisation des tissus ; Histologie", "i": false}, {"y": "B2", "s": "TP histologie", "i": false}], [{"y": "B1", "s": "Praktikum Histologie I", "i": false}, {"y": "B2", "s": "Praktikum Histologie II–III", "i": false}]]}, {"cat": "Sciences de base", "name": "Anatomie", "u": [[{"y": "B1", "s": "BMed1.4 – Anatomie du système locomoteur", "i": false}, {"y": "B2", "s": "Morphologie par système ; TP anatomie (BMed2.10)", "i": false}], [{"y": "B1", "s": "SMB – Anatomie (+ TP)", "i": false}, {"y": "B2", "s": "TP anatomie", "i": false}], [{"y": "B1", "s": "Funktionelle Anatomie des Bewegungsapparates", "i": false}, {"y": "B2", "s": "Klinische und topographische Anatomie I–II", "i": false}]]}, {"cat": "Sciences de base", "name": "Physiologie", "u": [[{"y": "B1", "s": "BMed1.4 – Physiologie du système locomoteur", "i": false}, {"y": "B2", "s": "Physiologie par système (BMed2.1 à 2.6)", "i": false}], [{"y": "B1", "s": "SMB – Systèmes (circulatoire, respiratoire, urinaire…)", "i": false}, {"y": "B2", "s": "Unités par système", "i": false}], [{"y": "B1", "s": "Molekulare Zellbiologie (partie physiologie)", "i": false}, {"y": "B2", "s": "Humanbiologie I–II ; Praktikum Physiologie I–II", "i": false}]]}, {"cat": "Sciences de base", "name": "Neurosciences fondamentales", "u": [[{"y": "B2", "s": "BMed2.3 Neurosciences", "i": false}], [{"y": "B1", "s": "SMB – Système nerveux", "i": false}, {"y": "B3", "s": "Unités Introduction au système nerveux ; Neurosciences", "i": false}], [{"y": "B2", "s": "Humanbiologie II – TB Zentrales Nervensystem, Sinnesorgane", "i": false}]]}, {"cat": "Sciences de base", "name": "Microbiologie (bactério-, viro-, parasitologie)", "u": [[{"y": "B2", "s": "BMed2.2 Sang, immunité, microbes – Microbes", "i": false}, {"y": "B3", "s": "BMed3.3 Inflammation – Microbiologie", "i": false}], [{"y": "B1", "s": "SMB – Microbiologie", "i": false}, {"y": "B3", "s": "Unité Infections", "i": false}], [{"y": "B3", "s": "Laborkurse II – Mikrobiologie, Parasitologie, Virologie", "i": false}]]}, {"cat": "Sciences de base", "name": "Immunologie", "u": [[{"y": "B2", "s": "BMed2.2 – Immunité", "i": false}, {"y": "B3", "s": "BMed3.3 – Immunologie, immunopathologie", "i": false}, {"y": "M2", "s": "MMed2.3 – Immunologie", "i": false}], [{"y": "B1", "s": "SMB – Immunologie, inflammation", "i": false}, {"y": "B3", "s": "Unité Défenses et immunité", "i": false}], [{"y": "B2", "s": "Humanbiologie I – TB Blut und Immunsystem", "i": false}, {"y": "B3", "s": "TB Infekt, Abwehr, Systemerkrankungen ; Laborkurs Immunologie", "i": false}]]}, {"cat": "Sciences de base", "name": "Pharmacologie", "u": [[{"y": "B2", "s": "BMed2.1 – Bases de pharmacologie, SNA ; pharmacologie par système", "i": false}, {"y": "B3", "s": "Pharmacologie dans BMed3.2 et 3.3", "i": false}, {"y": "M2", "s": "MMed2.4 – Pharmacologie clinique", "i": false}], [{"y": "B1", "s": "SMB – Pharmacologie", "i": false}, {"y": "M1", "s": "AMC Médecine interne, pharmacologie clinique et médecine palliative", "i": false}], [{"y": "B3", "s": "TB Grundlagen der Diagnostik und Therapie (contenu non détaillé)", "i": true}, {"y": "M3", "s": "Fallbasierte Repetition – Pharmakologie", "i": false}]]}, {"cat": "Sciences de base", "name": "Pathologie", "u": [[{"y": "B2", "s": "BMed2.1 – Pathologie générale ; TP pathologie", "i": false}, {"y": "B3", "s": "Pathologie dans BMed3.1 et 3.2", "i": false}, {"y": "M1", "s": "MMed1.2 – Pathologie", "i": false}, {"y": "M2", "s": "MMed2.10 Compétences pratiques – Pathologie", "i": false}], [{"y": "B2", "s": "TP histopathologie", "i": false}, {"y": "M1", "s": "Discipline transversale Pathologie (sem. 1–4)", "i": false}, {"y": "M2", "s": "Discipline transversale Pathologie (sem. 1–4)", "i": false}], [{"y": "B3", "s": "Pathologie-Kurse ; TB Grundlagen der Diagnostik und Therapie", "i": false}, {"y": "M1", "s": "Kurs Pathologie 2", "i": false}, {"y": "M3", "s": "Kurs Pathologie – autopsie, macropathologie (6ᵉ année)", "i": false}]]}, {"cat": "Sciences de base", "name": "Radiologie et imagerie (dont médecine nucléaire)", "u": [[{"y": "B2", "s": "BMed2.1 – Bases d'imagerie médicale ; TP radiologie", "i": false}, {"y": "B3", "s": "Imagerie et neuroradiologie dans BMed3.1 et 3.4", "i": false}, {"y": "M1", "s": "Cours-bloc radiologie ; MMed1.2 radiologie", "i": false}, {"y": "M2", "s": "MMed2.10 – Radiologie ; MMed2.2 médecine nucléaire", "i": false}], [{"y": "M1", "s": "Discipline transversale Radiologie (sem. 1–4)", "i": false}, {"y": "M2", "s": "Discipline transversale Radiologie (sem. 1–4)", "i": false}], [{"y": "B1", "s": "Introduction à la radiographie (partie anatomie)", "i": false}, {"y": "M1", "s": "Klinische Radiologie ; Neuroradiologie ; Nuklearmedizin", "i": false}, {"y": "M3", "s": "Repetition: radiologische Bildbeurteilung", "i": false}]]}, {"cat": "Sciences de base", "name": "Biostatistique et épidémiologie", "u": [[{"y": "B1", "s": "BMed1.5 – Épidémiologie et statistique", "i": false}, {"y": "B3", "s": "BMed3.8 – Épidémiologie", "i": false}, {"y": "M1", "s": "MMed1.6 – Tests diagnostiques, épidémiologie", "i": false}], [{"y": "B1", "s": "SFO – Statistiques", "i": false}], [{"y": "B1", "s": "Biostatistik und Öffentliche Gesundheit ; Praktikum Biostatistik", "i": false}, {"y": "M1", "s": "Kurs Klinische Biostatistik", "i": false}]]}, {"cat": "Sciences de base", "name": "Informatique médicale, IA et numérique", "u": [[{"y": "B1", "s": "BMed1.1 – Informatique médicale ; intelligence artificielle", "i": false}], [{"y": "B1", "s": "PSS – Médecine à l'ère des diagnostics assistés ; santé numérique", "i": false}, {"y": "B2", "s": "DC – IA et Big Data ; formation plagiat et IA générative", "i": false}], [{"y": "B1", "s": "Fokuswoche Digitalisierung", "i": false}, {"y": "M2", "s": "Thème longitudinal Digitalisierung", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Cardiologie et angiologie", "u": [[{"y": "B2", "s": "BMed2.4 Circulation, respiration", "i": false}, {"y": "B3", "s": "BMed3.1 Cœur, poumons", "i": false}, {"y": "M2", "s": "MMed2.4 Médecine vasculaire (angiologie, HTA)", "i": false}], [{"y": "B1", "s": "SMB – Système circulatoire", "i": false}, {"y": "B2", "s": "Unité Cœur et circulation", "i": false}], [{"y": "B2", "s": "TB Herz-Kreislauf", "i": false}, {"y": "B3", "s": "TB Herz-Kreislauf (clinique)", "i": false}, {"y": "M2", "s": "Feld Thorax", "i": false}, {"y": "M3", "s": "Repetition Kardiologie, Angiologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Pneumologie", "u": [[{"y": "B2", "s": "BMed2.4 Circulation, respiration", "i": false}, {"y": "B3", "s": "BMed3.1 Cœur, poumons", "i": false}], [{"y": "B1", "s": "SMB – Système respiratoire", "i": false}, {"y": "B2", "s": "Unité Respiration", "i": false}], [{"y": "B2", "s": "TB Atmung", "i": false}, {"y": "B3", "s": "TB Atmung (clinique)", "i": false}, {"y": "M2", "s": "Feld Thorax", "i": false}, {"y": "M3", "s": "Repetition Pneumologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Gastro-entérologie et hépatologie", "u": [[{"y": "B2", "s": "BMed2.5 Digestion, métabolisme", "i": false}, {"y": "B3", "s": "BMed3.2 Douleurs abdominales", "i": false}], [{"y": "B1", "s": "SMB – Système digestif", "i": false}, {"y": "B2", "s": "Unité Nutrition, digestion et métabolisme", "i": false}], [{"y": "B2", "s": "TB Verdauung und Ernährung", "i": false}, {"y": "B3", "s": "TB Gastrointestinaltrakt", "i": false}, {"y": "M2", "s": "Feld Abdomen", "i": false}, {"y": "M3", "s": "Repetition Gastroenterologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Nutrition", "u": [[{"y": "B2", "s": "BMed2.5 – Besoins nutritionnels, obésité", "i": false}], [{"y": "B2", "s": "Unité Nutrition, digestion et métabolisme", "i": false}], [{"y": "B2", "s": "TB Verdauung und Ernährung", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Néphrologie et urologie", "u": [[{"y": "B2", "s": "BMed2.6 Système urogénital et homéostasie", "i": false}, {"y": "B3", "s": "BMed3.2 – Néphrologie, urologie", "i": false}], [{"y": "B1", "s": "SMB – Système urinaire", "i": false}, {"y": "B2", "s": "Unité Excrétion et homéostasie", "i": false}], [{"y": "B2", "s": "TB Niere", "i": false}, {"y": "M1", "s": "TB Niere, Elektrolyte, Wasserhaushalt", "i": false}, {"y": "M2", "s": "Feld Urogenital", "i": false}, {"y": "M3", "s": "Repetition Nephrologie, Urologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Endocrinologie et diabétologie", "u": [[{"y": "B2", "s": "BMed2.1 – Glandes et hormones ; BMed2.5 homéostasie glucidique", "i": false}, {"y": "M2", "s": "MMed2.2 – Endocrinologie", "i": false}], [{"y": "B1", "s": "SMB – Système endocrinien", "i": false}], [{"y": "B2", "s": "TB Endokrinologie", "i": false}, {"y": "M1", "s": "TB Stoffwechsel, endokrine Organe", "i": false}, {"y": "M3", "s": "Repetition Endokrinologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Reproduction et système génital", "u": [[{"y": "B2", "s": "BMed2.6 – Périnée et génital ; hormones de la reproduction", "i": false}], [{"y": "B1", "s": "SMB – Système reproducteur", "i": false}, {"y": "B2", "s": "Unité Reproduction", "i": false}], [{"y": "B2", "s": "TB Reproduktion", "i": false}, {"y": "B3", "s": "TB Geschlechtsorgane", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Appareil locomoteur (orthopédie, rhumatologie, traumatologie)", "u": [[{"y": "B1", "s": "BMed1.4 Système locomoteur", "i": false}, {"y": "M1", "s": "MMed1.1 Système musculosquelettique", "i": false}], [{"y": "B1", "s": "SMB – Locomotion ; Métabolisme osseux", "i": false}, {"y": "B2", "s": "Unité Os et articulations", "i": false}], [{"y": "B1", "s": "Anatomie + Untersuchungskurs Bewegungsapparat", "i": false}, {"y": "B3", "s": "TB Bewegungsapparat ; KK Bewegungsapparat", "i": false}, {"y": "M2", "s": "Feld Rücken/Extremitäten", "i": false}, {"y": "M3", "s": "Repetition Rheumatologie, Traumatologie/Orthopädie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Hématologie", "u": [[{"y": "B2", "s": "BMed2.2 – Sang", "i": false}, {"y": "M2", "s": "MMed2.3 – Hématologie, hémato-oncologie", "i": false}], [{"y": "B1", "s": "SMB – Hémostase (système circulatoire)", "i": false}], [{"y": "B2", "s": "TB Blut und Immunsystem", "i": false}, {"y": "M1", "s": "TB Hämatologische Neoplasien ; Laborkurs Hämatologie", "i": false}, {"y": "M3", "s": "Repetition Hämatologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Maladies infectieuses", "u": [[{"y": "B3", "s": "BMed3.3 – Maladies infectieuses", "i": false}, {"y": "M2", "s": "MMed2.3 – Maladies infectieuses", "i": false}], [{"y": "B3", "s": "Unité Infections", "i": false}], [{"y": "B3", "s": "TB Infekt, Abwehr, Systemerkrankungen", "i": false}, {"y": "M3", "s": "Repetition Infektiologie und Spitalhygiene", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Oncologie", "u": [[{"y": "M1", "s": "MMed1.2 – Oncologie (pédiatrique)", "i": false}, {"y": "M2", "s": "MMed2.1 Oncologie interdisciplinaire", "i": false}], [{"y": "B1", "s": "Cas de liaison MFE – cancer, coordination des soins oncologiques", "i": true}], [{"y": "B3", "s": "Cluster Onkologie (longitudinal)", "i": false}, {"y": "M1", "s": "Cluster Onkologie ; TB Hämatologische Neoplasien", "i": false}, {"y": "M2", "s": "Feld Systemisch", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Neurologie et neurochirurgie", "u": [[{"y": "B3", "s": "BMed3.4 – Neurologie, neurochirurgie", "i": false}, {"y": "M1", "s": "Cours-bloc neurologie / neurosciences", "i": false}, {"y": "M2", "s": "MMed2.2 – Neurologie", "i": false}], [{"y": "M2", "s": "AMC Neurologie-Neurochirurgie", "i": false}], [{"y": "B3", "s": "Klinischer Kurs Neurologie", "i": false}, {"y": "M1", "s": "TB Nervensystem ; KK Neurologie und Neurochirurgie", "i": false}, {"y": "M2", "s": "Feld Kopf/Hals", "i": true}, {"y": "M3", "s": "Repetition Neurologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Psychiatrie", "u": [[{"y": "B3", "s": "BMed3.4 – Psychiatrie", "i": false}, {"y": "M1", "s": "Cours-bloc psychiatrie ; MMed1.8 compétences cliniques", "i": false}, {"y": "M2", "s": "MMed2.2 – Psychiatrie", "i": false}], [{"y": "M1", "s": "AMC Psychiatrie", "i": false}], [{"y": "B3", "s": "Klinischer Kurs Psychiatrie", "i": false}, {"y": "M1", "s": "TB Psyche und Verhalten ; KK Psychiatrie", "i": false}, {"y": "M3", "s": "Repetition Psychiatrie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Médecine psychosociale et psychologie médicale", "u": [[{"y": "B1", "s": "BMed1.5 – Déterminants de l'interaction médecin-malade", "i": false}, {"y": "B3", "s": "BMed3.4 – Neuropsychologie", "i": false}], [{"y": "B1", "s": "PSS – Médecine psycho-sociale", "i": false}], [{"y": "B1", "s": "Grundlagen der Psychosozialen Medizin I", "i": false}, {"y": "B3", "s": "TB Psychosoziale Medizin II ; KK Psychosoziale Medizin", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Pédiatrie", "u": [[{"y": "B3", "s": "BMed3.5 Croissance et développement", "i": false}, {"y": "M1", "s": "MMed1.2 Mère, enfant – Pédiatrie, chirurgie pédiatrique", "i": false}], [{"y": "B1", "s": "PSS – Âges de la vie ; MFE (médecine de l'enfance)", "i": false}, {"y": "M1", "s": "AMC Pédiatrie", "i": false}], [{"y": "B3", "s": "Klinischer Kurs Pädiatrie", "i": false}, {"y": "M1", "s": "TB Kinder- und Jugendmedizin ; KK Pädiatrie", "i": false}, {"y": "M2", "s": "Thème longitudinal Pädiatrie", "i": false}, {"y": "M3", "s": "Repetition Pädiatrie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Gynécologie-obstétrique", "u": [[{"y": "M1", "s": "MMed1.2 Mère, enfant – Gynécologie-obstétrique", "i": false}], [{"y": "M1", "s": "AMC Gynécologie-Obstétrique", "i": false}], [{"y": "B3", "s": "TB Geschlechtsorgane", "i": false}, {"y": "M1", "s": "TB Schwangerschaft, Geburt ; KK Gynäkologie und Geburtshilfe", "i": false}, {"y": "M2", "s": "Thème longitudinal Schwangerschaft", "i": false}, {"y": "M3", "s": "Repetition ; KK VI Gynäkologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Chirurgie", "u": [[{"y": "B3", "s": "BMed3.2 – Chirurgie", "i": false}, {"y": "M1", "s": "Cours-bloc chirurgie générale ; MMed1.8 sutures", "i": false}], [{"y": "M1", "s": "AMC Chirurgie", "i": false}], [{"y": "B3", "s": "Klinischer Kurs Chirurgie", "i": false}, {"y": "M2", "s": "Chirurgische Visite", "i": false}, {"y": "M3", "s": "Repetition Viszeral-, Thorax-, Herzchirurgie ; KK VI", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Médecine interne générale", "u": [[{"y": "M1", "s": "MMed1.5 Généralisme I ; cours-blocs médecine interne", "i": false}, {"y": "M2", "s": "MMed2.5 Généralisme II", "i": false}], [{"y": "M1", "s": "AMC Médecine interne, pharmacologie clinique et médecine palliative", "i": false}], [{"y": "B3", "s": "Klinischer Einführungskurs / KK Innere Medizin", "i": false}, {"y": "M1", "s": "KK Innere Medizin", "i": false}, {"y": "M2", "s": "Internistische Visite", "i": false}, {"y": "M3", "s": "KK VI – Falldiskussion Innere Medizin", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Dermatologie", "u": [[{"y": "M1", "s": "MMed1.3 ORL, dermatologie, ophtalmologie", "i": false}], [{"y": "M2", "s": "AMC Dermatologie", "i": false}], [{"y": "B3", "s": "Klinischer Kurs Dermatologie", "i": false}, {"y": "M1", "s": "TB Haut ; Kurs Dermatologie Teil 1", "i": false}, {"y": "M3", "s": "Dermatologie Teil 2 ; Repetition", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Ophtalmologie", "u": [[{"y": "M1", "s": "MMed1.3 ORL, dermatologie, ophtalmologie", "i": false}], [{"y": "M2", "s": "AMC Ophtalmologie", "i": false}], [{"y": "M1", "s": "TB Sinnesorgane, Gesicht, Hals ; KK Ophthalmologie", "i": false}, {"y": "M3", "s": "KK VI ; Repetition Ophthalmologie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "ORL (oto-rhino-laryngologie)", "u": [[{"y": "M1", "s": "MMed1.3 ORL, dermatologie, ophtalmologie", "i": false}], [{"y": "M2", "s": "AMC Oto-Rhino-Laryngologie", "i": false}], [{"y": "M1", "s": "TB Sinnesorgane, Gesicht, Hals ; KK ORL", "i": false}, {"y": "M2", "s": "Feld Kopf/Hals", "i": false}, {"y": "M3", "s": "KK VI ORL", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Urgences, médecine aiguë et réanimation", "u": [[{"y": "B2", "s": "BMed2.8 – Urgences et réanimation", "i": false}, {"y": "B3", "s": "BMed3.5 urgences pédiatriques ; BMed3.8", "i": false}, {"y": "M1", "s": "Cours-bloc urgences", "i": false}, {"y": "M2", "s": "MMed2.1 – Médecine aiguë", "i": false}], [{"y": "M2", "s": "AMC Urgences et médecine intensive", "i": false}], [{"y": "B3", "s": "Basic Life Support", "i": false}, {"y": "M1", "s": "TB Notfälle", "i": false}, {"y": "M2", "s": "Thème longitudinal Notfallmedizin", "i": false}, {"y": "M3", "s": "Notfallkurs ; Repetition", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Anesthésiologie et traitement de la douleur", "u": [[{"y": "B3", "s": "BMed3.2 anesthésie ; BMed3.4 antalgie", "i": false}, {"y": "M2", "s": "MMed2.1 – Traitement de la douleur", "i": false}], [], [{"y": "M1", "s": "TB Anästhesiologie, perioperative Medizin", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Gériatrie", "u": [[{"y": "B3", "s": "BMed3.7 – Vieillissement de la population", "i": false}, {"y": "M1", "s": "Cours-bloc réadaptation gériatrique", "i": false}, {"y": "M2", "s": "MMed2.5 – Personne âgée", "i": false}], [{"y": "B1", "s": "PSS – Vieillissement ; prise en charge de la personne âgée", "i": false}], [{"y": "B3", "s": "Cluster Altersmedizin", "i": false}, {"y": "M1", "s": "Cluster Altersmedizin", "i": false}, {"y": "M2", "s": "Thème longitudinal Geriatrie", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Soins palliatifs et fin de vie", "u": [[{"y": "M2", "s": "MMed2.2 – Soins palliatifs", "i": false}], [{"y": "B1", "s": "PSS – Autonomie en fin de vie, aide à mourir ; MFE soins palliatifs", "i": false}, {"y": "M1", "s": "AMC … et médecine palliative", "i": false}], [{"y": "B3", "s": "Fokuswoche Vernetzung – cas de palliative care", "i": true}]]}, {"cat": "Systèmes et spécialités", "name": "Médecine de famille et premier recours", "u": [[{"y": "B2", "s": "BMed2.7 – Rôle des médecins de famille", "i": false}, {"y": "M1", "s": "Généralisme I ; médecine interne ambulatoire", "i": false}, {"y": "M2", "s": "MMed2.5 – Médecine de première ligne", "i": false}, {"y": "M3", "s": "1 mois obligatoire en cabinet", "i": false}], [{"y": "B1", "s": "MFE – Médecine de famille et de l'enfance", "i": false}, {"y": "B2", "s": "Stage IMFE", "i": false}, {"y": "M1", "s": "AMC Médecine communautaire et premier recours", "i": false}, {"y": "M3", "s": "1 mois obligatoire IuMFE", "i": false}], [{"y": "B1", "s": "Hausarztmedizin", "i": false}, {"y": "B3", "s": "Klinischer Kurs Hausarztmedizin", "i": false}, {"y": "M1", "s": "Einzeltutoriat Hausarztmedizin ; Fokuswoche Grundversorgung", "i": false}, {"y": "M2", "s": "Thème longitudinal Hausarztmedizin", "i": false}, {"y": "M3", "s": "Hausarztmedizin – Fälle und Ausblick", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Addictologie", "u": [[{"y": "B3", "s": "BMed3.7 – Addictions", "i": false}, {"y": "M2", "s": "MMed2.4 – Addictions", "i": false}], [], []]}, {"cat": "Systèmes et spécialités", "name": "Médecine légale", "u": [[{"y": "M2", "s": "MMed2.4 – Médecine légale", "i": false}], [{"y": "B2", "s": "DC – Médecine légale et éthique", "i": false}, {"y": "B3", "s": "DC – Médecine légale et éthique", "i": false}, {"y": "M1", "s": "Discipline transversale Médecine légale et éthique", "i": false}, {"y": "M2", "s": "Discipline transversale Médecine légale et éthique", "i": false}], [{"y": "M1", "s": "TB Rechtsmedizin ; Kurs Rechtsmedizin", "i": false}]]}, {"cat": "Systèmes et spécialités", "name": "Activité physique et médecine du sport", "u": [[{"y": "B3", "s": "BMed3.7 – Activité physique et alimentation", "i": false}], [{"y": "B1", "s": "SMB – Locomotion, activité physique et balance énergétique", "i": false}], []]}, {"cat": "Santé, société et profession", "name": "Éthique médicale", "u": [[{"y": "B1", "s": "BMed1.5 – Bases de l'éthique médicale", "i": false}, {"y": "M1", "s": "MMed1.7 – Éthique de la décision médicale", "i": false}, {"y": "M2", "s": "MMed2.2 – Éthique", "i": false}], [{"y": "B1", "s": "PSS – Éthique, déontologie", "i": false}, {"y": "B2", "s": "DC – Médecine légale et éthique", "i": false}, {"y": "B3", "s": "DC – Médecine légale et éthique", "i": false}, {"y": "M1", "s": "Discipline transversale Médecine légale et éthique", "i": false}, {"y": "M2", "s": "Discipline transversale Médecine légale et éthique", "i": false}], [{"y": "B1", "s": "Biomedizinische Ethik ; Kurs Grundlagen der Ethik", "i": false}, {"y": "B3", "s": "Kurs Ethische Fallanalysen", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Droit médical", "u": [[{"y": "B1", "s": "BMed1.5 – Introduction au droit médical", "i": false}, {"y": "M1", "s": "MMed1.7 – Droit médical", "i": false}], [{"y": "B1", "s": "PSS – Déontologie médicale", "i": true}], []]}, {"cat": "Santé, société et profession", "name": "Sciences humaines et sociales (histoire, anthropologie, sociologie, philosophie)", "u": [[{"y": "B1", "s": "BMed1.5 – Sciences humaines et sociales", "i": false}], [{"y": "B1", "s": "PSS – Médecine et sciences humaines", "i": false}], [{"y": "B1", "s": "Wissenschaftstheoretische Grundlagen der Medizin", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Genre et médecine", "u": [[], [{"y": "B1", "s": "PSS – Sexe, genre ; genre, médecine, santé", "i": false}], [{"y": "B1", "s": "Geschlechtsspezifische Medizin", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Santé publique, prévention et médecine communautaire", "u": [[{"y": "B1", "s": "BMed1.5 – Systèmes de santé", "i": false}, {"y": "B3", "s": "BMed3.6–3.7 MSC Épidémiologie, prévention, médecine communautaire", "i": false}, {"y": "M1", "s": "MMed1.7 Déterminants de la santé", "i": false}], [{"y": "B1", "s": "PSS – Déterminants sociaux et environnementaux", "i": false}, {"y": "B2", "s": "DC – Santé publique", "i": false}, {"y": "B3", "s": "Médecine et santé communautaires (stage 4 sem.)", "i": false}, {"y": "M1", "s": "Discipline transversale Santé publique, santé globale", "i": false}, {"y": "M2", "s": "Discipline transversale Santé publique, santé globale", "i": false}], [{"y": "B1", "s": "Öffentliche Gesundheit", "i": false}, {"y": "B3", "s": "TB Public and Global Health", "i": false}, {"y": "M3", "s": "Sozial- und Präventivmedizin", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Économie et systèmes de santé", "u": [[{"y": "B1", "s": "BMed1.5 – Systèmes de santé", "i": false}, {"y": "M1", "s": "MMed1.7 – Économie de la santé, assécurologie", "i": false}], [{"y": "B1", "s": "PSS – Le système suisse de santé", "i": false}, {"y": "B2", "s": "DC – Économie du système de santé", "i": false}], []]}, {"cat": "Santé, société et profession", "name": "Médecine du travail et santé environnementale", "u": [[{"y": "M1", "s": "MMed1.7 – Médecine du travail et santé environnementale", "i": false}], [{"y": "B2", "s": "DC – Médecine du travail", "i": false}, {"y": "M1", "s": "Discipline transversale … médecine du travail", "i": false}, {"y": "M2", "s": "Discipline transversale … médecine du travail", "i": false}], []]}, {"cat": "Santé, société et profession", "name": "Santé planétaire et durabilité", "u": [[{"y": "B1", "s": "BMed1.5 – Durabilité et santé", "i": false}], [{"y": "B1", "s": "PSS – Santé planétaire", "i": false}], [{"y": "M2", "s": "Thème longitudinal Planetary Health", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Communication et relation médecin-patient", "u": [[{"y": "B1", "s": "BMed1.5 – Interaction médecin-malade", "i": false}, {"y": "B2", "s": "BMed2.8 – Anamnèse et communication", "i": false}, {"y": "M1", "s": "Cours-bloc communication ; MMed1.8 annonce de mauvaise nouvelle", "i": false}, {"y": "M2", "s": "MMed2.8 – Entretien motivationnel", "i": false}], [{"y": "B1", "s": "PSS – Communication, relation médecin-malade", "i": false}, {"y": "B2", "s": "Compétences cliniques – relation médecin-malade", "i": false}, {"y": "B3", "s": "Compétences cliniques – relation médecin-malade", "i": false}], [{"y": "B1", "s": "Kurs Kommunikation und Interaktion", "i": false}, {"y": "B3", "s": "Klinischer Kurs Psychosoziale Medizin", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Compétences cliniques (anamnèse, examen clinique)", "u": [[{"y": "B2", "s": "BMed2.8 Compétences cliniques", "i": false}, {"y": "B3", "s": "BMed3.8 Compétences cliniques (dont immersion clinique)", "i": false}, {"y": "M1", "s": "MMed1.6 Cours-blocs ; MMed1.8", "i": false}, {"y": "M2", "s": "MMed2.8 – POCUS, TeamSTEPPS", "i": false}], [{"y": "B2", "s": "Compétences cliniques (CC)", "i": false}, {"y": "B3", "s": "Compétences cliniques – ECOS", "i": false}, {"y": "M1", "s": "UIDC Introduction à la démarche clinique", "i": false}], [{"y": "B1", "s": "Klinischer Untersuchungskurs Bewegungsapparat", "i": false}, {"y": "B2", "s": "Klinischer Untersuchungskurs I–II ; Sonographie", "i": false}, {"y": "B3", "s": "Klinischer Einführungskurs I ; Klinische Kurse II", "i": false}, {"y": "M1", "s": "Klinische Kurse III–IV ; OSCE", "i": false}, {"y": "M2", "s": "Klinische Kurse V ; POCUS", "i": false}, {"y": "M3", "s": "Klinische Kurse VI", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Raisonnement clinique et intégration de cas", "u": [[{"y": "B3", "s": "BMed3.8 – Résolution de cas cliniques", "i": false}, {"y": "M1", "s": "MMed1.6 – Résolution de cas cliniques", "i": false}], [{"y": "B3", "s": "Intégration", "i": false}, {"y": "M1", "s": "UIDC", "i": false}, {"y": "M2", "s": "USIT 1", "i": false}, {"y": "M3", "s": "USIT 2", "i": false}], [{"y": "B3", "s": "Clinical Reasoning 1–2", "i": false}, {"y": "M1", "s": "Clinical Reasoning 3–4", "i": false}, {"y": "M2", "s": "Fallbasierte Vernetzung und Anwendung", "i": false}, {"y": "M3", "s": "Fallbasierte Repetition", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Gestes techniques (sutures, injections, sondages)", "u": [[{"y": "M1", "s": "MMed1.8 – Habiletés cliniques et techniques ; sutures", "i": false}], [{"y": "B2", "s": "Compétences cliniques – gestes médicaux de base", "i": false}, {"y": "B3", "s": "Compétences cliniques – gestes médicaux de base", "i": false}], [{"y": "M2", "s": "Vorbereitung Wahlstudienjahr – sutures, injections, sondage", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Hygiène et prévention des infections", "u": [[{"y": "B3", "s": "BMed3.8 – Prévention et contrôle des infections", "i": false}, {"y": "M1", "s": "Cours-bloc prévention et contrôle des infections", "i": false}], [], [{"y": "B1", "s": "Kurs Händehygiene (réalité virtuelle)", "i": false}, {"y": "M3", "s": "Repetition Infektiologie und Spitalhygiene", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Collaboration interprofessionnelle", "u": [[{"y": "B2", "s": "BMed2.7 – Rôle de l'équipe interprofessionnelle", "i": false}, {"y": "M1", "s": "EIP – Journées interprofessionnelles", "i": false}, {"y": "M2", "s": "EIP ; TeamSTEPPS", "i": false}], [{"y": "B2", "s": "Enseignement interprofessionnel 1", "i": false}, {"y": "M1", "s": "Enseignement interprofessionnel 2", "i": false}, {"y": "M2", "s": "Enseignement interprofessionnel", "i": false}, {"y": "M3", "s": "Enseignement interprofessionnel 3", "i": false}], [{"y": "B3", "s": "Fokuswoche Vernetzung", "i": false}, {"y": "M2", "s": "Interprofessionelle Zusammenarbeit (année à option)", "i": false}, {"y": "M3", "s": "Interprofessionelle Zusammenarbeit (année à option)", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Identité et rôles professionnels", "u": [[{"y": "M2", "s": "MMed2.5 – Examen et métier de médecin", "i": false}], [{"y": "B2", "s": "Identité professionnelle", "i": false}, {"y": "B3", "s": "Identité professionnelle", "i": false}], [{"y": "M3", "s": "Workshop Ärztliche Rollen (CanMEDS)", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Recherche et méthodologie scientifique", "u": [[{"y": "B2", "s": "BMed2.9 Ateliers Design de recherche", "i": false}, {"y": "B3", "s": "BMed3.6 – Recherche clinique", "i": false}], [{"y": "B2", "s": "Communication scientifique (APP, CBCL)", "i": false}, {"y": "B3", "s": "Communication scientifique (APP, CBCL)", "i": false}], [{"y": "B1", "s": "Wissenschaftstheorie ; FIT recherche documentaire", "i": false}, {"y": "B2", "s": "Fokuswoche Forschung ; Methodik medizinischer Forschung", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Cours à option", "u": [[{"y": "B2", "s": "BMed2.9", "i": false}, {"y": "B3", "s": "BMed3.9", "i": false}, {"y": "M1", "s": "MMed1.9", "i": false}], [{"y": "B2", "s": "2 cours à option", "i": false}, {"y": "B3", "s": "2 cours à option", "i": false}], [{"y": "B1", "s": "Mantelstudium (Wahlpflichtmodul)", "i": false}, {"y": "B2", "s": "Mantelstudium", "i": false}, {"y": "B3", "s": "Mantelstudium", "i": false}, {"y": "M1", "s": "Mantelstudium", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Travail de master", "u": [[{"y": "M1", "s": "Travail de maîtrise (5 ECTS)", "i": false}, {"y": "M2", "s": "Travail de maîtrise (5 ECTS)", "i": false}, {"y": "M3", "s": "Travail de maîtrise (10 ECTS)", "i": false}], [{"y": "M1", "s": "Mémoire de Master (sem. 1–4)", "i": false}, {"y": "M2", "s": "Mémoire de Master (sem. 1–4)", "i": false}], [{"y": "M3", "s": "Masterarbeit (remise en octobre de la 6ᵉ année)", "i": false}]]}, {"cat": "Santé, société et profession", "name": "Stages et immersion clinique", "u": [[{"y": "B3", "s": "Immersion clinique au lit du malade (BMed3.8)", "i": false}, {"y": "M1", "s": "18 semaines de cours-blocs en clinique", "i": false}, {"y": "M2", "s": "Immersion clinique (MMed2.8)", "i": false}, {"y": "M3", "s": "10 mois de stages", "i": false}], [{"y": "B2", "s": "Stage IMFE", "i": false}, {"y": "B3", "s": "Stage Médecine et santé communautaires", "i": false}, {"y": "M1", "s": "AMC 1ʳᵉ section", "i": false}, {"y": "M2", "s": "AMC 2ᵉ section ; début des stages à choix", "i": false}, {"y": "M3", "s": "10 mois de stages à choix", "i": false}], [{"y": "M2", "s": "Wahlstudienjahr – Unterassistenz (2ᵉ semestre)", "i": false}, {"y": "M3", "s": "Wahlstudienjahr – Unterassistenz (1er semestre)", "i": false}]]}];
+const YEARS = ["B1", "B2", "B3", "M1", "M2", "M3"];
+const LABEL = { B1: "1ʳᵉ année", B2: "2ᵉ année", B3: "3ᵉ année", M1: "4ᵉ année", M2: "5ᵉ année", M3: "6ᵉ année" };
+const UNIS = ["UNIL", "UNIGE", "UZH"];
+const $ = (id) => document.getElementById(id);
+
+function yearsOf(cell) {
+  return YEARS.filter((y) => cell.some((c) => c.y === y));
+}
+function commonYears(row) {
+  if (row.u.some((c) => !c.length)) return [];
+  return YEARS.filter((y) => row.u.every((c) => c.some((x) => x.y === y)));
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function chipsHtml(cell, hitYears, onlyYear) {
+  if (!cell.length) return '<span class="none">—</span>';
+  const ys = onlyYear ? [onlyYear] : yearsOf(cell);
+  const chips = ys.map((y) => {
+    const items = cell.filter((c) => c.y === y);
+    const implicit = items.every((c) => c.i);
+    const title = items.map((c) => c.s).join(" ; ");
+    const cls = ["chip", "y-" + y, implicit ? "implicit" : "", hitYears.includes(y) ? "hit" : ""].join(" ");
+    return `<span class="${cls}" title="${esc(title)}">${implicit ? "(" + y + ")" : y}</span>`;
+  }).join("");
+  const src = ys.map((y) => cell.filter((c) => c.y === y)
+    .map((c) => `<div><b>${y}</b>${esc(c.i ? "(" + c.s + ")" : c.s)}</div>`).join("")).join("");
+  return `<div class="chips">${chips}</div><div class="src">${src}</div>`;
+}
+function fold(s) {
+  return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+function query() {
+  return fold($("q").value.trim());
+}
+function matches(row, q, cat) {
+  if (cat && row.cat !== cat) return false;
+  if (!q) return true;
+  return fold(row.name + " " + row.u.flat().map((c) => c.s).join(" ")).includes(q);
+}
+
+function renderAll() {
+  const q = query();
+  const cat = $("cat").value;
+  let html = "", current = null, n = 0;
+  for (const row of DATA) {
+    if (!matches(row, q, cat)) continue;
+    if (row.cat !== current) {
+      current = row.cat;
+      html += `<tr class="cat"><td colspan="4">${esc(current)}</td></tr>`;
+    }
+    const hit = commonYears(row);
+    html += `<tr><td class="name">${esc(row.name)}</td>` +
+      row.u.map((c) => `<td class="uni">${chipsHtml(c, hit)}</td>`).join("") + "</tr>";
+    n++;
+  }
+  $("tbody-all").innerHTML = html || '<tr><td colspan="4" class="none">Aucune matière ne correspond à cette recherche.</td></tr>';
+  $("count").textContent = n + " matière" + (n > 1 ? "s" : "") + ((q || cat) ? " sur " + DATA.length + " (filtre actif)" : "") + " · pastille encadrée = année commune aux trois";
+}
+
+function renderCommon() {
+  const q = query();
+  const cat = $("cat").value;
+  const perYear = Object.fromEntries(YEARS.map((y) => [y, 0]));
+  const shown = DATA.filter((row) => commonYears(row).length && matches(row, q, cat));
+  shown.forEach((row) => commonYears(row).forEach((y) => perYear[y]++));
+  let html = "", lines = 0;
+  for (const y of YEARS) {
+    const rows = DATA.filter((row) => commonYears(row).includes(y) && matches(row, q, cat));
+    if (!rows.length) continue;
+    html += `<tr class="cat"><td colspan="4"><span class="chip y-${y}">${y}</span> ${LABEL[y]} · ${rows.length} matière${rows.length > 1 ? "s" : ""}</td></tr>`;
+    for (const row of rows) {
+      const implicit = row.u.some((c) => c.filter((x) => x.y === y).every((x) => x.i));
+      html += `<tr><td class="name">${esc(row.name)}${implicit ? ' <span class="none" title="Au moins une université l\'aborde de façon intégrée, sans la nommer">*</span>' : ""}</td>` +
+        row.u.map((c) => `<td class="uni">${chipsHtml(c, [], y)}</td>`).join("") + "</tr>";
+      lines++;
+    }
+  }
+  $("tbody-common").innerHTML = html || '<tr><td colspan="4" class="none">Aucune matière commune ne correspond à cette recherche.</td></tr>';
+  $("summary").innerHTML = YEARS.map((y) =>
+    `<div><span class="tag">${y}</span><b>${perYear[y]}</b><span>${LABEL[y]}</span></div>`).join("");
+  const filtered = q || cat;
+  $("count").textContent = shown.length + " matière" + (shown.length > 1 ? "s" : "") + " commune" + (shown.length > 1 ? "s" : "") +
+    (filtered ? " (filtre actif)" : " sur " + DATA.length) + " · " + lines + " ligne" + (lines > 1 ? "s" : "") + " · * = intégrée quelque part";
+}
+
+function render() {
+  if ($("panel-all").hidden) renderCommon(); else renderAll();
+}
+
+[...new Set(DATA.map((r) => r.cat))].forEach((c) => {
+  const o = document.createElement("option");
+  o.value = c; o.textContent = c; $("cat").appendChild(o);
+});
+function selectTab(which) {
+  const all = which === "all";
+  $("tab-all").setAttribute("aria-selected", String(all));
+  $("tab-common").setAttribute("aria-selected", String(!all));
+  $("panel-all").hidden = !all;
+  $("panel-common").hidden = all;
+  $("srctoggle").hidden = !all;
+  try { localStorage.setItem("cmp-tab", which); } catch (e) {}
+  render();
+}
+$("tab-all").addEventListener("click", () => selectTab("all"));
+$("tab-common").addEventListener("click", () => selectTab("common"));
+$("q").addEventListener("input", render);
+$("cat").addEventListener("change", render);
+$("showsrc").addEventListener("change", (e) => {
+  $("box-all").classList.toggle("hide-src", !e.target.checked);
+});
+let start = location.hash === "#communes" ? "common" : "all";
+try { if (!location.hash && localStorage.getItem("cmp-tab") === "common") start = "common"; } catch (e) {}
+selectTab(start);
+</script>

@@ -1,0 +1,24 @@
+{#- Téléchargement des données brutes (espace formateur). -#}
+{% macro export_form(books=none, user_id=none) -%}
+<form class="acc-inline-form" method="get" action="{{ url_for('account.trainer_export') }}">
+    {%- if user_id %}
+    <input type="hidden" name="user" value="{{ user_id }}">
+    {%- endif %}
+    {%- if books %}
+    <label>Livre
+        <select name="book">
+            <option value="">Tous les livres</option>
+            {%- for b in books %}
+            <option value="{{ b.slug }}">{{ b.title }}</option>
+            {%- endfor %}
+        </select>
+    </label>
+    {%- endif %}
+    <label class="acc-check"><input type="checkbox" name="pseudo" value="1"> Pseudonymiser (P001…)</label>
+    <div class="acc-export-btns">
+        <button class="primary-btn small" type="submit" name="format" value="xlsx">Excel (.xlsx)</button>
+        <button class="ghost-btn small" type="submit" name="format" value="csv">CSV (.zip)</button>
+        <button class="ghost-btn small" type="submit" name="format" value="json">JSON</button>
+    </div>
+</form>
+{%- endmacro %}

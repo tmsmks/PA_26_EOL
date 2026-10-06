@@ -5,6 +5,11 @@ jinja2>=3.0
 # Module d'enrichissement (4.2) avec LLM OpenAI / Ollama
 openai>=1.0.0
 requests>=2.0
+# Comptes, sessions et historique (SQLite en local, PostgreSQL en production)
+sqlalchemy>=2.0
+psycopg[binary]>=3.1
+# Export des données de jeu au format Excel (.xlsx)
+openpyxl>=3.1
 
 # Tests (dev)
 pytest>=7.0

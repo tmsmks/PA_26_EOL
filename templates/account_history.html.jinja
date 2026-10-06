@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ 'Parcours de ' ~ subject.display_name if trainer_view else 'Mon parcours' }} — End of Life</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='play.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
+</head>
+<body class="play-menu">
+{% from "_export_form.html.jinja" import export_form %}
+{% include "_userbar.html.jinja" %}
+<main class="acc-wrap">
+    <nav class="acc-crumbs">
+        {%- if trainer_view %}
+        <a href="{{ url_for('account.trainer_dashboard') }}">← Espace formateur</a>
+        {%- else %}
+        <a href="{{ url_for('pages.landing') }}">← Tous les livres</a>
+        {%- endif %}
+    </nav>
+
+    <header class="acc-header">
+        <p class="eyebrow">{{ 'Suivi participant' if trainer_view else 'Mon parcours' }}</p>
+        <h1>{{ subject.display_name }}</h1>
+        <p class="acc-sub">@{{ subject.username }} · inscrit·e le {{ subject.created_at | date_fr }}{% if subject.is_trainer %} · formateur·rice{% endif %}</p>
+    </header>
+
+    {%- for category, message in get_flashed_messages(with_categories=true) %}
+    <p class="{{ 'form-ok' if category == 'ok' else 'form-error' }}" role="status">{{ message }}</p>
+    {%- endfor %}
+
+    {%- if not blocks %}
+    <section class="acc-card">
+        <h2>Aucune session pour l'instant</h2>
+        <p class="acc-empty">
+        {%- if trainer_view %}
+            Ce participant n'a encore joué aucun chapitre.
+        {%- else %}
+            Choisissez un livre et jouez ses chapitres : chaque parcours complet devient une session, avec un bilan, un feedback personnalisé et une note qui suit votre progression.
+        {%- endif %}
+        </p>
+        {%- if not trainer_view %}<a class="primary-btn small" style="align-self:flex-start" href="{{ url_for('pages.landing') }}">Choisir un livre</a>{% endif %}
+    </section>
+    {%- endif %}
+
+    {%- for block in blocks %}
+    {%- set b = block.book %}
+    {%- set pr = block.progress %}
+    {%- set prof = pr.profile %}
+    <section class="acc-book" aria-labelledby="book-{{ b.slug }}">
+        <h2 class="acc-book-title" id="book-{{ b.slug }}">{{ b.title }}</h2>
+
+        {%- if prof.global is none %}
+        {%- set ip = block.in_progress %}
+        <div class="acc-card acc-pending">
+            <div>
+                <h3>{% if ip %}Session {{ ip.number }} en cours · {{ ip.n_done }}/{{ ip.n_chapters }} chapitre{{ 's' if ip.n_chapters > 1 }}{% else %}Aucun chapitre noté{% endif %}</h3>
+                <p class="acc-hint">
+                {%- if trainer_view %}Le niveau de chaque chapitre apparaîtra dès que cette personne en aura terminé un.
+                {%- else %}Chaque chapitre terminé est noté : votre niveau, votre profil et votre progression apparaîtront ici dès le premier.{% endif %}
+                </p>
+            </div>
+            {%- if not trainer_view %}
+            <a class="primary-btn small" href="{{ url_for('pages.play_book', book_slug=b.slug) }}">{{ 'Reprendre' if ip and ip.n_done else 'Commencer' }}</a>
+            {%- endif %}
+        </div>
+        {%- else %}
+        <div class="kpi-row">
+            <div class="kpi">
+                <span class="kpi-label">Note du livre</span>
+                <span class="kpi-value">{{ prof.global | note(1) }}<small> /100</small></span>
+                <span class="kpi-foot">{% if prof.complete %}Moyenne des {{ prof.n_chapters }} chapitres{% else %}Partielle : moyenne des chapitres évalués{% endif %}</span>
+            </div>
+            <div class="kpi">
+                <span class="kpi-label">Chapitres évalués</span>
+                <span class="kpi-value">{{ prof.n_evaluated }}<small> /{{ prof.n_chapters }}</small></span>
+                <span class="kpi-foot">{% if prof.complete %}Tous les chapitres ont un passage noté{% else %}La note est complète quand chaque chapitre a un passage noté{% endif %}</span>
+            </div>
+            <div class="kpi">
+                <span class="kpi-label">Passages notés</span>
+                <span class="kpi-value">{{ prof.n_passages }}</span>
+                {%- set practice = pr.chapters | sum(attribute='n_practice') %}
+                <span class="kpi-foot">{% if practice %}+ {{ practice }} d'entraînement{% else %}Un passage = un chapitre joué en entier{% endif %}</span>
+            </div>
+            <div class="kpi">
+                <span class="kpi-label">Progression moyenne</span>
+                {%- if prof.progression is not none %}
+                {%- set d = prof.progression | round | int %}
+                <span class="kpi-value {{ 'delta-up' if d > 0 else ('delta-down' if d < 0 else '') }}">{{ '+' if d > 0 else ('−' if d < 0 else '±') }}{{ d | abs }}<small> %</small></span>
+                <span class="kpi-foot">de ce qui restait à gagner depuis le 1ᵉʳ passage</span>
+                {%- else %}
+                <span class="kpi-value">—</span>
+                <span class="kpi-foot">Visible dès le 2ᵉ passage noté d'un chapitre</span>
+                {%- endif %}
+            </div>
+        </div>
+
+        <div class="acc-card">
+            <h2>Profil de compétences</h2>
+            <p class="acc-hint">Qualité de {{ 'ses' if trainer_view else 'vos' }} choix par compétence, tous chapitres confondus : 100 = la meilleure réponse à chaque fois, 0 = la pire ; répondre au hasard donne environ 50. Une compétence est notée quand au moins {{ min_evidence }} choix la mettent en jeu.</p>
+            <div data-chart="profile" data-book="{{ b.slug }}"></div>
+        </div>
+        {%- endif %}
+
+        <div class="acc-card">
+            <h2>Chapitres</h2>
+            <p class="acc-hint">Niveau = moyenne des passages notés, les plus récents pèsent plus (1 ; 1,25 ; 1,5…). ± = marge d'incertitude à 95 % : elle se resserre à chaque passage. Progression = part de ce qui restait à gagner depuis le premier passage. Un chapitre rejoué compte s'il a lieu au moins {{ spacing_days }} jour{{ 's' if spacing_days > 1 }} après son dernier passage noté ; avant, c'est de l'entraînement.</p>
+            <div class="acc-table-wrap">
+            <table class="acc-table">
+                <thead><tr>
+                    <th>Chapitre</th><th class="num">Niveau</th><th class="num">±</th>
+                    <th class="num">Progression</th><th class="num">Passages notés</th><th>Dernier passage</th>
+                    {%- if not trainer_view %}<th></th>{% endif %}
+                </tr></thead>
+                <tbody>
+                {%- for c in pr.chapters %}
+                {%- set lv = c.level %}
+                <tr>
+                    <td>{{ c.id }}. {{ c.name }}</td>
+                    <td class="num">{% if lv %}<strong>{{ lv.level | note }}</strong>{% else %}<span class="muted">—</span>{% endif %}</td>
+                    <td class="num muted">{% if lv and lv.margin is not none %}± {{ lv.margin | round | int }}{% else %}—{% endif %}</td>
+                    <td class="num">
+                        {%- if lv and lv.progression is not none %}
+                        {%- set d = lv.progression | round | int %}
+                        <span class="{{ 'delta-up' if d > 0 else ('delta-down' if d < 0 else '') }}">{{ '+' if d > 0 else ('−' if d < 0 else '±') }}{{ d | abs }} %</span>
+                        {%- else %}<span class="muted">—</span>{% endif %}
+                    </td>
+                    <td class="num">{{ lv.n_passages if lv else 0 }}{% if c.n_practice %} <span class="muted">(+{{ c.n_practice }})</span>{% endif %}</td>
+                    <td class="muted nowrap">{{ c.last_at | date_fr }}</td>
+                    {%- if not trainer_view %}
+                    <td class="num"><a href="{{ url_for('pages.play_chapter', book_slug=b.slug, chapter_id=c.id) }}">{{ 'Rejouer' if lv else 'Jouer' }} →</a></td>
+                    {%- endif %}
+                </tr>
+                {%- endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        {%- if prof.global is not none %}
+        <div class="acc-card">
+            <h2>Progression par chapitre</h2>
+            {%- set curves = pr.chapters | selectattr('level') | selectattr('level.n_passages', 'gt', 1) | list %}
+            {%- if curves %}
+            <p class="acc-hint">Qualité des choix à chaque passage noté (P1, P2…).</p>
+            <div class="acc-grid-2">
+                {%- for c in curves %}
+                <div>
+                    <h3>{{ c.id }}. {{ c.name }}</h3>
+                    <div data-chart="chapter" data-book="{{ b.slug }}" data-chapter="{{ c.id }}"></div>
+                </div>
+                {%- endfor %}
+            </div>
+            {%- else %}
+            <p class="acc-empty">La courbe d'un chapitre apparaît dès son 2ᵉ passage noté.</p>
+            {%- endif %}
+        </div>
+        {%- endif %}
+
+        {%- if block.sessions %}
+        <div class="acc-card">
+            <h2>Sessions</h2>
+            <p class="acc-hint">Une session suit l'histoire du livre d'un chapitre à l'autre ; son bilan reprend le dernier passage de chaque chapitre joué dans la session.</p>
+            <div class="acc-table-wrap">
+            <table class="acc-table">
+                <thead><tr>
+                    <th>Session</th><th>Statut</th><th>Début</th><th>Fin</th>
+                    <th class="num">Note</th><th></th>
+                </tr></thead>
+                <tbody>
+                {%- for s in block.sessions %}
+                <tr>
+                    <td>Session {{ s.number }}</td>
+                    <td>{% if s.status == 'completed' %}Terminée{% else %}<span class="acc-badge is-live">En cours · {{ s.n_done }}/{{ s.n_chapters }}</span>{% endif %}</td>
+                    <td>{{ s.started_at | date_fr }}</td>
+                    <td class="{{ '' if s.completed_at else 'muted' }}">{{ s.completed_at | date_fr }}</td>
+                    <td class="num">{{ s.global | note }}</td>
+                    <td class="num">
+                        {%- if s.status == 'completed' %}
+                        <a href="{{ url_for('account.session_report', session_id=s.id) }}">Bilan →</a>
+                        {%- elif trainer_view %}
+                        <a href="{{ url_for('account.session_report', session_id=s.id) }}">Provisoire →</a>
+                        {%- else %}
+                        <a href="{{ url_for('pages.play_book', book_slug=b.slug) }}">Reprendre →</a>
+                        {%- endif %}
+                    </td>
+                </tr>
+                {%- endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+        {%- endif %}
+    </section>
+    {%- endfor %}
+
+    {%- if trainer_view %}
+    <section class="acc-card" aria-labelledby="h-export">
+        <h2 id="h-export">Données brutes</h2>
+        <p class="acc-hint">Les sessions, chapitres, scènes et choix de ce participant, dans le même format que l'export de l'espace formateur.</p>
+        {{ export_form(user_id=subject.id) }}
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-reset">
+        <h2 id="h-reset">Réinitialiser le mot de passe</h2>
+        <p class="acc-hint">Définissez un mot de passe temporaire et communiquez-le au participant.</p>
+        <form class="acc-inline-form" method="post" action="{{ url_for('account.trainer_reset_password', user_id=subject.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>Nouveau mot de passe
+                <input type="text" name="password" minlength="8" required autocomplete="off">
+            </label>
+            <button class="primary-btn small" type="submit">Enregistrer</button>
+        </form>
+    </section>
+    {%- endif %}
+</main>
+
+<script>
+window.PA_HISTORY = {
+    skills: {{ skills | list | tojson }},
+    labels: {{ labels | tojson }},
+    books: {{ charts | tojson }}
+};
+</script>
+<script type="module" src="{{ url_for('static', filename='account/history.js') }}"></script>
+</body>
+</html>

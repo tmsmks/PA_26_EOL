@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>{{ book.title }} — {{ chapter.Name }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='play.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
+</head>
+<body class="play-stage">
+
+<div class="hud">
+    <a class="hud-back" href="{{ url_for('pages.play_book', book_slug=book.slug) }}" title="Retour au sommaire">←</a>
+    <div class="hud-titles">
+        <span class="hud-chapter">Chapitre {{ chapter.Id }} · {{ chapter.Name }}</span>
+        <span class="hud-scene" id="hud-scene"></span>
+    </div>
+    <div class="hud-progress" aria-hidden="true"><span id="hud-bar"></span></div>
+</div>
+
+<main class="stage" id="stage">
+
+    <section class="screen screen-intro" id="screen-intro">
+        <div class="intro-box">
+            <p class="eyebrow">Chapitre {{ chapter.Id }}</p>
+            <h1>{{ chapter.Name }}</h1>
+            <p class="intro-text">{{ player_intro }}</p>
+            {%- if outlook.counted %}
+            <p class="session-note">Ce passage comptera dans votre niveau du chapitre{% if outlook.n_counted %} (passage noté n° {{ outlook.n_counted + 1 }}){% endif %}.
+            {%- else %}
+            <p class="session-note is-info">Passage d'entraînement : ce chapitre a été noté le {{ outlook.last_counted_at | date_fr }}. Un nouveau passage comptera à partir du {{ outlook.next_counted_at | date_fr }}.
+            {%- endif %}
+            {%- if session_info %} Session {{ session_info.number }} en cours · {{ session_info.completed_chapters | length }} chapitre{{ 's' if session_info.completed_chapters | length > 1 }} sur {{ chapter_count }} terminé{{ 's' if session_info.completed_chapters | length > 1 }}.
+            {%- else %} Ce chapitre ouvrira votre session {{ next_number }} de ce livre.{% endif %}</p>
+            <button class="primary-btn" id="btn-start">Commencer</button>
+            <p class="save-status" id="start-status" hidden></p>
+            {%- if teacher_intro %}
+            <details class="teacher-note">
+                <summary>Objectifs pédagogiques</summary>
+                <p>{{ teacher_intro }}</p>
+            </details>
+            {%- endif %}
+        </div>
+    </section>
+
+    <section class="screen screen-start-choice" id="screen-start-choice" hidden>
+        <div class="intro-box">
+            <p class="eyebrow">Avant de commencer</p>
+            <p class="intro-text" id="start-question"></p>
+            <div class="choices" id="start-options"></div>
+        </div>
+    </section>
+
+    <section class="screen screen-scene-intro" id="screen-scene-intro" hidden>
+        <div class="intro-box">
+            <p class="eyebrow" id="scene-counter"></p>
+            <h2 id="scene-title"></h2>
+            <p class="intro-text" id="scene-intro"></p>
+            <button class="primary-btn" id="btn-enter">Entrer dans la scène</button>
+        </div>
+    </section>
+
+    <section class="screen screen-dialogue" id="screen-dialogue" hidden>
+        <div class="portrait-col">
+            <div class="portrait" id="portrait"></div>
+            <p class="actor-name" id="actor-name"></p>
+        </div>
+        <div class="dialogue-col">
+            <p class="dialogue-text" id="dialogue-text"></p>
+            <div class="choices" id="choices"></div>
+        </div>
+    </section>
+
+    <section class="screen screen-debrief" id="screen-debrief" hidden>
+        <div class="debrief-box">
+            <p class="eyebrow">Fin du scénario</p>
+            <h2 id="debrief-title"></h2>
+            <p class="debrief-lead" id="debrief-lead"></p>
+            <div class="bars" id="debrief-bars"></div>
+            <p class="save-status" id="save-status" hidden></p>
+            <div class="debrief-actions">
+                <button class="ghost-btn" id="btn-replay">Refaire ce scénario</button>
+                <button class="primary-btn" id="btn-next">Scénario suivant</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="screen screen-end" id="screen-end" hidden>
+        <div class="intro-box">
+            <p class="eyebrow">Chapitre terminé</p>
+            <h1 id="end-title"></h1>
+            <p class="end-score" id="end-score" hidden></p>
+            <div class="bars" id="end-bars"></div>
+            <p class="save-status" id="end-status" hidden></p>
+            <div class="debrief-actions">
+                <a class="ghost-btn" href="{{ url_for('pages.play_book', book_slug=book.slug) }}">Retour au sommaire</a>
+                {%- if next_chapter_id %}
+                <a class="primary-btn" id="btn-next-chapter" href="{{ url_for('pages.play_chapter', book_slug=book.slug, chapter_id=next_chapter_id) }}">Chapitre suivant</a>
+                {%- endif %}
+                <a class="primary-btn" id="btn-report" href="#" hidden>Voir mon bilan du livre</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<p class="keyhint" id="keyhint">Chiffres <b>1-9</b> pour choisir · <b>Entrée</b> pour continuer</p>
+
+<script>
+window.PA_PLAY = {
+    bookSlug: {{ book.slug | tojson }},
+    bookTitle: {{ book.title | tojson }},
+    chapterId: {{ chapter.Id | tojson }},
+    chapterName: {{ chapter.Name | tojson }},
+    scenesData: {{ scenes_data | tojson }},
+    chapterMeta: {{ chapter_meta | tojson }},
+    chapterCount: {{ chapter_count | tojson }},
+    session: {{ session_info | tojson }},
+    startSessionUrl: {{ url_for('session_api.start_session', book_slug=book.slug) | tojson }},
+    imagesBaseUrl: {{ url_for('api.serve_images', filename='') | tojson }}
+};
+</script>
+<script type="module" src="{{ url_for('static', filename='play/main.js') }}"></script>
+</body>
+</html>

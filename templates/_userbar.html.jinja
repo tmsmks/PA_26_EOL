@@ -1,0 +1,17 @@
+{#- Barre de compte, partagée par les pages publiques et joueur. -#}
+<nav class="userbar" aria-label="Compte">
+{%- if current_user %}
+    <span class="userbar-name">{{ current_user.display_name }}</span>
+    <a href="{{ url_for('account.my_history') }}">Mon parcours</a>
+    {%- if current_user.is_trainer %}
+    <a href="{{ url_for('account.trainer_dashboard') }}">Espace formateur</a>
+    {%- endif %}
+    <form method="post" action="{{ url_for('auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit">Se déconnecter</button>
+    </form>
+{%- else %}
+    <a href="{{ url_for('auth.login', next=request.path) }}">Se connecter</a>
+    <a class="userbar-cta" href="{{ url_for('auth.register_page', next=request.path) }}">Créer un compte</a>
+{%- endif %}
+</nav>

@@ -1,0 +1,2638 @@
+{
+  "chapters": [
+    {
+      "id": 1,
+      "name": "Les mots qu'on n'a pas appris",
+      "focus": "CC, RD, EM, IC",
+      "share_percent": {
+        "RespectAndDignity": 22,
+        "Empathy": 17,
+        "Compassion": 8,
+        "EmotionalRegulation": 10,
+        "CommunicationClarity": 20,
+        "ProfessionalBoundaries": 11,
+        "InterprofessionalCollaboration": 13
+      },
+      "positive_points": {
+        "RespectAndDignity": 266,
+        "Empathy": 209,
+        "Compassion": 101,
+        "EmotionalRegulation": 118,
+        "CommunicationClarity": 250,
+        "ProfessionalBoundaries": 132,
+        "InterprofessionalCollaboration": 161
+      },
+      "categories": {
+        "Très bon": 48,
+        "Bon": 111,
+        "Moyen": 66,
+        "Mauvais": 150,
+        "Très mauvais": 20
+      },
+      "scenes": [
+        {
+          "title": "1.1 Premier matin",
+          "slot": "1.1",
+          "condition": {},
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Respect et dignité",
+            "Frontières professionnelles"
+          ],
+          "n_interactions": 14,
+          "n_responses": 67,
+          "positive_points": {
+            "RespectAndDignity": 29,
+            "Empathy": 14,
+            "Compassion": 0,
+            "EmotionalRegulation": 6,
+            "CommunicationClarity": 30,
+            "ProfessionalBoundaries": 27,
+            "InterprofessionalCollaboration": 49
+          },
+          "negative_points": {
+            "RespectAndDignity": -33,
+            "Empathy": -11,
+            "Compassion": 0,
+            "EmotionalRegulation": -5,
+            "CommunicationClarity": -16,
+            "ProfessionalBoundaries": -26,
+            "InterprofessionalCollaboration": -33
+          },
+          "share_percent": {
+            "RespectAndDignity": 19,
+            "Empathy": 9,
+            "Compassion": 0,
+            "EmotionalRegulation": 4,
+            "CommunicationClarity": 19,
+            "ProfessionalBoundaries": 17,
+            "InterprofessionalCollaboration": 32
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 25,
+            "Moyen": 13,
+            "Mauvais": 23,
+            "Très mauvais": 5
+          },
+          "best_path_total": 58,
+          "best_path_profile": {
+            "RespectAndDignity": 10,
+            "Empathy": 7,
+            "Compassion": 0,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": 13,
+            "ProfessionalBoundaries": 9,
+            "InterprofessionalCollaboration": 19
+          }
+        },
+        {
+          "title": "1.2 Avant d'entrer",
+          "slot": "1.2",
+          "condition": {},
+          "focus": [
+            "Clarté de communication",
+            "Collaboration interprofessionnelle",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 16,
+          "n_responses": 75,
+          "positive_points": {
+            "RespectAndDignity": 46,
+            "Empathy": 31,
+            "Compassion": 4,
+            "EmotionalRegulation": 20,
+            "CommunicationClarity": 53,
+            "ProfessionalBoundaries": 37,
+            "InterprofessionalCollaboration": 33
+          },
+          "negative_points": {
+            "RespectAndDignity": -34,
+            "Empathy": -24,
+            "Compassion": -2,
+            "EmotionalRegulation": -9,
+            "CommunicationClarity": -26,
+            "ProfessionalBoundaries": -40,
+            "InterprofessionalCollaboration": -16
+          },
+          "share_percent": {
+            "RespectAndDignity": 21,
+            "Empathy": 14,
+            "Compassion": 2,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 24,
+            "ProfessionalBoundaries": 17,
+            "InterprofessionalCollaboration": 15
+          },
+          "categories": {
+            "Très bon": 9,
+            "Bon": 21,
+            "Moyen": 12,
+            "Mauvais": 28,
+            "Très mauvais": 5
+          },
+          "best_path_total": 104,
+          "best_path_profile": {
+            "RespectAndDignity": 20,
+            "Empathy": 13,
+            "Compassion": 2,
+            "EmotionalRegulation": 6,
+            "CommunicationClarity": 30,
+            "ProfessionalBoundaries": 22,
+            "InterprofessionalCollaboration": 11
+          }
+        },
+        {
+          "title": "1.3 L'annonce",
+          "slot": "1.3",
+          "condition": {},
+          "focus": [
+            "Clarté de communication",
+            "Empathie",
+            "Régulation émotionnelle",
+            "Respect et dignité"
+          ],
+          "n_interactions": 26,
+          "n_responses": 120,
+          "positive_points": {
+            "RespectAndDignity": 100,
+            "Empathy": 87,
+            "Compassion": 63,
+            "EmotionalRegulation": 35,
+            "CommunicationClarity": 95,
+            "ProfessionalBoundaries": 28,
+            "InterprofessionalCollaboration": 22
+          },
+          "negative_points": {
+            "RespectAndDignity": -34,
+            "Empathy": -71,
+            "Compassion": -23,
+            "EmotionalRegulation": -4,
+            "CommunicationClarity": -64,
+            "ProfessionalBoundaries": -24,
+            "InterprofessionalCollaboration": -6
+          },
+          "share_percent": {
+            "RespectAndDignity": 23,
+            "Empathy": 20,
+            "Compassion": 15,
+            "EmotionalRegulation": 8,
+            "CommunicationClarity": 22,
+            "ProfessionalBoundaries": 7,
+            "InterprofessionalCollaboration": 5
+          },
+          "categories": {
+            "Très bon": 21,
+            "Bon": 32,
+            "Moyen": 13,
+            "Mauvais": 49,
+            "Très mauvais": 5
+          },
+          "best_path_total": 223,
+          "best_path_profile": {
+            "RespectAndDignity": 56,
+            "Empathy": 38,
+            "Compassion": 30,
+            "EmotionalRegulation": 12,
+            "CommunicationClarity": 51,
+            "ProfessionalBoundaries": 23,
+            "InterprofessionalCollaboration": 13
+          }
+        },
+        {
+          "title": "1.4 Le lendemain",
+          "slot": "1.4",
+          "condition": {},
+          "focus": [
+            "Respect et dignité",
+            "Empathie",
+            "Collaboration interprofessionnelle"
+          ],
+          "n_interactions": 18,
+          "n_responses": 82,
+          "positive_points": {
+            "RespectAndDignity": 77,
+            "Empathy": 60,
+            "Compassion": 29,
+            "EmotionalRegulation": 27,
+            "CommunicationClarity": 69,
+            "ProfessionalBoundaries": 32,
+            "InterprofessionalCollaboration": 17
+          },
+          "negative_points": {
+            "RespectAndDignity": -53,
+            "Empathy": -57,
+            "Compassion": -14,
+            "EmotionalRegulation": -10,
+            "CommunicationClarity": -18,
+            "ProfessionalBoundaries": -29,
+            "InterprofessionalCollaboration": -10
+          },
+          "share_percent": {
+            "RespectAndDignity": 25,
+            "Empathy": 19,
+            "Compassion": 9,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 22,
+            "ProfessionalBoundaries": 10,
+            "InterprofessionalCollaboration": 5
+          },
+          "categories": {
+            "Très bon": 17,
+            "Bon": 16,
+            "Moyen": 10,
+            "Mauvais": 35,
+            "Très mauvais": 4
+          },
+          "best_path_total": 173,
+          "best_path_profile": {
+            "RespectAndDignity": 41,
+            "Empathy": 31,
+            "Compassion": 20,
+            "EmotionalRegulation": 8,
+            "CommunicationClarity": 40,
+            "ProfessionalBoundaries": 26,
+            "InterprofessionalCollaboration": 7
+          }
+        },
+        {
+          "title": "1.5 Le vestiaire",
+          "slot": "1.5",
+          "condition": {},
+          "focus": [
+            "Régulation émotionnelle",
+            "Respect et dignité",
+            "Collaboration interprofessionnelle"
+          ],
+          "n_interactions": 12,
+          "n_responses": 51,
+          "positive_points": {
+            "RespectAndDignity": 14,
+            "Empathy": 17,
+            "Compassion": 5,
+            "EmotionalRegulation": 30,
+            "CommunicationClarity": 3,
+            "ProfessionalBoundaries": 8,
+            "InterprofessionalCollaboration": 40
+          },
+          "negative_points": {
+            "RespectAndDignity": -9,
+            "Empathy": -6,
+            "Compassion": -2,
+            "EmotionalRegulation": -17,
+            "CommunicationClarity": 0,
+            "ProfessionalBoundaries": -8,
+            "InterprofessionalCollaboration": -18
+          },
+          "share_percent": {
+            "RespectAndDignity": 12,
+            "Empathy": 15,
+            "Compassion": 4,
+            "EmotionalRegulation": 26,
+            "CommunicationClarity": 3,
+            "ProfessionalBoundaries": 7,
+            "InterprofessionalCollaboration": 34
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 17,
+            "Moyen": 18,
+            "Mauvais": 15,
+            "Très mauvais": 1
+          },
+          "best_path_total": 42,
+          "best_path_profile": {
+            "RespectAndDignity": 6,
+            "Empathy": 7,
+            "Compassion": 4,
+            "EmotionalRegulation": 8,
+            "CommunicationClarity": 2,
+            "ProfessionalBoundaries": 3,
+            "InterprofessionalCollaboration": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Et si on ne disait rien ?",
+      "focus": "RD, CC, PB, EM",
+      "share_percent": {
+        "RespectAndDignity": 21,
+        "Empathy": 14,
+        "Compassion": 8,
+        "EmotionalRegulation": 9,
+        "CommunicationClarity": 23,
+        "ProfessionalBoundaries": 14,
+        "InterprofessionalCollaboration": 11
+      },
+      "positive_points": {
+        "RespectAndDignity": 261,
+        "Empathy": 168,
+        "Compassion": 104,
+        "EmotionalRegulation": 109,
+        "CommunicationClarity": 281,
+        "ProfessionalBoundaries": 178,
+        "InterprofessionalCollaboration": 134
+      },
+      "categories": {
+        "Très bon": 56,
+        "Bon": 89,
+        "Moyen": 71,
+        "Mauvais": 124,
+        "Très mauvais": 28
+      },
+      "scenes": [
+        {
+          "title": "2.1 Dans le couloir",
+          "slot": "2.1",
+          "condition": {},
+          "focus": [
+            "Empathie",
+            "Frontières professionnelles",
+            "Respect et dignité"
+          ],
+          "n_interactions": 16,
+          "n_responses": 76,
+          "positive_points": {
+            "RespectAndDignity": 50,
+            "Empathy": 48,
+            "Compassion": 22,
+            "EmotionalRegulation": 24,
+            "CommunicationClarity": 68,
+            "ProfessionalBoundaries": 40,
+            "InterprofessionalCollaboration": 25
+          },
+          "negative_points": {
+            "RespectAndDignity": -37,
+            "Empathy": -32,
+            "Compassion": -10,
+            "EmotionalRegulation": -9,
+            "CommunicationClarity": -40,
+            "ProfessionalBoundaries": -42,
+            "InterprofessionalCollaboration": -7
+          },
+          "share_percent": {
+            "RespectAndDignity": 18,
+            "Empathy": 17,
+            "Compassion": 8,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 25,
+            "ProfessionalBoundaries": 14,
+            "InterprofessionalCollaboration": 9
+          },
+          "categories": {
+            "Très bon": 16,
+            "Bon": 15,
+            "Moyen": 14,
+            "Mauvais": 23,
+            "Très mauvais": 8
+          },
+          "best_path_total": 133,
+          "best_path_profile": {
+            "RespectAndDignity": 27,
+            "Empathy": 20,
+            "Compassion": 14,
+            "EmotionalRegulation": 7,
+            "CommunicationClarity": 33,
+            "ProfessionalBoundaries": 23,
+            "InterprofessionalCollaboration": 9
+          }
+        },
+        {
+          "title": "2.2 Ce que la patiente demande",
+          "slot": "2.2",
+          "condition": {},
+          "focus": [
+            "Respect et dignité",
+            "Clarté de communication",
+            "Empathie",
+            "Compassion"
+          ],
+          "n_interactions": 22,
+          "n_responses": 99,
+          "positive_points": {
+            "RespectAndDignity": 103,
+            "Empathy": 57,
+            "Compassion": 37,
+            "EmotionalRegulation": 31,
+            "CommunicationClarity": 85,
+            "ProfessionalBoundaries": 35,
+            "InterprofessionalCollaboration": 19
+          },
+          "negative_points": {
+            "RespectAndDignity": -46,
+            "Empathy": -32,
+            "Compassion": -9,
+            "EmotionalRegulation": -7,
+            "CommunicationClarity": -53,
+            "ProfessionalBoundaries": -24,
+            "InterprofessionalCollaboration": -2
+          },
+          "share_percent": {
+            "RespectAndDignity": 28,
+            "Empathy": 16,
+            "Compassion": 10,
+            "EmotionalRegulation": 8,
+            "CommunicationClarity": 23,
+            "ProfessionalBoundaries": 10,
+            "InterprofessionalCollaboration": 5
+          },
+          "categories": {
+            "Très bon": 19,
+            "Bon": 21,
+            "Moyen": 17,
+            "Mauvais": 40,
+            "Très mauvais": 2
+          },
+          "best_path_total": 187,
+          "best_path_profile": {
+            "RespectAndDignity": 45,
+            "Empathy": 32,
+            "Compassion": 26,
+            "EmotionalRegulation": 11,
+            "CommunicationClarity": 39,
+            "ProfessionalBoundaries": 20,
+            "InterprofessionalCollaboration": 14
+          }
+        },
+        {
+          "title": "2.3 Le colloque",
+          "slot": "2.3",
+          "condition": {},
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Frontières professionnelles",
+            "Clarté de communication"
+          ],
+          "n_interactions": 17,
+          "n_responses": 71,
+          "positive_points": {
+            "RespectAndDignity": 50,
+            "Empathy": 9,
+            "Compassion": 8,
+            "EmotionalRegulation": 17,
+            "CommunicationClarity": 70,
+            "ProfessionalBoundaries": 67,
+            "InterprofessionalCollaboration": 59
+          },
+          "negative_points": {
+            "RespectAndDignity": -20,
+            "Empathy": -7,
+            "Compassion": -2,
+            "EmotionalRegulation": -9,
+            "CommunicationClarity": -34,
+            "ProfessionalBoundaries": -37,
+            "InterprofessionalCollaboration": -32
+          },
+          "share_percent": {
+            "RespectAndDignity": 18,
+            "Empathy": 3,
+            "Compassion": 3,
+            "EmotionalRegulation": 6,
+            "CommunicationClarity": 25,
+            "ProfessionalBoundaries": 24,
+            "InterprofessionalCollaboration": 21
+          },
+          "categories": {
+            "Très bon": 17,
+            "Bon": 12,
+            "Moyen": 13,
+            "Mauvais": 24,
+            "Très mauvais": 5
+          },
+          "best_path_total": 163,
+          "best_path_profile": {
+            "RespectAndDignity": 34,
+            "Empathy": 7,
+            "Compassion": 8,
+            "EmotionalRegulation": 8,
+            "CommunicationClarity": 39,
+            "ProfessionalBoundaries": 38,
+            "InterprofessionalCollaboration": 29
+          }
+        },
+        {
+          "title": "2.4 Sofia",
+          "slot": "2.4",
+          "condition": {},
+          "focus": [
+            "Régulation émotionnelle",
+            "Empathie",
+            "Frontières professionnelles"
+          ],
+          "n_interactions": 15,
+          "n_responses": 64,
+          "positive_points": {
+            "RespectAndDignity": 18,
+            "Empathy": 36,
+            "Compassion": 15,
+            "EmotionalRegulation": 24,
+            "CommunicationClarity": 30,
+            "ProfessionalBoundaries": 28,
+            "InterprofessionalCollaboration": 16
+          },
+          "negative_points": {
+            "RespectAndDignity": -24,
+            "Empathy": -26,
+            "Compassion": -9,
+            "EmotionalRegulation": -12,
+            "CommunicationClarity": -14,
+            "ProfessionalBoundaries": -32,
+            "InterprofessionalCollaboration": -8
+          },
+          "share_percent": {
+            "RespectAndDignity": 11,
+            "Empathy": 22,
+            "Compassion": 9,
+            "EmotionalRegulation": 14,
+            "CommunicationClarity": 18,
+            "ProfessionalBoundaries": 17,
+            "InterprofessionalCollaboration": 10
+          },
+          "categories": {
+            "Très bon": 2,
+            "Bon": 21,
+            "Moyen": 15,
+            "Mauvais": 16,
+            "Très mauvais": 10
+          },
+          "best_path_total": 44,
+          "best_path_profile": {
+            "RespectAndDignity": 7,
+            "Empathy": 11,
+            "Compassion": 5,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 8,
+            "ProfessionalBoundaries": 4,
+            "InterprofessionalCollaboration": 6
+          }
+        },
+        {
+          "title": "2.5 La chaise du jardin",
+          "slot": "2.5",
+          "condition": {},
+          "focus": [
+            "Respect et dignité",
+            "Compassion",
+            "Clarté de communication",
+            "Empathie"
+          ],
+          "n_interactions": 14,
+          "n_responses": 58,
+          "positive_points": {
+            "RespectAndDignity": 40,
+            "Empathy": 18,
+            "Compassion": 22,
+            "EmotionalRegulation": 13,
+            "CommunicationClarity": 28,
+            "ProfessionalBoundaries": 8,
+            "InterprofessionalCollaboration": 15
+          },
+          "negative_points": {
+            "RespectAndDignity": -28,
+            "Empathy": -13,
+            "Compassion": -16,
+            "EmotionalRegulation": -12,
+            "CommunicationClarity": -8,
+            "ProfessionalBoundaries": -12,
+            "InterprofessionalCollaboration": -3
+          },
+          "share_percent": {
+            "RespectAndDignity": 28,
+            "Empathy": 12,
+            "Compassion": 15,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 19,
+            "ProfessionalBoundaries": 6,
+            "InterprofessionalCollaboration": 10
+          },
+          "categories": {
+            "Très bon": 2,
+            "Bon": 20,
+            "Moyen": 12,
+            "Mauvais": 21,
+            "Très mauvais": 3
+          },
+          "best_path_total": 57,
+          "best_path_profile": {
+            "RespectAndDignity": 9,
+            "Empathy": 10,
+            "Compassion": 11,
+            "EmotionalRegulation": 1,
+            "CommunicationClarity": 14,
+            "ProfessionalBoundaries": 5,
+            "InterprofessionalCollaboration": 7
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Le doute",
+      "focus": "CC, PB, RD, ER",
+      "share_percent": {
+        "RespectAndDignity": 14,
+        "Empathy": 12,
+        "Compassion": 7,
+        "EmotionalRegulation": 11,
+        "CommunicationClarity": 31,
+        "ProfessionalBoundaries": 20,
+        "InterprofessionalCollaboration": 6
+      },
+      "positive_points": {
+        "RespectAndDignity": 164,
+        "Empathy": 140,
+        "Compassion": 81,
+        "EmotionalRegulation": 125,
+        "CommunicationClarity": 353,
+        "ProfessionalBoundaries": 227,
+        "InterprofessionalCollaboration": 66
+      },
+      "categories": {
+        "Très bon": 45,
+        "Bon": 91,
+        "Moyen": 84,
+        "Mauvais": 139,
+        "Très mauvais": 26
+      },
+      "scenes": [
+        {
+          "title": "3.1 La consultation",
+          "slot": "3.1",
+          "condition": {},
+          "focus": [
+            "Clarté de communication",
+            "Empathie",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 20,
+          "n_responses": 85,
+          "positive_points": {
+            "RespectAndDignity": 58,
+            "Empathy": 38,
+            "Compassion": 20,
+            "EmotionalRegulation": 22,
+            "CommunicationClarity": 101,
+            "ProfessionalBoundaries": 35,
+            "InterprofessionalCollaboration": 14
+          },
+          "negative_points": {
+            "RespectAndDignity": -28,
+            "Empathy": -42,
+            "Compassion": -13,
+            "EmotionalRegulation": -5,
+            "CommunicationClarity": -49,
+            "ProfessionalBoundaries": -18,
+            "InterprofessionalCollaboration": -4
+          },
+          "share_percent": {
+            "RespectAndDignity": 20,
+            "Empathy": 13,
+            "Compassion": 7,
+            "EmotionalRegulation": 8,
+            "CommunicationClarity": 35,
+            "ProfessionalBoundaries": 12,
+            "InterprofessionalCollaboration": 5
+          },
+          "categories": {
+            "Très bon": 15,
+            "Bon": 16,
+            "Moyen": 18,
+            "Mauvais": 29,
+            "Très mauvais": 7
+          },
+          "best_path_total": 148,
+          "best_path_profile": {
+            "RespectAndDignity": 40,
+            "Empathy": 17,
+            "Compassion": 13,
+            "EmotionalRegulation": 5,
+            "CommunicationClarity": 45,
+            "ProfessionalBoundaries": 20,
+            "InterprofessionalCollaboration": 8
+          }
+        },
+        {
+          "title": "3.2 Le résultat qui n'en est pas un",
+          "slot": "3.2",
+          "condition": {},
+          "focus": [
+            "Clarté de communication",
+            "Empathie",
+            "Respect et dignité"
+          ],
+          "n_interactions": 18,
+          "n_responses": 75,
+          "positive_points": {
+            "RespectAndDignity": 54,
+            "Empathy": 27,
+            "Compassion": 23,
+            "EmotionalRegulation": 25,
+            "CommunicationClarity": 80,
+            "ProfessionalBoundaries": 52,
+            "InterprofessionalCollaboration": 9
+          },
+          "negative_points": {
+            "RespectAndDignity": -29,
+            "Empathy": -21,
+            "Compassion": -24,
+            "EmotionalRegulation": -1,
+            "CommunicationClarity": -56,
+            "ProfessionalBoundaries": -36,
+            "InterprofessionalCollaboration": -2
+          },
+          "share_percent": {
+            "RespectAndDignity": 20,
+            "Empathy": 10,
+            "Compassion": 9,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 30,
+            "ProfessionalBoundaries": 19,
+            "InterprofessionalCollaboration": 3
+          },
+          "categories": {
+            "Très bon": 16,
+            "Bon": 9,
+            "Moyen": 17,
+            "Mauvais": 25,
+            "Très mauvais": 8
+          },
+          "best_path_total": 167,
+          "best_path_profile": {
+            "RespectAndDignity": 40,
+            "Empathy": 14,
+            "Compassion": 18,
+            "EmotionalRegulation": 13,
+            "CommunicationClarity": 42,
+            "ProfessionalBoundaries": 33,
+            "InterprofessionalCollaboration": 7
+          }
+        },
+        {
+          "title": "3.3 Le débriefing",
+          "slot": "3.3",
+          "condition": {},
+          "focus": [
+            "Régulation émotionnelle",
+            "Frontières professionnelles",
+            "Collaboration interprofessionnelle"
+          ],
+          "n_interactions": 12,
+          "n_responses": 49,
+          "positive_points": {
+            "RespectAndDignity": 7,
+            "Empathy": 10,
+            "Compassion": 8,
+            "EmotionalRegulation": 30,
+            "CommunicationClarity": 39,
+            "ProfessionalBoundaries": 33,
+            "InterprofessionalCollaboration": 24
+          },
+          "negative_points": {
+            "RespectAndDignity": -7,
+            "Empathy": -7,
+            "Compassion": -5,
+            "EmotionalRegulation": -14,
+            "CommunicationClarity": -10,
+            "ProfessionalBoundaries": -13,
+            "InterprofessionalCollaboration": -2
+          },
+          "share_percent": {
+            "RespectAndDignity": 5,
+            "Empathy": 7,
+            "Compassion": 5,
+            "EmotionalRegulation": 20,
+            "CommunicationClarity": 26,
+            "ProfessionalBoundaries": 22,
+            "InterprofessionalCollaboration": 16
+          },
+          "categories": {
+            "Très bon": 8,
+            "Bon": 4,
+            "Moyen": 22,
+            "Mauvais": 14,
+            "Très mauvais": 1
+          },
+          "best_path_total": 105,
+          "best_path_profile": {
+            "RespectAndDignity": 7,
+            "Empathy": 6,
+            "Compassion": 8,
+            "EmotionalRegulation": 19,
+            "CommunicationClarity": 23,
+            "ProfessionalBoundaries": 27,
+            "InterprofessionalCollaboration": 15
+          }
+        },
+        {
+          "title": "3.4 Au guichet",
+          "slot": "3.4",
+          "condition": {},
+          "focus": [
+            "Frontières professionnelles",
+            "Empathie",
+            "Respect et dignité"
+          ],
+          "n_interactions": 12,
+          "n_responses": 51,
+          "positive_points": {
+            "RespectAndDignity": 12,
+            "Empathy": 26,
+            "Compassion": 3,
+            "EmotionalRegulation": 7,
+            "CommunicationClarity": 23,
+            "ProfessionalBoundaries": 49,
+            "InterprofessionalCollaboration": 13
+          },
+          "negative_points": {
+            "RespectAndDignity": -16,
+            "Empathy": -16,
+            "Compassion": -1,
+            "EmotionalRegulation": -5,
+            "CommunicationClarity": -21,
+            "ProfessionalBoundaries": -49,
+            "InterprofessionalCollaboration": -8
+          },
+          "share_percent": {
+            "RespectAndDignity": 9,
+            "Empathy": 20,
+            "Compassion": 2,
+            "EmotionalRegulation": 5,
+            "CommunicationClarity": 17,
+            "ProfessionalBoundaries": 37,
+            "InterprofessionalCollaboration": 10
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 20,
+            "Moyen": 7,
+            "Mauvais": 17,
+            "Très mauvais": 6
+          },
+          "best_path_total": 41,
+          "best_path_profile": {
+            "RespectAndDignity": 5,
+            "Empathy": 8,
+            "Compassion": 0,
+            "EmotionalRegulation": 1,
+            "CommunicationClarity": 10,
+            "ProfessionalBoundaries": 13,
+            "InterprofessionalCollaboration": 4
+          }
+        },
+        {
+          "title": "3.5 Jeudi, 14 h",
+          "slot": "3.5",
+          "condition": {},
+          "focus": [
+            "Clarté de communication",
+            "Empathie",
+            "Respect et dignité",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 15,
+          "n_responses": 62,
+          "positive_points": {
+            "RespectAndDignity": 17,
+            "Empathy": 17,
+            "Compassion": 19,
+            "EmotionalRegulation": 20,
+            "CommunicationClarity": 62,
+            "ProfessionalBoundaries": 27,
+            "InterprofessionalCollaboration": 3
+          },
+          "negative_points": {
+            "RespectAndDignity": -11,
+            "Empathy": -43,
+            "Compassion": -9,
+            "EmotionalRegulation": -5,
+            "CommunicationClarity": -18,
+            "ProfessionalBoundaries": -19,
+            "InterprofessionalCollaboration": -2
+          },
+          "share_percent": {
+            "RespectAndDignity": 10,
+            "Empathy": 10,
+            "Compassion": 12,
+            "EmotionalRegulation": 12,
+            "CommunicationClarity": 38,
+            "ProfessionalBoundaries": 16,
+            "InterprofessionalCollaboration": 2
+          },
+          "categories": {
+            "Très bon": 3,
+            "Bon": 20,
+            "Moyen": 11,
+            "Mauvais": 28,
+            "Très mauvais": 0
+          },
+          "best_path_total": 31,
+          "best_path_profile": {
+            "RespectAndDignity": 3,
+            "Empathy": 5,
+            "Compassion": 5,
+            "EmotionalRegulation": 5,
+            "CommunicationClarity": 11,
+            "ProfessionalBoundaries": 2,
+            "InterprofessionalCollaboration": 0
+          }
+        },
+        {
+          "title": "3.6 Douze jours plus tard",
+          "slot": "3.6",
+          "condition": {},
+          "focus": [
+            "Clarté de communication",
+            "Empathie",
+            "Frontières professionnelles",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 15,
+          "n_responses": 63,
+          "positive_points": {
+            "RespectAndDignity": 16,
+            "Empathy": 22,
+            "Compassion": 8,
+            "EmotionalRegulation": 21,
+            "CommunicationClarity": 48,
+            "ProfessionalBoundaries": 31,
+            "InterprofessionalCollaboration": 3
+          },
+          "negative_points": {
+            "RespectAndDignity": -12,
+            "Empathy": -26,
+            "Compassion": -6,
+            "EmotionalRegulation": -6,
+            "CommunicationClarity": -38,
+            "ProfessionalBoundaries": -31,
+            "InterprofessionalCollaboration": -1
+          },
+          "share_percent": {
+            "RespectAndDignity": 11,
+            "Empathy": 15,
+            "Compassion": 5,
+            "EmotionalRegulation": 14,
+            "CommunicationClarity": 32,
+            "ProfessionalBoundaries": 21,
+            "InterprofessionalCollaboration": 2
+          },
+          "categories": {
+            "Très bon": 2,
+            "Bon": 22,
+            "Moyen": 9,
+            "Mauvais": 26,
+            "Très mauvais": 4
+          },
+          "best_path_total": 37,
+          "best_path_profile": {
+            "RespectAndDignity": 3,
+            "Empathy": 7,
+            "Compassion": 3,
+            "EmotionalRegulation": 1,
+            "CommunicationClarity": 15,
+            "ProfessionalBoundaries": 6,
+            "InterprofessionalCollaboration": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Ceux qui restent",
+      "focus": "CO, IC, CC, RD",
+      "share_percent": {
+        "RespectAndDignity": 15,
+        "Empathy": 13,
+        "Compassion": 19,
+        "EmotionalRegulation": 13,
+        "CommunicationClarity": 12,
+        "ProfessionalBoundaries": 9,
+        "InterprofessionalCollaboration": 19
+      },
+      "positive_points": {
+        "RespectAndDignity": 117,
+        "Empathy": 103,
+        "Compassion": 155,
+        "EmotionalRegulation": 105,
+        "CommunicationClarity": 99,
+        "ProfessionalBoundaries": 73,
+        "InterprofessionalCollaboration": 149
+      },
+      "categories": {
+        "Très bon": 10,
+        "Bon": 115,
+        "Moyen": 80,
+        "Mauvais": 147,
+        "Très mauvais": 11
+      },
+      "scenes": [
+        {
+          "title": "4.1 Chambre 312",
+          "slot": "4.1",
+          "condition": {},
+          "focus": [
+            "Respect et dignité",
+            "Empathie",
+            "Frontières professionnelles",
+            "Collaboration interprofessionnelle"
+          ],
+          "n_interactions": 14,
+          "n_responses": 63,
+          "positive_points": {
+            "RespectAndDignity": 35,
+            "Empathy": 23,
+            "Compassion": 13,
+            "EmotionalRegulation": 13,
+            "CommunicationClarity": 17,
+            "ProfessionalBoundaries": 21,
+            "InterprofessionalCollaboration": 26
+          },
+          "negative_points": {
+            "RespectAndDignity": -26,
+            "Empathy": -25,
+            "Compassion": -12,
+            "EmotionalRegulation": -4,
+            "CommunicationClarity": -15,
+            "ProfessionalBoundaries": -19,
+            "InterprofessionalCollaboration": -15
+          },
+          "share_percent": {
+            "RespectAndDignity": 24,
+            "Empathy": 16,
+            "Compassion": 9,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 11,
+            "ProfessionalBoundaries": 14,
+            "InterprofessionalCollaboration": 18
+          },
+          "categories": {
+            "Très bon": 3,
+            "Bon": 22,
+            "Moyen": 10,
+            "Mauvais": 28,
+            "Très mauvais": 0
+          },
+          "best_path_total": 56,
+          "best_path_profile": {
+            "RespectAndDignity": 14,
+            "Empathy": 6,
+            "Compassion": 7,
+            "EmotionalRegulation": 1,
+            "CommunicationClarity": 10,
+            "ProfessionalBoundaries": 6,
+            "InterprofessionalCollaboration": 12
+          }
+        },
+        {
+          "title": "4.2 Les deux sœurs",
+          "slot": "4.2",
+          "condition": {},
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Empathie",
+            "Régulation émotionnelle",
+            "Clarté de communication"
+          ],
+          "n_interactions": 14,
+          "n_responses": 64,
+          "positive_points": {
+            "RespectAndDignity": 27,
+            "Empathy": 26,
+            "Compassion": 16,
+            "EmotionalRegulation": 16,
+            "CommunicationClarity": 26,
+            "ProfessionalBoundaries": 11,
+            "InterprofessionalCollaboration": 19
+          },
+          "negative_points": {
+            "RespectAndDignity": -20,
+            "Empathy": -24,
+            "Compassion": -18,
+            "EmotionalRegulation": -12,
+            "CommunicationClarity": -21,
+            "ProfessionalBoundaries": -18,
+            "InterprofessionalCollaboration": -7
+          },
+          "share_percent": {
+            "RespectAndDignity": 19,
+            "Empathy": 18,
+            "Compassion": 11,
+            "EmotionalRegulation": 11,
+            "CommunicationClarity": 18,
+            "ProfessionalBoundaries": 8,
+            "InterprofessionalCollaboration": 13
+          },
+          "categories": {
+            "Très bon": 2,
+            "Bon": 19,
+            "Moyen": 15,
+            "Mauvais": 24,
+            "Très mauvais": 4
+          },
+          "best_path_total": 57,
+          "best_path_profile": {
+            "RespectAndDignity": 9,
+            "Empathy": 13,
+            "Compassion": 9,
+            "EmotionalRegulation": 2,
+            "CommunicationClarity": 11,
+            "ProfessionalBoundaries": 4,
+            "InterprofessionalCollaboration": 9
+          }
+        },
+        {
+          "title": "4.3 Lina",
+          "slot": "4.3",
+          "condition": {},
+          "focus": [
+            "Empathie",
+            "Respect et dignité",
+            "Clarté de communication",
+            "Compassion"
+          ],
+          "n_interactions": 15,
+          "n_responses": 66,
+          "positive_points": {
+            "RespectAndDignity": 20,
+            "Empathy": 36,
+            "Compassion": 24,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 29,
+            "ProfessionalBoundaries": 16,
+            "InterprofessionalCollaboration": 14
+          },
+          "negative_points": {
+            "RespectAndDignity": -21,
+            "Empathy": -38,
+            "Compassion": -16,
+            "EmotionalRegulation": -4,
+            "CommunicationClarity": -24,
+            "ProfessionalBoundaries": -15,
+            "InterprofessionalCollaboration": -5
+          },
+          "share_percent": {
+            "RespectAndDignity": 14,
+            "Empathy": 24,
+            "Compassion": 16,
+            "EmotionalRegulation": 6,
+            "CommunicationClarity": 20,
+            "ProfessionalBoundaries": 11,
+            "InterprofessionalCollaboration": 9
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 21,
+            "Moyen": 14,
+            "Mauvais": 28,
+            "Très mauvais": 2
+          },
+          "best_path_total": 51,
+          "best_path_profile": {
+            "RespectAndDignity": 7,
+            "Empathy": 15,
+            "Compassion": 7,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": 16,
+            "ProfessionalBoundaries": 2,
+            "InterprofessionalCollaboration": 4
+          }
+        },
+        {
+          "title": "4.4 Le mariage",
+          "slot": "4.4",
+          "condition": {},
+          "focus": [
+            "Compassion",
+            "Collaboration interprofessionnelle",
+            "Respect et dignité"
+          ],
+          "n_interactions": 13,
+          "n_responses": 58,
+          "positive_points": {
+            "RespectAndDignity": 6,
+            "Empathy": 2,
+            "Compassion": 38,
+            "EmotionalRegulation": 15,
+            "CommunicationClarity": 6,
+            "ProfessionalBoundaries": 11,
+            "InterprofessionalCollaboration": 45
+          },
+          "negative_points": {
+            "RespectAndDignity": -13,
+            "Empathy": -7,
+            "Compassion": -26,
+            "EmotionalRegulation": -13,
+            "CommunicationClarity": -11,
+            "ProfessionalBoundaries": -19,
+            "InterprofessionalCollaboration": -19
+          },
+          "share_percent": {
+            "RespectAndDignity": 5,
+            "Empathy": 2,
+            "Compassion": 31,
+            "EmotionalRegulation": 12,
+            "CommunicationClarity": 5,
+            "ProfessionalBoundaries": 9,
+            "InterprofessionalCollaboration": 37
+          },
+          "categories": {
+            "Très bon": 2,
+            "Bon": 16,
+            "Moyen": 14,
+            "Mauvais": 23,
+            "Très mauvais": 3
+          },
+          "best_path_total": 31,
+          "best_path_profile": {
+            "RespectAndDignity": 2,
+            "Empathy": 0,
+            "Compassion": 11,
+            "EmotionalRegulation": 2,
+            "CommunicationClarity": 2,
+            "ProfessionalBoundaries": 4,
+            "InterprofessionalCollaboration": 10
+          }
+        },
+        {
+          "title": "4.5 La dernière nuit",
+          "slot": "4.5",
+          "condition": {},
+          "focus": [
+            "Compassion",
+            "Régulation émotionnelle",
+            "Collaboration interprofessionnelle",
+            "Clarté de communication"
+          ],
+          "n_interactions": 15,
+          "n_responses": 61,
+          "positive_points": {
+            "RespectAndDignity": 14,
+            "Empathy": 8,
+            "Compassion": 43,
+            "EmotionalRegulation": 21,
+            "CommunicationClarity": 20,
+            "ProfessionalBoundaries": 4,
+            "InterprofessionalCollaboration": 24
+          },
+          "negative_points": {
+            "RespectAndDignity": -17,
+            "Empathy": -8,
+            "Compassion": -26,
+            "EmotionalRegulation": -17,
+            "CommunicationClarity": -10,
+            "ProfessionalBoundaries": -18,
+            "InterprofessionalCollaboration": -17
+          },
+          "share_percent": {
+            "RespectAndDignity": 10,
+            "Empathy": 6,
+            "Compassion": 32,
+            "EmotionalRegulation": 16,
+            "CommunicationClarity": 15,
+            "ProfessionalBoundaries": 3,
+            "InterprofessionalCollaboration": 18
+          },
+          "categories": {
+            "Très bon": 2,
+            "Bon": 19,
+            "Moyen": 11,
+            "Mauvais": 27,
+            "Très mauvais": 2
+          },
+          "best_path_total": 52,
+          "best_path_profile": {
+            "RespectAndDignity": 5,
+            "Empathy": 7,
+            "Compassion": 15,
+            "EmotionalRegulation": 7,
+            "CommunicationClarity": 11,
+            "ProfessionalBoundaries": 0,
+            "InterprofessionalCollaboration": 7
+          }
+        },
+        {
+          "title": "4.6 Le matin d'après",
+          "slot": "4.6",
+          "condition": {},
+          "focus": [
+            "Régulation émotionnelle",
+            "Collaboration interprofessionnelle",
+            "Compassion",
+            "Frontières professionnelles"
+          ],
+          "n_interactions": 13,
+          "n_responses": 51,
+          "positive_points": {
+            "RespectAndDignity": 15,
+            "Empathy": 8,
+            "Compassion": 21,
+            "EmotionalRegulation": 31,
+            "CommunicationClarity": 1,
+            "ProfessionalBoundaries": 10,
+            "InterprofessionalCollaboration": 21
+          },
+          "negative_points": {
+            "RespectAndDignity": -10,
+            "Empathy": -5,
+            "Compassion": -8,
+            "EmotionalRegulation": -23,
+            "CommunicationClarity": 0,
+            "ProfessionalBoundaries": -9,
+            "InterprofessionalCollaboration": -12
+          },
+          "share_percent": {
+            "RespectAndDignity": 14,
+            "Empathy": 7,
+            "Compassion": 20,
+            "EmotionalRegulation": 29,
+            "CommunicationClarity": 1,
+            "ProfessionalBoundaries": 9,
+            "InterprofessionalCollaboration": 20
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 18,
+            "Moyen": 16,
+            "Mauvais": 17,
+            "Très mauvais": 0
+          },
+          "best_path_total": 42,
+          "best_path_profile": {
+            "RespectAndDignity": 5,
+            "Empathy": 5,
+            "Compassion": 11,
+            "EmotionalRegulation": 10,
+            "CommunicationClarity": 1,
+            "ProfessionalBoundaries": 3,
+            "InterprofessionalCollaboration": 7
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Une seule ligne",
+      "focus": "PB, CC, IC, ER",
+      "share_percent": {
+        "RespectAndDignity": 9,
+        "Empathy": 3,
+        "Compassion": 5,
+        "EmotionalRegulation": 10,
+        "CommunicationClarity": 22,
+        "ProfessionalBoundaries": 29,
+        "InterprofessionalCollaboration": 23
+      },
+      "positive_points": {
+        "RespectAndDignity": 88,
+        "Empathy": 36,
+        "Compassion": 50,
+        "EmotionalRegulation": 99,
+        "CommunicationClarity": 230,
+        "ProfessionalBoundaries": 299,
+        "InterprofessionalCollaboration": 233
+      },
+      "categories": {
+        "Très bon": 10,
+        "Bon": 153,
+        "Moyen": 93,
+        "Mauvais": 183,
+        "Très mauvais": 18
+      },
+      "scenes": [
+        {
+          "title": "5.1 L'entrée de 19 h",
+          "slot": "5.1",
+          "condition": {},
+          "focus": [
+            "Clarté de communication",
+            "Respect et dignité",
+            "Frontières professionnelles"
+          ],
+          "n_interactions": 17,
+          "n_responses": 77,
+          "positive_points": {
+            "RespectAndDignity": 20,
+            "Empathy": 13,
+            "Compassion": 0,
+            "EmotionalRegulation": 5,
+            "CommunicationClarity": 58,
+            "ProfessionalBoundaries": 44,
+            "InterprofessionalCollaboration": 20
+          },
+          "negative_points": {
+            "RespectAndDignity": -22,
+            "Empathy": -7,
+            "Compassion": 0,
+            "EmotionalRegulation": -4,
+            "CommunicationClarity": -36,
+            "ProfessionalBoundaries": -62,
+            "InterprofessionalCollaboration": -10
+          },
+          "share_percent": {
+            "RespectAndDignity": 12,
+            "Empathy": 8,
+            "Compassion": 0,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 36,
+            "ProfessionalBoundaries": 28,
+            "InterprofessionalCollaboration": 12
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 24,
+            "Moyen": 18,
+            "Mauvais": 28,
+            "Très mauvais": 6
+          },
+          "best_path_total": 50,
+          "best_path_profile": {
+            "RespectAndDignity": 6,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": 20,
+            "ProfessionalBoundaries": 16,
+            "InterprofessionalCollaboration": 8
+          }
+        },
+        {
+          "title": "5.2 La relève",
+          "slot": "5.2",
+          "condition": {},
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Clarté de communication",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 12,
+          "n_responses": 45,
+          "positive_points": {
+            "RespectAndDignity": 6,
+            "Empathy": 2,
+            "Compassion": 0,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": 27,
+            "ProfessionalBoundaries": 17,
+            "InterprofessionalCollaboration": 50
+          },
+          "negative_points": {
+            "RespectAndDignity": -11,
+            "Empathy": -1,
+            "Compassion": 0,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": -10,
+            "ProfessionalBoundaries": -19,
+            "InterprofessionalCollaboration": -36
+          },
+          "share_percent": {
+            "RespectAndDignity": 6,
+            "Empathy": 2,
+            "Compassion": 0,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": 26,
+            "ProfessionalBoundaries": 17,
+            "InterprofessionalCollaboration": 49
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 15,
+            "Moyen": 11,
+            "Mauvais": 14,
+            "Très mauvais": 2
+          },
+          "best_path_total": 28,
+          "best_path_profile": {
+            "RespectAndDignity": 4,
+            "Empathy": 1,
+            "Compassion": 0,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": 5,
+            "ProfessionalBoundaries": 4,
+            "InterprofessionalCollaboration": 14
+          }
+        },
+        {
+          "title": "5.3 Deux heures dix",
+          "slot": "5.3",
+          "condition": {},
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Frontières professionnelles",
+            "Clarté de communication"
+          ],
+          "n_interactions": 17,
+          "n_responses": 61,
+          "positive_points": {
+            "RespectAndDignity": 10,
+            "Empathy": 4,
+            "Compassion": 5,
+            "EmotionalRegulation": 15,
+            "CommunicationClarity": 47,
+            "ProfessionalBoundaries": 58,
+            "InterprofessionalCollaboration": 33
+          },
+          "negative_points": {
+            "RespectAndDignity": -12,
+            "Empathy": -2,
+            "Compassion": -1,
+            "EmotionalRegulation": -10,
+            "CommunicationClarity": -23,
+            "ProfessionalBoundaries": -60,
+            "InterprofessionalCollaboration": -15
+          },
+          "share_percent": {
+            "RespectAndDignity": 6,
+            "Empathy": 2,
+            "Compassion": 3,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 27,
+            "ProfessionalBoundaries": 34,
+            "InterprofessionalCollaboration": 19
+          },
+          "categories": {
+            "Très bon": 3,
+            "Bon": 23,
+            "Moyen": 7,
+            "Mauvais": 24,
+            "Très mauvais": 4
+          },
+          "best_path_total": 33,
+          "best_path_profile": {
+            "RespectAndDignity": 2,
+            "Empathy": 2,
+            "Compassion": 0,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 9,
+            "ProfessionalBoundaries": 11,
+            "InterprofessionalCollaboration": 6
+          }
+        },
+        {
+          "title": "5.4 Le choc",
+          "slot": "5.4",
+          "condition": {
+            "all": [
+              "erreur"
+            ]
+          },
+          "focus": [
+            "Régulation émotionnelle",
+            "Collaboration interprofessionnelle",
+            "Frontières professionnelles",
+            "Clarté de communication"
+          ],
+          "n_interactions": 12,
+          "n_responses": 41,
+          "positive_points": {
+            "RespectAndDignity": 0,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 12,
+            "CommunicationClarity": 18,
+            "ProfessionalBoundaries": 15,
+            "InterprofessionalCollaboration": 41
+          },
+          "negative_points": {
+            "RespectAndDignity": -3,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": -24,
+            "CommunicationClarity": -13,
+            "ProfessionalBoundaries": -22,
+            "InterprofessionalCollaboration": -13
+          },
+          "share_percent": {
+            "RespectAndDignity": 0,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 14,
+            "CommunicationClarity": 21,
+            "ProfessionalBoundaries": 17,
+            "InterprofessionalCollaboration": 48
+          },
+          "categories": {
+            "Très bon": 2,
+            "Bon": 10,
+            "Moyen": 10,
+            "Mauvais": 15,
+            "Très mauvais": 1
+          },
+          "best_path_total": 24,
+          "best_path_profile": {
+            "RespectAndDignity": 0,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 7,
+            "ProfessionalBoundaries": 5,
+            "InterprofessionalCollaboration": 9
+          }
+        },
+        {
+          "title": "5.5 Quatre heures",
+          "slot": "5.5",
+          "condition": {
+            "all": [
+              "erreur"
+            ]
+          },
+          "focus": [
+            "Respect et dignité",
+            "Compassion",
+            "Frontières professionnelles",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 17,
+          "n_responses": 75,
+          "positive_points": {
+            "RespectAndDignity": 15,
+            "Empathy": 3,
+            "Compassion": 20,
+            "EmotionalRegulation": 23,
+            "CommunicationClarity": 35,
+            "ProfessionalBoundaries": 67,
+            "InterprofessionalCollaboration": 6
+          },
+          "negative_points": {
+            "RespectAndDignity": -9,
+            "Empathy": -5,
+            "Compassion": -9,
+            "EmotionalRegulation": -12,
+            "CommunicationClarity": -28,
+            "ProfessionalBoundaries": -62,
+            "InterprofessionalCollaboration": -9
+          },
+          "share_percent": {
+            "RespectAndDignity": 9,
+            "Empathy": 2,
+            "Compassion": 12,
+            "EmotionalRegulation": 14,
+            "CommunicationClarity": 21,
+            "ProfessionalBoundaries": 40,
+            "InterprofessionalCollaboration": 4
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 25,
+            "Moyen": 16,
+            "Mauvais": 30,
+            "Très mauvais": 3
+          },
+          "best_path_total": 42,
+          "best_path_profile": {
+            "RespectAndDignity": 5,
+            "Empathy": 2,
+            "Compassion": 4,
+            "EmotionalRegulation": 6,
+            "CommunicationClarity": 10,
+            "ProfessionalBoundaries": 15,
+            "InterprofessionalCollaboration": 0
+          }
+        },
+        {
+          "title": "5.6 La ligne",
+          "slot": "5.6",
+          "condition": {
+            "all": [
+              "erreur"
+            ]
+          },
+          "focus": [
+            "Frontières professionnelles",
+            "Régulation émotionnelle",
+            "Collaboration interprofessionnelle"
+          ],
+          "n_interactions": 13,
+          "n_responses": 53,
+          "positive_points": {
+            "RespectAndDignity": 4,
+            "Empathy": 8,
+            "Compassion": 10,
+            "EmotionalRegulation": 23,
+            "CommunicationClarity": 4,
+            "ProfessionalBoundaries": 31,
+            "InterprofessionalCollaboration": 30
+          },
+          "negative_points": {
+            "RespectAndDignity": -3,
+            "Empathy": -2,
+            "Compassion": 0,
+            "EmotionalRegulation": -16,
+            "CommunicationClarity": -11,
+            "ProfessionalBoundaries": -36,
+            "InterprofessionalCollaboration": -16
+          },
+          "share_percent": {
+            "RespectAndDignity": 4,
+            "Empathy": 7,
+            "Compassion": 9,
+            "EmotionalRegulation": 21,
+            "CommunicationClarity": 4,
+            "ProfessionalBoundaries": 28,
+            "InterprofessionalCollaboration": 27
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 16,
+            "Moyen": 13,
+            "Mauvais": 20,
+            "Très mauvais": 2
+          },
+          "best_path_total": 38,
+          "best_path_profile": {
+            "RespectAndDignity": 3,
+            "Empathy": 4,
+            "Compassion": 3,
+            "EmotionalRegulation": 7,
+            "CommunicationClarity": 4,
+            "ProfessionalBoundaries": 7,
+            "InterprofessionalCollaboration": 10
+          }
+        },
+        {
+          "title": "5.4 La poche",
+          "slot": "5.4",
+          "condition": {
+            "all": [
+              "evite"
+            ]
+          },
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Régulation émotionnelle",
+            "Respect et dignité",
+            "Frontières professionnelles"
+          ],
+          "n_interactions": 10,
+          "n_responses": 41,
+          "positive_points": {
+            "RespectAndDignity": 16,
+            "Empathy": 1,
+            "Compassion": 8,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 8,
+            "ProfessionalBoundaries": 20,
+            "InterprofessionalCollaboration": 24
+          },
+          "negative_points": {
+            "RespectAndDignity": -11,
+            "Empathy": -1,
+            "Compassion": -3,
+            "EmotionalRegulation": -11,
+            "CommunicationClarity": -4,
+            "ProfessionalBoundaries": -24,
+            "InterprofessionalCollaboration": -18
+          },
+          "share_percent": {
+            "RespectAndDignity": 19,
+            "Empathy": 1,
+            "Compassion": 9,
+            "EmotionalRegulation": 10,
+            "CommunicationClarity": 9,
+            "ProfessionalBoundaries": 23,
+            "InterprofessionalCollaboration": 28
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 16,
+            "Moyen": 4,
+            "Mauvais": 20,
+            "Très mauvais": 0
+          },
+          "best_path_total": 31,
+          "best_path_profile": {
+            "RespectAndDignity": 5,
+            "Empathy": 0,
+            "Compassion": 2,
+            "EmotionalRegulation": 4,
+            "CommunicationClarity": 4,
+            "ProfessionalBoundaries": 8,
+            "InterprofessionalCollaboration": 8
+          }
+        },
+        {
+          "title": "5.5 Sept heures",
+          "slot": "5.5",
+          "condition": {
+            "all": [
+              "evite"
+            ]
+          },
+          "focus": [
+            "Frontières professionnelles",
+            "Collaboration interprofessionnelle",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 7,
+          "n_responses": 30,
+          "positive_points": {
+            "RespectAndDignity": 0,
+            "Empathy": 2,
+            "Compassion": 0,
+            "EmotionalRegulation": 7,
+            "CommunicationClarity": 5,
+            "ProfessionalBoundaries": 20,
+            "InterprofessionalCollaboration": 24
+          },
+          "negative_points": {
+            "RespectAndDignity": 0,
+            "Empathy": -1,
+            "Compassion": 0,
+            "EmotionalRegulation": -2,
+            "CommunicationClarity": -3,
+            "ProfessionalBoundaries": -19,
+            "InterprofessionalCollaboration": -21
+          },
+          "share_percent": {
+            "RespectAndDignity": 0,
+            "Empathy": 3,
+            "Compassion": 0,
+            "EmotionalRegulation": 12,
+            "CommunicationClarity": 9,
+            "ProfessionalBoundaries": 34,
+            "InterprofessionalCollaboration": 41
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 11,
+            "Moyen": 4,
+            "Mauvais": 15,
+            "Très mauvais": 0
+          },
+          "best_path_total": 20,
+          "best_path_profile": {
+            "RespectAndDignity": 0,
+            "Empathy": 2,
+            "Compassion": 0,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 3,
+            "ProfessionalBoundaries": 5,
+            "InterprofessionalCollaboration": 7
+          }
+        },
+        {
+          "title": "5.6 La visite",
+          "slot": "5.6",
+          "condition": {
+            "all": [
+              "evite"
+            ]
+          },
+          "focus": [
+            "Respect et dignité",
+            "Clarté de communication",
+            "Compassion"
+          ],
+          "n_interactions": 10,
+          "n_responses": 41,
+          "positive_points": {
+            "RespectAndDignity": 17,
+            "Empathy": 3,
+            "Compassion": 7,
+            "EmotionalRegulation": 5,
+            "CommunicationClarity": 28,
+            "ProfessionalBoundaries": 27,
+            "InterprofessionalCollaboration": 5
+          },
+          "negative_points": {
+            "RespectAndDignity": -9,
+            "Empathy": -6,
+            "Compassion": -2,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": -14,
+            "ProfessionalBoundaries": -26,
+            "InterprofessionalCollaboration": -3
+          },
+          "share_percent": {
+            "RespectAndDignity": 18,
+            "Empathy": 3,
+            "Compassion": 8,
+            "EmotionalRegulation": 5,
+            "CommunicationClarity": 30,
+            "ProfessionalBoundaries": 29,
+            "InterprofessionalCollaboration": 5
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 13,
+            "Moyen": 10,
+            "Mauvais": 17,
+            "Très mauvais": 0
+          },
+          "best_path_total": 25,
+          "best_path_profile": {
+            "RespectAndDignity": 7,
+            "Empathy": 1,
+            "Compassion": 2,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": 9,
+            "ProfessionalBoundaries": 4,
+            "InterprofessionalCollaboration": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Ce qui reste",
+      "focus": "PB, ER, IC, CC",
+      "share_percent": {
+        "RespectAndDignity": 9,
+        "Empathy": 8,
+        "Compassion": 9,
+        "EmotionalRegulation": 14,
+        "CommunicationClarity": 13,
+        "ProfessionalBoundaries": 32,
+        "InterprofessionalCollaboration": 16
+      },
+      "positive_points": {
+        "RespectAndDignity": 91,
+        "Empathy": 84,
+        "Compassion": 89,
+        "EmotionalRegulation": 139,
+        "CommunicationClarity": 128,
+        "ProfessionalBoundaries": 322,
+        "InterprofessionalCollaboration": 166
+      },
+      "categories": {
+        "Très bon": 4,
+        "Bon": 148,
+        "Moyen": 136,
+        "Mauvais": 168,
+        "Très mauvais": 15
+      },
+      "scenes": [
+        {
+          "title": "6.1 La rencontre",
+          "slot": "6.1",
+          "condition": {
+            "all": [
+              "erreur"
+            ]
+          },
+          "focus": [
+            "Respect et dignité",
+            "Compassion",
+            "Clarté de communication",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 16,
+          "n_responses": 70,
+          "positive_points": {
+            "RespectAndDignity": 35,
+            "Empathy": 2,
+            "Compassion": 11,
+            "EmotionalRegulation": 31,
+            "CommunicationClarity": 13,
+            "ProfessionalBoundaries": 70,
+            "InterprofessionalCollaboration": 9
+          },
+          "negative_points": {
+            "RespectAndDignity": -33,
+            "Empathy": -6,
+            "Compassion": -6,
+            "EmotionalRegulation": -18,
+            "CommunicationClarity": -15,
+            "ProfessionalBoundaries": -53,
+            "InterprofessionalCollaboration": -11
+          },
+          "share_percent": {
+            "RespectAndDignity": 20,
+            "Empathy": 1,
+            "Compassion": 6,
+            "EmotionalRegulation": 18,
+            "CommunicationClarity": 8,
+            "ProfessionalBoundaries": 41,
+            "InterprofessionalCollaboration": 5
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 28,
+            "Moyen": 6,
+            "Mauvais": 32,
+            "Très mauvais": 3
+          },
+          "best_path_total": 49,
+          "best_path_profile": {
+            "RespectAndDignity": 11,
+            "Empathy": 2,
+            "Compassion": 5,
+            "EmotionalRegulation": 8,
+            "CommunicationClarity": 6,
+            "ProfessionalBoundaries": 12,
+            "InterprofessionalCollaboration": 5
+          }
+        },
+        {
+          "title": "6.1 La déclaration",
+          "slot": "6.1",
+          "condition": {
+            "all": [
+              "evite"
+            ]
+          },
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Frontières professionnelles",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 10,
+          "n_responses": 43,
+          "positive_points": {
+            "RespectAndDignity": 2,
+            "Empathy": 7,
+            "Compassion": 1,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 17,
+            "ProfessionalBoundaries": 24,
+            "InterprofessionalCollaboration": 32
+          },
+          "negative_points": {
+            "RespectAndDignity": 0,
+            "Empathy": -6,
+            "Compassion": 0,
+            "EmotionalRegulation": -6,
+            "CommunicationClarity": -4,
+            "ProfessionalBoundaries": -18,
+            "InterprofessionalCollaboration": -21
+          },
+          "share_percent": {
+            "RespectAndDignity": 2,
+            "Empathy": 8,
+            "Compassion": 1,
+            "EmotionalRegulation": 10,
+            "CommunicationClarity": 18,
+            "ProfessionalBoundaries": 26,
+            "InterprofessionalCollaboration": 35
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 16,
+            "Moyen": 12,
+            "Mauvais": 15,
+            "Très mauvais": 0
+          },
+          "best_path_total": 27,
+          "best_path_profile": {
+            "RespectAndDignity": 2,
+            "Empathy": 3,
+            "Compassion": 0,
+            "EmotionalRegulation": 1,
+            "CommunicationClarity": 6,
+            "ProfessionalBoundaries": 6,
+            "InterprofessionalCollaboration": 9
+          }
+        },
+        {
+          "title": "6.2 La lettre",
+          "slot": "6.2",
+          "condition": {
+            "all": [
+              "erreur"
+            ]
+          },
+          "focus": [
+            "Frontières professionnelles",
+            "Clarté de communication",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 14,
+          "n_responses": 59,
+          "positive_points": {
+            "RespectAndDignity": 2,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 13,
+            "CommunicationClarity": 23,
+            "ProfessionalBoundaries": 63,
+            "InterprofessionalCollaboration": 4
+          },
+          "negative_points": {
+            "RespectAndDignity": -1,
+            "Empathy": -2,
+            "Compassion": -1,
+            "EmotionalRegulation": -12,
+            "CommunicationClarity": -25,
+            "ProfessionalBoundaries": -59,
+            "InterprofessionalCollaboration": -9
+          },
+          "share_percent": {
+            "RespectAndDignity": 2,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 12,
+            "CommunicationClarity": 22,
+            "ProfessionalBoundaries": 60,
+            "InterprofessionalCollaboration": 4
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 13,
+            "Moyen": 21,
+            "Mauvais": 20,
+            "Très mauvais": 5
+          },
+          "best_path_total": 15,
+          "best_path_profile": {
+            "RespectAndDignity": 0,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 2,
+            "CommunicationClarity": 3,
+            "ProfessionalBoundaries": 8,
+            "InterprofessionalCollaboration": 2
+          }
+        },
+        {
+          "title": "6.2 Kevin",
+          "slot": "6.2",
+          "condition": {
+            "all": [
+              "evite"
+            ]
+          },
+          "focus": [
+            "Empathie",
+            "Collaboration interprofessionnelle",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 7,
+          "n_responses": 25,
+          "positive_points": {
+            "RespectAndDignity": 2,
+            "Empathy": 17,
+            "Compassion": 6,
+            "EmotionalRegulation": 4,
+            "CommunicationClarity": 1,
+            "ProfessionalBoundaries": 2,
+            "InterprofessionalCollaboration": 20
+          },
+          "negative_points": {
+            "RespectAndDignity": -5,
+            "Empathy": -17,
+            "Compassion": -2,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": -1,
+            "ProfessionalBoundaries": -1,
+            "InterprofessionalCollaboration": -10
+          },
+          "share_percent": {
+            "RespectAndDignity": 4,
+            "Empathy": 33,
+            "Compassion": 12,
+            "EmotionalRegulation": 8,
+            "CommunicationClarity": 2,
+            "ProfessionalBoundaries": 4,
+            "InterprofessionalCollaboration": 38
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 10,
+            "Moyen": 6,
+            "Mauvais": 9,
+            "Très mauvais": 0
+          },
+          "best_path_total": 26,
+          "best_path_profile": {
+            "RespectAndDignity": 1,
+            "Empathy": 6,
+            "Compassion": 4,
+            "EmotionalRegulation": 1,
+            "CommunicationClarity": 1,
+            "ProfessionalBoundaries": 2,
+            "InterprofessionalCollaboration": 11
+          }
+        },
+        {
+          "title": "6.3 La revue",
+          "slot": "6.3",
+          "condition": {
+            "all": [
+              "erreur"
+            ]
+          },
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Frontières professionnelles",
+            "Clarté de communication",
+            "Régulation émotionnelle"
+          ],
+          "n_interactions": 12,
+          "n_responses": 50,
+          "positive_points": {
+            "RespectAndDignity": 4,
+            "Empathy": 10,
+            "Compassion": 10,
+            "EmotionalRegulation": 10,
+            "CommunicationClarity": 15,
+            "ProfessionalBoundaries": 29,
+            "InterprofessionalCollaboration": 38
+          },
+          "negative_points": {
+            "RespectAndDignity": -3,
+            "Empathy": -8,
+            "Compassion": -1,
+            "EmotionalRegulation": -8,
+            "CommunicationClarity": -6,
+            "ProfessionalBoundaries": -19,
+            "InterprofessionalCollaboration": -24
+          },
+          "share_percent": {
+            "RespectAndDignity": 3,
+            "Empathy": 9,
+            "Compassion": 9,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 13,
+            "ProfessionalBoundaries": 25,
+            "InterprofessionalCollaboration": 33
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 20,
+            "Moyen": 11,
+            "Mauvais": 18,
+            "Très mauvais": 1
+          },
+          "best_path_total": 45,
+          "best_path_profile": {
+            "RespectAndDignity": 1,
+            "Empathy": 6,
+            "Compassion": 4,
+            "EmotionalRegulation": 4,
+            "CommunicationClarity": 7,
+            "ProfessionalBoundaries": 10,
+            "InterprofessionalCollaboration": 13
+          }
+        },
+        {
+          "title": "6.3 La revue",
+          "slot": "6.3",
+          "condition": {
+            "all": [
+              "evite"
+            ]
+          },
+          "focus": [
+            "Collaboration interprofessionnelle",
+            "Clarté de communication",
+            "Frontières professionnelles"
+          ],
+          "n_interactions": 8,
+          "n_responses": 34,
+          "positive_points": {
+            "RespectAndDignity": 5,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 7,
+            "CommunicationClarity": 23,
+            "ProfessionalBoundaries": 20,
+            "InterprofessionalCollaboration": 22
+          },
+          "negative_points": {
+            "RespectAndDignity": -2,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": -9,
+            "CommunicationClarity": -2,
+            "ProfessionalBoundaries": -8,
+            "InterprofessionalCollaboration": -17
+          },
+          "share_percent": {
+            "RespectAndDignity": 6,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 30,
+            "ProfessionalBoundaries": 26,
+            "InterprofessionalCollaboration": 29
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 12,
+            "Moyen": 9,
+            "Mauvais": 13,
+            "Très mauvais": 0
+          },
+          "best_path_total": 30,
+          "best_path_profile": {
+            "RespectAndDignity": 2,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": 12,
+            "ProfessionalBoundaries": 9,
+            "InterprofessionalCollaboration": 7
+          }
+        },
+        {
+          "title": "6.4 Me Dufaux",
+          "slot": "6.4",
+          "condition": {
+            "all": [
+              "erreur"
+            ]
+          },
+          "focus": [
+            "Frontières professionnelles",
+            "Clarté de communication",
+            "Régulation émotionnelle",
+            "Respect et dignité"
+          ],
+          "n_interactions": 12,
+          "n_responses": 47,
+          "positive_points": {
+            "RespectAndDignity": 7,
+            "Empathy": 1,
+            "Compassion": 7,
+            "EmotionalRegulation": 16,
+            "CommunicationClarity": 20,
+            "ProfessionalBoundaries": 43,
+            "InterprofessionalCollaboration": 3
+          },
+          "negative_points": {
+            "RespectAndDignity": -4,
+            "Empathy": 0,
+            "Compassion": -3,
+            "EmotionalRegulation": -8,
+            "CommunicationClarity": -21,
+            "ProfessionalBoundaries": -38,
+            "InterprofessionalCollaboration": -8
+          },
+          "share_percent": {
+            "RespectAndDignity": 7,
+            "Empathy": 1,
+            "Compassion": 7,
+            "EmotionalRegulation": 16,
+            "CommunicationClarity": 21,
+            "ProfessionalBoundaries": 44,
+            "InterprofessionalCollaboration": 3
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 13,
+            "Moyen": 12,
+            "Mauvais": 20,
+            "Très mauvais": 2
+          },
+          "best_path_total": 21,
+          "best_path_profile": {
+            "RespectAndDignity": 1,
+            "Empathy": 1,
+            "Compassion": 5,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 6,
+            "ProfessionalBoundaries": 5,
+            "InterprofessionalCollaboration": 0
+          }
+        },
+        {
+          "title": "6.4 Jonas",
+          "slot": "6.4",
+          "condition": {
+            "all": [
+              "evite"
+            ]
+          },
+          "focus": [
+            "Frontières professionnelles",
+            "Collaboration interprofessionnelle",
+            "Empathie"
+          ],
+          "n_interactions": 8,
+          "n_responses": 33,
+          "positive_points": {
+            "RespectAndDignity": 1,
+            "Empathy": 16,
+            "Compassion": 1,
+            "EmotionalRegulation": 10,
+            "CommunicationClarity": 3,
+            "ProfessionalBoundaries": 15,
+            "InterprofessionalCollaboration": 20
+          },
+          "negative_points": {
+            "RespectAndDignity": -1,
+            "Empathy": -12,
+            "Compassion": 0,
+            "EmotionalRegulation": 0,
+            "CommunicationClarity": -5,
+            "ProfessionalBoundaries": -21,
+            "InterprofessionalCollaboration": -25
+          },
+          "share_percent": {
+            "RespectAndDignity": 2,
+            "Empathy": 24,
+            "Compassion": 2,
+            "EmotionalRegulation": 15,
+            "CommunicationClarity": 5,
+            "ProfessionalBoundaries": 23,
+            "InterprofessionalCollaboration": 30
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 7,
+            "Moyen": 11,
+            "Mauvais": 14,
+            "Très mauvais": 1
+          },
+          "best_path_total": 20,
+          "best_path_profile": {
+            "RespectAndDignity": 1,
+            "Empathy": 4,
+            "Compassion": 1,
+            "EmotionalRegulation": 1,
+            "CommunicationClarity": 2,
+            "ProfessionalBoundaries": 3,
+            "InterprofessionalCollaboration": 8
+          }
+        },
+        {
+          "title": "6.5 Un appel",
+          "slot": "6.5",
+          "condition": {},
+          "focus": [
+            "Compassion",
+            "Empathie",
+            "Régulation émotionnelle",
+            "Frontières professionnelles"
+          ],
+          "n_interactions": 7,
+          "n_responses": 28,
+          "positive_points": {
+            "RespectAndDignity": 3,
+            "Empathy": 10,
+            "Compassion": 24,
+            "EmotionalRegulation": 6,
+            "CommunicationClarity": 0,
+            "ProfessionalBoundaries": 17,
+            "InterprofessionalCollaboration": 2
+          },
+          "negative_points": {
+            "RespectAndDignity": -2,
+            "Empathy": -7,
+            "Compassion": -11,
+            "EmotionalRegulation": -6,
+            "CommunicationClarity": -1,
+            "ProfessionalBoundaries": -11,
+            "InterprofessionalCollaboration": 0
+          },
+          "share_percent": {
+            "RespectAndDignity": 5,
+            "Empathy": 16,
+            "Compassion": 39,
+            "EmotionalRegulation": 10,
+            "CommunicationClarity": 0,
+            "ProfessionalBoundaries": 27,
+            "InterprofessionalCollaboration": 3
+          },
+          "categories": {
+            "Très bon": 0,
+            "Bon": 7,
+            "Moyen": 13,
+            "Mauvais": 7,
+            "Très mauvais": 1
+          },
+          "best_path_total": 23,
+          "best_path_profile": {
+            "RespectAndDignity": 2,
+            "Empathy": 5,
+            "Compassion": 8,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 0,
+            "ProfessionalBoundaries": 5,
+            "InterprofessionalCollaboration": 0
+          }
+        },
+        {
+          "title": "6.6 Trois mois plus tard",
+          "slot": "6.6",
+          "condition": {
+            "all": [
+              "erreur"
+            ]
+          },
+          "focus": [
+            "Compassion",
+            "Régulation émotionnelle",
+            "Respect et dignité"
+          ],
+          "n_interactions": 15,
+          "n_responses": 61,
+          "positive_points": {
+            "RespectAndDignity": 27,
+            "Empathy": 20,
+            "Compassion": 19,
+            "EmotionalRegulation": 24,
+            "CommunicationClarity": 7,
+            "ProfessionalBoundaries": 33,
+            "InterprofessionalCollaboration": 2
+          },
+          "negative_points": {
+            "RespectAndDignity": -16,
+            "Empathy": -12,
+            "Compassion": -12,
+            "EmotionalRegulation": -14,
+            "CommunicationClarity": -3,
+            "ProfessionalBoundaries": -18,
+            "InterprofessionalCollaboration": 0
+          },
+          "share_percent": {
+            "RespectAndDignity": 20,
+            "Empathy": 15,
+            "Compassion": 14,
+            "EmotionalRegulation": 18,
+            "CommunicationClarity": 5,
+            "ProfessionalBoundaries": 25,
+            "InterprofessionalCollaboration": 2
+          },
+          "categories": {
+            "Très bon": 2,
+            "Bon": 17,
+            "Moyen": 23,
+            "Mauvais": 17,
+            "Très mauvais": 2
+          },
+          "best_path_total": 28,
+          "best_path_profile": {
+            "RespectAndDignity": 6,
+            "Empathy": 2,
+            "Compassion": 5,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 5,
+            "ProfessionalBoundaries": 7,
+            "InterprofessionalCollaboration": 0
+          }
+        },
+        {
+          "title": "6.6 Fin de stage",
+          "slot": "6.6",
+          "condition": {
+            "all": [
+              "evite"
+            ]
+          },
+          "focus": [
+            "Régulation émotionnelle",
+            "Respect et dignité",
+            "Collaboration interprofessionnelle"
+          ],
+          "n_interactions": 6,
+          "n_responses": 21,
+          "positive_points": {
+            "RespectAndDignity": 3,
+            "Empathy": 1,
+            "Compassion": 10,
+            "EmotionalRegulation": 9,
+            "CommunicationClarity": 6,
+            "ProfessionalBoundaries": 6,
+            "InterprofessionalCollaboration": 14
+          },
+          "negative_points": {
+            "RespectAndDignity": 0,
+            "Empathy": 0,
+            "Compassion": 0,
+            "EmotionalRegulation": -5,
+            "CommunicationClarity": -2,
+            "ProfessionalBoundaries": -4,
+            "InterprofessionalCollaboration": -2
+          },
+          "share_percent": {
+            "RespectAndDignity": 6,
+            "Empathy": 2,
+            "Compassion": 20,
+            "EmotionalRegulation": 18,
+            "CommunicationClarity": 12,
+            "ProfessionalBoundaries": 12,
+            "InterprofessionalCollaboration": 29
+          },
+          "categories": {
+            "Très bon": 1,
+            "Bon": 5,
+            "Moyen": 12,
+            "Mauvais": 3,
+            "Très mauvais": 0
+          },
+          "best_path_total": 19,
+          "best_path_profile": {
+            "RespectAndDignity": 0,
+            "Empathy": 1,
+            "Compassion": 2,
+            "EmotionalRegulation": 3,
+            "CommunicationClarity": 4,
+            "ProfessionalBoundaries": 4,
+            "InterprofessionalCollaboration": 5
+          }
+        }
+      ]
+    }
+  ],
+  "book_share_percent": {
+    "RespectAndDignity": 15,
+    "Empathy": 11,
+    "Compassion": 9,
+    "EmotionalRegulation": 11,
+    "CommunicationClarity": 21,
+    "ProfessionalBoundaries": 19,
+    "InterprofessionalCollaboration": 14
+  }
+}

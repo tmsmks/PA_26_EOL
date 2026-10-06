@@ -1,5 +1,6 @@
 // Module AI Modal — proposer une nouvelle réponse via LLM (4.2).
 
+import { jsonHeaders } from "../shared/http.js";
 import { config, SCORE_SKILLS, SKILL_LABELS_FR, state } from "./store.js";
 import {
     rebuildEditorHtml,
@@ -165,7 +166,7 @@ export function openAiProposalModal(sceneIdx, iIdx) {
 
         fetch(config.apiEnrichUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: jsonHeaders(),
             body: JSON.stringify(payload),
         })
             .then((r) => r.json().then((d) => ({ ok: r.ok, data: d })))

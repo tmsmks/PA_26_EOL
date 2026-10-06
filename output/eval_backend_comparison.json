@@ -1,0 +1,493 @@
+{
+  "metrics": {
+    "openai": {
+      "n": 10,
+      "success": 10,
+      "json_valid": 10,
+      "avg_duration_s": 9.2,
+      "compliance_pct": 100.0
+    },
+    "ollama": {
+      "n": 10,
+      "success": 10,
+      "json_valid": 10,
+      "avg_duration_s": 98.2,
+      "compliance_pct": 91.3
+    }
+  },
+  "results": {
+    "openai": [
+      {
+        "backend": "openai",
+        "label": "Empathique — Présentation I1",
+        "orientation": {
+          "Empathy": 2,
+          "RespectAndDignity": 2,
+          "Compassion": 1
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 3.93,
+        "text": "« Bonjour Madame Salamin, je suis Claude, votre infirmière aujourd’hui. Je frappe doucement pour ne pas vous surprendre et j’attends que vous soyez prête avant d’entrer, est-ce que cela vous convient ? »",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 2,
+          "Compassion": 1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 3,
+        "compliance_total": 3
+      },
+      {
+        "backend": "openai",
+        "label": "Problématique — Présentation I6",
+        "orientation": {
+          "Empathy": -2,
+          "RespectAndDignity": -1
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 8.65,
+        "text": "« D’après moi, vous semblez préférer rester seule plutôt que de discuter. »",
+        "scores": {
+          "RespectAndDignity": -1,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "openai",
+        "label": "Très compassionnel — I13",
+        "orientation": {
+          "Empathy": 3,
+          "Compassion": 3
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 7.83,
+        "text": "« Je ressens à quel point c'est difficile pour vous, Madame Salamin. Cela doit être très pesant de rester ici alors que votre cœur est ailleurs, auprès de votre mari. Je suis là pour vous accompagner au mieux dans ce moment. »",
+        "scores": {
+          "RespectAndDignity": 3,
+          "Empathy": 3,
+          "Compassion": 3,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 3,
+          "InterprofessionalCollaboration": 1
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "openai",
+        "label": "Professionnel — Pascal I1",
+        "orientation": {
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 5.23,
+        "text": "« Je comprends l’importance de respecter les délais, Pascal, mais je dois aussi assurer des soins de qualité dans le cadre de mes responsabilités. Je reste disponible si tu souhaites revoir ensemble la planification. »",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 1,
+          "Compassion": 1,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 1
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "openai",
+        "label": "Régulé — Les soins I5",
+        "orientation": {
+          "EmotionalRegulation": 2,
+          "Empathy": 1
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 25.93,
+        "text": "Je prends une profonde inspiration avant de répondre doucement : « Je comprends que vous ressentez peut-être de la frustration, Agathe. Je suis là pour vous aider, pas pour vous juger. »",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 1,
+          "Compassion": 1,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "openai",
+        "label": "Compassionnel débordant — I18",
+        "orientation": {
+          "Compassion": 3,
+          "Empathy": 3,
+          "EmotionalRegulation": -1
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 9.35,
+        "text": "« Je comprends que c’est difficile, et c’est normal d’être submergée par ces émotions. Je suis là avec vous, prenez tout le temps qu’il vous faudra. »",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 3,
+          "EmotionalRegulation": -1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 3,
+        "compliance_total": 3
+      },
+      {
+        "backend": "openai",
+        "label": "Neutre — Lieu de vie I5",
+        "orientation": {
+          "Empathy": 0,
+          "Compassion": 0
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 5.59,
+        "text": "« Je comprends que vous vous sentiez seule, c’est une situation difficile. »",
+        "scores": {
+          "RespectAndDignity": 1,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "openai",
+        "label": "Collaboratif — Lieu de vie I12",
+        "orientation": {
+          "InterprofessionalCollaboration": 2,
+          "CommunicationClarity": 2
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 11.03,
+        "text": "«Je comprends que cette peur vous affecte profondément. Sachez que toute l'équipe soignante est mobilisée pour vous accompagner au mieux. N'hésitez pas à nous faire part de vos besoins ou inquiétudes à tout moment, nous sommes là pour vous.»",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 2,
+          "Compassion": 2,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 2
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "openai",
+        "label": "Empathique — Dyspnée I1",
+        "orientation": {
+          "Empathy": 2,
+          "Compassion": 2,
+          "RespectAndDignity": 2
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 6.7,
+        "text": "« Agathe, cela me touche profondément de vous voir comme ça. Je suis là pour vous accompagner, écoutez-moi si vous avez envie de parler. »",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 2,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 3,
+        "compliance_total": 3
+      },
+      {
+        "backend": "openai",
+        "label": "Cadré — Dyspnée I15",
+        "orientation": {
+          "ProfessionalBoundaries": 3,
+          "EmotionalRegulation": 2
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 7.87,
+        "text": "« Je comprends votre demande, mais je ne peux pas faire cela. Je suis là pour vous accompagner et soulager vos souffrances autrement. »",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 2,
+          "Compassion": 2,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 3,
+          "InterprofessionalCollaboration": 1
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      }
+    ],
+    "ollama": [
+      {
+        "backend": "ollama",
+        "label": "Empathique — Présentation I1",
+        "orientation": {
+          "Empathy": 2,
+          "RespectAndDignity": 2,
+          "Compassion": 1
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 146.75,
+        "text": "''Je vais d’abord vérifier si elle souhaite qu’on frappe ou non avant d’entrer.''",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 2,
+          "Compassion": 1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 3,
+        "compliance_total": 3
+      },
+      {
+        "backend": "ollama",
+        "label": "Problématique — Présentation I6",
+        "orientation": {
+          "Empathy": -2,
+          "RespectAndDignity": -1
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 63.57,
+        "text": "Puis-je vous laisser votre espace pour un moment, ma présence ne semble pas être le bienvenu en ce moment ?",
+        "scores": {
+          "RespectAndDignity": -1,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 0,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "ollama",
+        "label": "Très compassionnel — I13",
+        "orientation": {
+          "Empathy": 3,
+          "Compassion": 3
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 60.99,
+        "text": "Je comprends vos souffrances, Agathe. Rentrer chez soi signifie rentrer dans sa paix, n'est-ce pas ?",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 3,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 2
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "ollama",
+        "label": "Professionnel — Pascal I1",
+        "orientation": {
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 67.21,
+        "text": "Je comprends vos contraintes, mais nous devons également respecter les besoins des résidents.",
+        "scores": {
+          "RespectAndDignity": 1,
+          "Empathy": 2,
+          "Compassion": 1,
+          "EmotionalRegulation": -1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "ollama",
+        "label": "Régulé — Les soins I5",
+        "orientation": {
+          "EmotionalRegulation": 2,
+          "Empathy": 1
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 121.26,
+        "text": "''Je comprends qu'un ton un peu vif ne vous dit rien, mais si je voulais jouer avec vous, je dirais simplement : ''Voulez-vous jouer avec moi ?'':",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 1,
+          "Compassion": 1,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": -1,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "ollama",
+        "label": "Compassionnel débordant — I18",
+        "orientation": {
+          "Compassion": 3,
+          "Empathy": 3,
+          "EmotionalRegulation": -1
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 206.31,
+        "text": "",
+        "scores": {},
+        "error": null,
+        "compliance_within_1": 1,
+        "compliance_total": 3
+      },
+      {
+        "backend": "ollama",
+        "label": "Neutre — Lieu de vie I5",
+        "orientation": {
+          "Empathy": 0,
+          "Compassion": 0
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 61.18,
+        "text": "",
+        "scores": {},
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "ollama",
+        "label": "Collaboratif — Lieu de vie I12",
+        "orientation": {
+          "InterprofessionalCollaboration": 2,
+          "CommunicationClarity": 2
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 74.59,
+        "text": "Pascal a souhaité que nous discutions de votre entourage familial et médical pour planifier vos soins, afin que vous puissiez rester confortablement chez-vous.",
+        "scores": {
+          "RespectAndDignity": 1,
+          "Empathy": 2,
+          "Compassion": 2,
+          "EmotionalRegulation": -1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 2
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      },
+      {
+        "backend": "ollama",
+        "label": "Empathique — Dyspnée I1",
+        "orientation": {
+          "Empathy": 2,
+          "Compassion": 2,
+          "RespectAndDignity": 2
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 91.75,
+        "text": "Je tiens à vous savoir, Agathe, que je suis là pour vous soutenir et écouter vos pensées.",
+        "scores": {
+          "RespectAndDignity": 2,
+          "Empathy": 2,
+          "Compassion": 2,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ce peut faire référence à la clarté des termes, dans ce cas-là « pensées ». Cela montre que sa réponse est claire d’un point de vue émotionnel, et qu’elle est au contraire du terme que choisit pour résumer les idée/ le problème ;  ": "ProfessionalBoundaries"
+        },
+        "error": null,
+        "compliance_within_1": 3,
+        "compliance_total": 3
+      },
+      {
+        "backend": "ollama",
+        "label": "Cadré — Dyspnée I15",
+        "orientation": {
+          "ProfessionalBoundaries": 3,
+          "EmotionalRegulation": 2
+        },
+        "success": true,
+        "json_valid": true,
+        "duration_s": 88.22,
+        "text": "Je comprends votre peur, mais je dois vous assurer que nous allons procéder de manière à respecter vos droits et nos propres valeurs médicales.",
+        "scores": {
+          "RespectAndDignity": 3,
+          "Empathy": 2,
+          "Compassion": 0,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 3,
+          "InterprofessionalCollaboration": 0
+        },
+        "error": null,
+        "compliance_within_1": 2,
+        "compliance_total": 2
+      }
+    ]
+  }
+}

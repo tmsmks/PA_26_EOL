@@ -43,3 +43,17 @@ def test_error_when_next_id_unknown():
     assert err.interaction_id == 1
     assert err.response_idx == 1
     assert "EG-7" in str(err)
+
+
+def test_entry_points_valid_and_invalid():
+    from services.validation_service import validate_entry_points
+
+    scene = Scene.from_dict({
+        "Id": 1,
+        "Title": "S",
+        "EntryPoints": [{"InteractionId": 2}, {"InteractionId": 42}, {"InteractionId": "x"}],
+        "Interactions": [{"Id": 1}, {"Id": 2}],
+    })
+    errors = validate_entry_points([Chapter(Id=3, Scenes=[scene])])
+    assert [e.invalid_interaction_id for e in errors] == [42, "x"]
+    assert all(e.chapter_id == 3 for e in errors)

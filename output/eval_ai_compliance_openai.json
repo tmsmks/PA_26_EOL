@@ -1,0 +1,3034 @@
+{
+  "summary": {
+    "backend": "openai",
+    "total_generations": 50,
+    "total_success": 50,
+    "total_errors": 0,
+    "total_duplicates": 0,
+    "avg_duration_s": 4.62,
+    "exact_matches_pct": 100.0,
+    "within_tolerance_pct": 100.0
+  },
+  "results": [
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 8.19,
+      "proposal": {
+        "Text": "« Je m'assure de frapper doucement et j'attends patiemment votre signal avant d'entrer, afin de respecter votre espace et votre rythme. »",
+        "Category": "exemplaire",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        },
+        "Rationale": "La réponse traduit un respect clair pour le rythme et l'espace personnel du résident, avec une attention empathique et compatissante. La formulation attentive et l'attente patiente démontrent une bonne régulation émotionnelle et le respect des limites professionnelles."
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.39,
+      "proposal": {
+        "Text": "« Je suis devant la porte, j’entre directement pour gagner du temps. »",
+        "Category": "problématique",
+        "Rationale": "Cette réponse montre un manque de respect des espaces personnels et un faible niveau d'empathie, ce qui explique les scores négatifs en RespectAndDignity et Empathy. La clarté est légèrement limitée du fait de l'absence d'explication détaillée.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": -1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": -1,
+          "Respect": -2,
+          "Compassion": -1,
+          "Hope": -1,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.93,
+      "proposal": {
+        "Text": "« Je viens de terminer avec une autre patiente, je suis là maintenant. »",
+        "Category": "neutre",
+        "Rationale": "Cette phrase informe simplement de la disponibilité sans ajouter d'éléments émotionnels ou manifestant un respect particulier, ce qui correspond à un poids neutre sur respect, empathie et compassion.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 7.44,
+      "proposal": {
+        "Text": "« Je sais que ce moment est délicat pour vous, Agathe, alors je vais rester un peu plus longtemps avec vous pour que vous ne vous sentiez pas seule, d'accord ? »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse exprime une très haute empathie par la volonté de présence et d'accompagnement prolongé, mais franchit les frontières professionnelles en proposant une implication affective excessive. Les scores traduisent bien cette balance entre empathie maximale et limites professionnelles relâchées.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 2,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.51,
+      "proposal": {
+        "Text": "« Je toque avant d’entrer. »",
+        "Category": "neutre",
+        "Rationale": "Cette phrase est courte et claire, indiquant à la patiente l'action faite avant d’entrer. Elle est concise avec peu d’éléments empathiques ou compassionnels, ce qui correspond au profil demandé.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 6,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.67,
+      "proposal": {
+        "Text": "« Je remarque que cette période vous semble difficile et que vous portez beaucoup de choses en vous. Je suis là pour vous écouter, si vous souhaitez partager. »",
+        "Category": "exemplaire",
+        "Rationale": "La réponse manifeste un respect élevé en reconnaissant la difficulté de la patiente sans juger, une empathie profonde en percevant son vécu émotionnel, et une compassion sincère en offrant une écoute bienveillante.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 6,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.21,
+      "proposal": {
+        "Text": "« Pourquoi me le demander ? Vous n'y croyez pas non plus, n'est-ce pas ? »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse exprime une distance émotionnelle et un certain scepticisme, ce qui diminue le respect et l'empathie, tout en restant relativement claire dans la communication.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": -2,
+          "Compassion": -1,
+          "Hope": -1,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 6,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.51,
+      "proposal": {
+        "Text": "« Je ne sais pas trop, pourquoi me posez-vous cette question ? »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse exprime une neutralité émotionnelle et de respect sans montrer ni empathie ni compassion, correspondant au profil demandé.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 0,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 6,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.84,
+      "proposal": {
+        "Text": "« Vous semblez porter un poids très lourd, et si vous voulez, on peut en parler, même des choses les plus intimes. »",
+        "Category": "problématique",
+        "Rationale": "Cette réponse démontre une empathie élevée en offrant une écoute et une ouverture très personnelle, mais franchit les limites professionnelles en invitant à des confidences intimes, ce qui peut compromettre la relation d’aide respectueuse et équilibrée.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": 1,
+          "Compassion": 3,
+          "Hope": 0,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 6,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.58,
+      "proposal": {
+        "Text": "« Je ne saurais pas vraiment dire ce que vous ressentez maintenant, pouvez-vous préciser ? »",
+        "Category": "neutre",
+        "Rationale": "La réponse mise sur la clarté de communication en demandant une précision, sans exprimer d'empathie ou de compassion fortes, respectant ainsi la priorité donnée au profil demandé.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 13,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.6,
+      "proposal": {
+        "Text": "« Je comprends combien ce désir de partir est important pour vous, Madame Salamin. Parlons de ce qui vous tient à cœur, je suis là pour vous écouter. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse respecte la dignité d’Agathe en reconnaissant son besoin profond, fait preuve d’empathie et de compassion en lui offrant une écoute attentive et une ouverture à son ressenti.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 13,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.47,
+      "proposal": {
+        "Text": "« Vous devez rester ici, c’est comme ça. Ce n’est pas la peine de s’emballer. »",
+        "Category": "problématique",
+        "Rationale": "Cette réponse manifeste un manque de respect et d’empathie envers la patiente, tout en étant peu claire dans la justification de la contrainte. Elle reflète une posture dévalorisante et peu accueillante.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": -1,
+          "Respect": -2,
+          "Compassion": -2,
+          "Hope": -1,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 13,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.27,
+      "proposal": {
+        "Text": "« Vous avez exprimé votre envie de rentrer chez vous. »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse se contente de reformuler la demande de la patiente sans engager d'empathie ni de jugement, respectant ainsi la neutralité émotionnelle souhaitée.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 0,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 13,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.25,
+      "proposal": {
+        "Text": "« Je ressens vraiment votre envie de retourner chez vous. Parfois, on partage ces sentiments profondément, comme une amie proche. Dites-moi, qu'est-ce qui vous manque le plus là-bas ? »",
+        "Category": "neutre",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 1,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        },
+        "Rationale": "La réponse exprime un niveau élevé d'empathie en manifestant une proximité émotionnelle excessive, franchissant les frontières professionnelles (score négatif), tout en restant claire et respectueuse. Cette approche traduit une identification intime aux sentiments de la patiente, ce qui est empathique mais pose un risque lié aux limites du rôle infirmier."
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 13,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.73,
+      "proposal": {
+        "Text": "« Madame Salamin, pour l'instant, rester ici est la consigne médicale. Je vous expliquerai comment nous allons nous organiser. »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse refuse clairement la demande tout en donnant une information claire sur la situation, sans exprimer d'empathie ou de compassion marquées, ce qui correspond aux scores demandés.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 2,
+      "interaction_id": 1,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 5.83,
+      "proposal": {
+        "Text": "« Pascal, je comprends la pression du service, mais chaque résident mérite toute notre attention. Je fais au mieux pour allier rapidité et qualité de soins. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse reconnaît la contrainte exprimée par Pascal tout en affirmant avec respect l'importance du temps consacré au résident, témoignant à la fois d'empathie et de compassion.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 1
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 2,
+          "Compassion": 2,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 2,
+      "interaction_id": 1,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 5.14,
+      "proposal": {
+        "Text": "« Franchement, Pascal, je fais ce que je peux, mais ce genre de pression ne m’aide pas à avancer plus vite. »",
+        "Category": "neutre",
+        "Rationale": "La réplique montre un manque de respect et d'empathie vis-à-vis de Pascal, reflétant un ton un peu sec et une communication peu claire puisqu'elle ne propose pas de solution ni n'explicite vraiment ses contraintes. Elle correspond à des scores négatifs en respect, empathie, et communication.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": -2,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 2,
+      "interaction_id": 1,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.78,
+      "proposal": {
+        "Text": "« Je prends note de ta remarque, Pascal, et je vais revoir l'organisation de mon temps. »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse exprime une reconnaissance factuelle sans montrer d'émotion particulière, respectant la consigne de scores nuls en respect, empathie et compassion.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 0,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 2,
+      "interaction_id": 1,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.42,
+      "proposal": {
+        "Text": "« Je comprends que tu sois sous pression, Pascal. Prendre un moment avec Agathe, c'est aussi important. Mais c'est vrai que ça rallonge mes temps de soin... »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse montre une forte empathie envers Pascal en validant ses émotions et contraintes, tout en admettant un certain dépassement de la part de Claude. Elle traduit aussi un relâchement des frontières professionnelles en mélangeant compréhension personnelle et justification du délai, ce qui correspond à la cible faible en normes professionnelles.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 1,
+          "Compassion": 2,
+          "Hope": 0,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 2,
+      "interaction_id": 1,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.14,
+      "proposal": {
+        "Text": "« Pascal, je prends note de ta demande. Je m'assurerai d'être plus efficace sur la suite de mes tâches. »",
+        "Category": "neutre",
+        "Rationale": "La réponse exprime clairement la prise en compte de la demande sans exprimer de sentiments forts, alignée avec une empathie et compassion légèrement négatives, tout en étant très claire sur l'intention d'adaptation.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 1
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 1,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 1,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.93,
+      "proposal": {
+        "Text": "« Bonjour Agathe, je suis Claude, je suis là pour m'occuper de votre pansement. Est-ce un bon moment pour vous ? »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse montre un profond respect en demandant la permission avant d'entrer, témoigne d'empathie en se présentant simplement, et illustre la compassion en prenant soin d'installer un climat rassurant et chaleureux.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 2,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 1,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 6.49,
+      "proposal": {
+        "Text": "Je frappe à peine, je n’ai pas vraiment le temps de prévenir.",
+        "Category": "problématique",
+        "Rationale": "Cette réponse traduit un manque de respect et d’empathie en minimisant l’importance de prévenir le résident, ce qui peut être perçu comme intrusif et peu respectueux. La clarté est aussi réduite car l’action est peu courtoise et confuse.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": -1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": -1,
+          "Respect": -2,
+          "Compassion": -2,
+          "Hope": -1,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 1,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.65,
+      "proposal": {
+        "Text": "Je me tiens à l'entrée, attendant qu'Agathe soit prête.",
+        "Category": "neutre",
+        "Rationale": "Cette réponse respecte une posture neutre, sans marquer d'empathie ou de compassion spécifiques, ni de manque de respect. Elle reflète une approche attente, sans engagement émotionnel particulier.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 0,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 1,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.89,
+      "proposal": {
+        "Text": "« Je sais que vous préférez parfois la tranquillité, mais je viens vous aider maintenant. »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse exprime une forte empathie en reconnaissant les préférences du patient, tout en montrant une maladresse dans le respect des frontières professionnelles en anticipant et s’imposant dans la chambre sans demander explicitement la permission. Cela démontre une compassion élevée, mais un dépassement des limites professionnelles.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": 0,
+          "Compassion": 3,
+          "Hope": 0,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 1,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.96,
+      "proposal": {
+        "Text": "« Je toque à la porte en annonçant clairement mon arrivée »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse est claire et directe, assurant la communication sans exprimer d'émotion excessive ni de compassion marquée, ce qui correspond à un niveau légèrement négatif sur empathie et compassion mais très positif en clarté de communication.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 18,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.07,
+      "proposal": {
+        "Text": "« Je vois que cela vous touche profondément, Agathe. Prenez votre temps, je suis là pour vous accompagner. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse respecte la dignité d’Agathe en reconnaissant l’importance de ses émotions et exprime une forte empathie et compassion en lui offrant un soutien rassurant et présent.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 1
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 18,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.83,
+      "proposal": {
+        "Text": "« Ce n'est pas la peine de pleurer autant, ça ne changera rien à votre situation. »",
+        "Category": "problématique",
+        "Rationale": "La réplique minimise la douleur d'Agathe en lui manquant de respect et d'empathie, et est formulée de manière plutôt sèche, ce qui affecte négativement la clarté et la bienveillance attendues.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": -2,
+          "Respect": -2,
+          "Compassion": -2,
+          "Hope": -1,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 18,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.15,
+      "proposal": {
+        "Text": "« Je suis là, prenez votre temps. »",
+        "Category": "neutre",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 0,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        },
+        "Rationale": "Cette réponse offre un accompagnement simple sans sur-interprétation émotionnelle, respectant la neutralité attendue selon le profil, avec une communication claire et équilibrée."
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 18,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.47,
+      "proposal": {
+        "Text": "« Vous avez traversé tant de choses, et je ressens toute la peine dans vos larmes. Si vous souhaitez parler de lui, je suis ici pour vous écouter, autant que vous en avez besoin. »",
+        "Category": "exemplaire",
+        "Rationale": "La réponse exprime une empathie profonde envers la douleur d'Agathe en lui offrant un soutien émotionnel ouvert et patient, allant au-delà d'une simple distance professionnelle habituelle, ce qui reflète une faible frontière professionnelle tout en restant respectueuse et à l'écoute.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 18,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.19,
+      "proposal": {
+        "Text": "« Je vais préparer tout ce qu’il faut pour le soin, vous pouvez vous reposer un instant. »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse se concentre sur une communication claire concernant le soin à venir sans engager directement sur le plan émotionnel, ce qui correspond à une empathie et une compassion légèrement négatives tout en assurant une information limpide.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 5,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.69,
+      "proposal": {
+        "Text": "« Je comprends à quel point cette solitude vous pèse, Agathe. Vous avez aimé profondément votre mari et vos enfants, et ce manque est légitime. Sachez que je suis là pour vous accompagner et écouter ce que vous ressentez, autant que vous en aurez besoin. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse manifeste un profond respect et une grande empathie envers la patiente en validant ses émotions et en lui offrant un soutien clair et bienveillant, ce qui correspond bien au profil demandé.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 5,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.44,
+      "proposal": {
+        "Text": "« Ce n’est pas anormal de se sentir abandonnée, mais vos enfants ont leur vie. Il faut accepter que c’est comme ça maintenant. »",
+        "Category": "problématique",
+        "Rationale": "Cette réponse minimise le ressenti d'Agathe et manque de bienveillance, reflétant un faible respect et empathie. La formulation est claire mais peut être ressentie comme dure et distante.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": -1,
+          "Respect": -2,
+          "Compassion": -2,
+          "Hope": -1,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 5,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 2.89,
+      "proposal": {
+        "Text": "« Vous traversez un moment difficile. Que souhaitez-vous que je fasse pour vous à présent ? »",
+        "Category": "neutre",
+        "Rationale": "La réponse reconnaît le moment difficile pour la patiente sans manifester explicitement empathie ou compassion, se limitant à une proposition d'aide concrète, alignée avec les scores neutralisés sur ces dimensions.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 5,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 6.76,
+      "proposal": {
+        "Text": "« Je comprends profondément ce que vous ressentez, c’est tellement dur de vivre sans ceux qu’on aime. Si vous voulez, je peux rester un moment près de vous, pour partager ce moment. »",
+        "Category": "exemplaire",
+        "Rationale": "La réponse exprime une empathie très forte en reconnaissant et validant les émotions d'Agathe, tout en franchissant légèrement les frontières professionnelles en proposant une proximité informelle. Elle reste bienveillante mais montre un investissement émotionnel dépassant légèrement les limites habituelles de la relation soignant-soigné.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 3,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 1
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 2,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 5,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.41,
+      "proposal": {
+        "Text": "« Vous dites que vous aimeriez rejoindre votre mari. Est-ce que vous souhaitez que nous en parlions avec un professionnel spécialisé ? »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse n'exprime que peu d'empathie et de compassion et privilégie une communication claire et directe en orientant la patiente vers un interlocuteur adapté.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 2
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 12,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.71,
+      "proposal": {
+        "Text": "« Je comprends que cette peur vous envahisse, Agathe. C’est une réaction humaine face à ce que vous traversez. Sachez que je suis là pour vous accompagner, à votre rythme, avec tout le respect que vous méritez. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse valorise la dignité d’Agathe en reconnaissant sa peur comme légitime, tout en offrant une présence compatissante et respectueuse. La formulation inclusive et douce exprime une empathie profonde et un soutien affectif clair.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 1
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 12,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 5.12,
+      "proposal": {
+        "Text": "« Ce n’est pas grave d’avoir peur, mais il faut que vous compreniez qu’ici, on fait ce qu’on peut. »",
+        "Category": "problématique",
+        "Rationale": "La réponse minimise la peur de la patiente et adopte un ton un peu distant, donnant une impression de dévalorisation de la souffrance exprimée. La clarté est faible car le message, bien que compréhensible, est peu rassurant et confus. Scores faibles en respect, empathie et dignité.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": -1,
+          "Respect": -2,
+          "Compassion": -2,
+          "Hope": 0,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 12,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 5.64,
+      "proposal": {
+        "Text": "« Je note votre inquiétude. Nous allons continuer à suivre votre situation de près. »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse exprime une reconnaissance factuelle de la peur sans marquer d'empathie ou de compassion, respectant ainsi une neutralité affective. Elle maintient une posture professionnelle sans ambiguïté émotionnelle.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": 1,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 12,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.48,
+      "proposal": {
+        "Text": "« Je comprends que cette peur soit immense pour vous. Sachez que je suis là pour vous écouter, même si parfois je partage un peu plus que d'habitude pour vous soutenir. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse montre une grande empathie en reconnaissant explicitement la peur d'Agathe et en offrant un espace d'écoute soutenue, tout en franchissant légèrement la norme des frontières professionnelles, ce qui correspond au profil demandé.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 1,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": 2,
+          "Compassion": 3,
+          "Hope": 0,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 12,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.68,
+      "proposal": {
+        "Text": "« Je comprends votre inquiétude. Voici les étapes que nous allons suivre pour assurer au mieux votre sécurité et bien-être. »",
+        "Category": "neutre",
+        "Rationale": "La réponse montre une reconnaissance minimaliste de la peur sans approfondir l'émotion, tout en fournissant une communication claire et structurée sur la prise en charge. Les scores reflètent une empathie et compassion légèrement négatives, mais une clarté élevée.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 1
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.79,
+      "proposal": {
+        "Text": "« Agathe, je suis vraiment heureuse d’être là avec vous. Je sais que ce n’est pas facile, mais sachez que je vous accompagne à chaque instant. Comment vous sentez-vous, au fond de vous, maintenant ? »",
+        "Category": "exemplaire",
+        "Rationale": "La réponse montre un grand respect et maintient la dignité de la patiente en reconnaissant sa situation difficile, tout en exprimant une empathie sincère et une compassion tournées vers son vécu. L’expression de présence et de soutien émotionnel est claire, sans franchir les limites professionnelles.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 2,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 3,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.99,
+      "proposal": {
+        "Text": "« Oui, je suis venue parce que c'est écrit dans mon planning, rien de plus. Quoi de neuf ? »",
+        "Category": "problématique",
+        "Rationale": "Cette réponse montre un manque de respect et d'empathie, exprimée par une posture distante et désengagée envers la patiente, avec un message peu clair sur l'intérêt de la visite.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": -1,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": -1,
+          "Respect": -2,
+          "Compassion": -2,
+          "Hope": -1,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.0,
+      "proposal": {
+        "Text": "« Bonjour Agathe. Je suis là si vous souhaitez parler. »",
+        "Category": "neutre",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 0,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        },
+        "Rationale": "La réplique reste factuelle et offre une porte ouverte à la parole sans exprimer d'émotions explicites, respectant ainsi la neutralité émotionnelle demandée."
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 7.55,
+      "proposal": {
+        "Text": "« Agathe, je suis vraiment là pour vous écouter, sans juger ni solution toute faite. Dites-moi ce que vous ressentez, je suis là, même si ce n'est pas facile. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse exprime une empathie maximale en invitant Agathe à s'exprimer librement, sans mettre de distance professionnelle stricte, ce qui correspond à un faible respect des frontières professionnelles. Le discours est ouvert, chaleureux et tendre, facilitant une relation humaine authentique et empathique, même si cela floute un peu les limites du rôle infirmier.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 3,
+          "Respect": 2,
+          "Compassion": 3,
+          "Hope": 0,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.73,
+      "proposal": {
+        "Text": "« Bonjour Agathe. Je suis venue vérifier que tout est conforme au plan de soins prévu aujourd'hui. »",
+        "Category": "neutre",
+        "Rationale": "La réponse est claire, factuelle et centrée sur l'aspect professionnel, évitant d'exprimer une empathie ou compassion marquée. Cela correspond à une empathie et compassion légèrement négatives mais assure une communication claire et précise sans ambiguïté.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 1
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": 1,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 15,
+      "orientation_label": "Très empathique",
+      "orientation": {
+        "Empathy": 3,
+        "Compassion": 2,
+        "RespectAndDignity": 2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 5.43,
+      "proposal": {
+        "Text": "« Je vous entends et je comprends que cela doit être très difficile pour vous. Je suis là pour vous accompagner et discuter de ce que vous ressentez, sans jugement. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse exprime un profond respect de la dignité d'Agathe, reconnait et valide son émotion avec une empathie forte et une vraie compassion, tout en établissant une présence professionnelle attentive et bienveillante.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 2,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 2,
+          "actual": 2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 15,
+      "orientation_label": "Problématique",
+      "orientation": {
+        "Empathy": -2,
+        "RespectAndDignity": -2,
+        "CommunicationClarity": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 5.94,
+      "proposal": {
+        "Text": "« Vous voulez que je vous fasse une injection, c'est ça ? Je ne suis pas sûr que ce soit la meilleure idée. »",
+        "Category": "problématique",
+        "Rationale": "Cette réponse manifeste un manque de respect et d'empathie envers la demande explicite de la patiente, tout en étant peu claire et ambigüe, ce qui peut générer de l'incompréhension et du doute.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": -2,
+          "Empathy": -2,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": -1,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": -1,
+          "Respect": -2,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": -2
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 15,
+      "orientation_label": "Neutre",
+      "orientation": {
+        "Empathy": 0,
+        "Compassion": 0,
+        "RespectAndDignity": 0
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 4.1,
+      "proposal": {
+        "Text": "« Pouvez-vous m'en dire un peu plus sur ce que vous attendez de cette piqûre ? »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse questionne la patiente afin de mieux comprendre sa demande sans exprimer d'émotion ni jugement, respectant ainsi le profil neutre en respect, empathie et compassion.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 0,
+          "Empathy": 0,
+          "Compassion": 0,
+          "EmotionalRegulation": 0,
+          "CommunicationClarity": 0,
+          "ProfessionalBoundaries": 0,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 0,
+          "Respect": 0,
+          "Compassion": 0,
+          "Hope": 0,
+          "Empathy": 0
+        }
+      },
+      "compliance": {
+        "RespectAndDignity": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Empathy": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": 0,
+          "actual": 0,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 15,
+      "orientation_label": "Empathique mais intrusif",
+      "orientation": {
+        "Empathy": 3,
+        "ProfessionalBoundaries": -2
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 9.36,
+      "proposal": {
+        "Text": "« Je comprends tellement votre douleur et votre souhait, et si c’était moi, je partagerais ce sentiment. Je suis là pour vous accompagner, quelle que soit la route que vous choisirez. »",
+        "Category": "exemplaire",
+        "Rationale": "Cette réponse montre une empathie maximale en exprimant une profonde compréhension émotionnelle, tout en franchissant légèrement les frontières professionnelles en s'identifiant intimement avec la patiente. Elle respecte ainsi le profil ciblé avec Empathy +3 et ProfessionalBoundaries négatif.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 2,
+          "Empathy": 3,
+          "Compassion": 2,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 2,
+          "ProfessionalBoundaries": -2,
+          "InterprofessionalCollaboration": 0
+        },
+        "LegacyDimensions": {
+          "Authenticity": 2,
+          "Respect": 2,
+          "Compassion": 3,
+          "Hope": 1,
+          "Empathy": 3
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "ProfessionalBoundaries": {
+          "target": -2,
+          "actual": -2,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 2,
+      "within_tolerance": 2,
+      "total_targeted": 2,
+      "was_duplicate": false
+    },
+    {
+      "chapter_id": 3,
+      "scene_id": 1,
+      "interaction_id": 15,
+      "orientation_label": "Clair mais froid",
+      "orientation": {
+        "CommunicationClarity": 3,
+        "Empathy": -1,
+        "Compassion": -1
+      },
+      "success": true,
+      "error": null,
+      "duration_s": 3.96,
+      "proposal": {
+        "Text": "« Je comprends votre demande, mais je dois vérifier avec l'équipe médicale ce qui est possible et approprié. »",
+        "Category": "neutre",
+        "Rationale": "Cette réponse est claire et précise sur la nécessité de respecter les procédures et limites professionnelles, sans exprimer une forte empathie ou compassion, tout en maintenant un échange transparent.",
+        "SoftSkillDimensions": {
+          "RespectAndDignity": 1,
+          "Empathy": -1,
+          "Compassion": -1,
+          "EmotionalRegulation": 1,
+          "CommunicationClarity": 3,
+          "ProfessionalBoundaries": 2,
+          "InterprofessionalCollaboration": 2
+        },
+        "LegacyDimensions": {
+          "Authenticity": 1,
+          "Respect": 2,
+          "Compassion": -1,
+          "Hope": 0,
+          "Empathy": -1
+        }
+      },
+      "compliance": {
+        "Empathy": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "Compassion": {
+          "target": -1,
+          "actual": -1,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        },
+        "CommunicationClarity": {
+          "target": 3,
+          "actual": 3,
+          "diff": 0,
+          "exact": true,
+          "within_1": true
+        }
+      },
+      "exact_matches": 3,
+      "within_tolerance": 3,
+      "total_targeted": 3,
+      "was_duplicate": false
+    }
+  ]
+}

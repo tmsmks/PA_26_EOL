@@ -1,6 +1,6 @@
 // Module Editor — édition des interactions/réponses + CRUD + validation EG-7.
 
-import { SCORE_SKILLS, state } from "./store.js";
+import { SCORE_SKILLS, SKILL_LABELS_FR, state } from "./store.js";
 import { scheduleCacheSave } from "./persistence.js";
 import { rebuildSceneGraph } from "./network.js";
 import {
@@ -9,6 +9,16 @@ import {
     getNextInteractionId,
     getNextResponseId,
 } from "./utils.js";
+
+let graphRebuildTimer = null;
+
+function scheduleSceneGraphRebuild(idx) {
+    if (graphRebuildTimer) clearTimeout(graphRebuildTimer);
+    graphRebuildTimer = setTimeout(() => {
+        graphRebuildTimer = null;
+        rebuildSceneGraph(idx);
+    }, 80);
+}
 
 export function showOnlySelectedBlock(interactionId) {
     const blocks = Array.from(document.querySelectorAll("#ed-content .block"));
@@ -52,6 +62,26 @@ export function focusResponseInEditor(interactionId, rIdx) {
     setTimeout(() => block.classList.remove("highlight-edge"), 1500);
 }
 
+function scoreOf(r, sk) {
+    const dims = r.SoftSkillDimensions || {};
+    return dims[sk] != null ? dims[sk] : r[sk] != null ? r[sk] : 0;
+}
+
+// Résumé replié des scores d'une réponse : seules les compétences non nulles.
+function scoreSummaryHtml(r) {
+    const chips = [];
+    for (const sk of SCORE_SKILLS) {
+        const v = scoreOf(r, sk);
+        if (!v) continue;
+        chips.push(
+            '<span class="score-chip ' + (v > 0 ? "pos" : "neg") + '">' +
+                escapeHtml(SKILL_LABELS_FR[sk] || sk) + " " + (v > 0 ? "+" : "−") + Math.abs(v) +
+                "</span>"
+        );
+    }
+    return chips.length ? chips.join("") : '<span class="score-chip zero">Aucun score</span>';
+}
+
 export function rebuildEditorHtml(idx) {
     const chapter = state.chaptersData.Chapters[0];
     if (!chapter || !chapter.Scenes || !chapter.Scenes[idx]) return;
@@ -59,7 +89,7 @@ export function rebuildEditorHtml(idx) {
 
     const introValue = sc.SceneIntroduction || "";
     const introHtml =
-        '<div class="scene-intro"><label>EG-4 : SceneIntroduction</label>' +
+        '<div class="scene-intro"><label>Introduction de la scène</label>' +
         '<textarea class="edit" data-type="intro" rows="3">' +
         escapeHtml(introValue) +
         "</textarea></div>";
@@ -72,23 +102,27 @@ export function rebuildEditorHtml(idx) {
         let b = '<div class="block" data-interaction-id="' + ia.Id + '" data-i="' + i + '">';
         b += '<div class="header"><span>Interaction ' + ia.Id + ' — ' + escapeHtml(actor) + "</span>";
         b += '<button type="button" class="crud-btn crud-delete-interaction" data-i="' + i + '" title="Supprimer cette interaction">✕</button></div>';
-        b += "<label>EG-4 : Name</label>";
+        b += "<label>Titre (affiché dans le graphe)</label>";
         b += '<textarea class="edit" data-type="name" data-i="' + i + '" rows="1">' + escapeHtml(name) + "</textarea>";
-        b += "<label>EG-4 : Text</label>";
+        b += "<label>Texte</label>";
         b += '<textarea class="edit" data-type="text" data-i="' + i + '" rows="3">' + escapeHtml(text) + "</textarea>";
         b += '<div class="responses-container" data-i="' + i + '">';
         (ia.Responses || []).forEach((r, rIdx) => {
             const rtext = r.Text || "";
             const nextId = r.NextInteractionID;
             b += '<div class="resp" data-i="' + i + '" data-r="' + rIdx + '">';
-            b += '<div class="resp-header"><label>Réponse ' + (rIdx + 1) + " — Text</label>";
+            b += '<div class="resp-header"><label>Réponse ' + (rIdx + 1) + "</label>";
+            b += '<span class="next-id-item"><label for="next-' + i + "-" + rIdx + '">Mène à l\'interaction</label>';
+            b += '<input type="number" class="next-id" id="next-' + i + "-" + rIdx + '" data-i="' + i + '" data-r="' + rIdx + '" value="' + (nextId != null ? nextId : "") + '" placeholder="fin"></span>';
             b += '<button type="button" class="crud-btn crud-delete-response" data-i="' + i + '" data-r="' + rIdx + '" title="Supprimer cette réponse">✕</button></div>';
             b += '<textarea class="edit" data-type="response" data-i="' + i + '" data-r="' + rIdx + '" rows="2">' + escapeHtml(rtext) + "</textarea>";
+            b += '<details class="score-details"><summary>';
+            b += '<span class="score-summary" data-i="' + i + '" data-r="' + rIdx + '">' + scoreSummaryHtml(r) + "</span>";
+            b += '<span class="score-edit" aria-hidden="true"></span></summary>';
             b += '<div class="scores">';
             for (const sk of SCORE_SKILLS) {
-                const dims = r.SoftSkillDimensions || {};
-                const val = dims[sk] != null ? dims[sk] : r[sk] != null ? r[sk] : 0;
-                b += '<div class="score-item"><label>' + sk + "</label>";
+                const val = scoreOf(r, sk);
+                b += '<div class="score-item"><label>' + escapeHtml(SKILL_LABELS_FR[sk] || sk) + "</label>";
                 b += '<div class="score-stepper">';
                 b += '<button type="button" class="score-btn score-minus" data-i="' + i + '" data-r="' + rIdx + '" data-skill="' + sk + '">-</button>';
                 b += '<input type="hidden" class="score" data-i="' + i + '" data-r="' + rIdx + '" data-skill="' + sk + '" value="' + val + '">';
@@ -96,9 +130,7 @@ export function rebuildEditorHtml(idx) {
                 b += '<button type="button" class="score-btn score-plus" data-i="' + i + '" data-r="' + rIdx + '" data-skill="' + sk + '">+</button>';
                 b += "</div></div>";
             }
-            b += '<div class="score-item next-id-item"><label>Next Id</label>';
-            b += '<input type="number" class="next-id" data-i="' + i + '" data-r="' + rIdx + '" value="' + (nextId != null ? nextId : "") + '"></div>';
-            b += "</div></div>";
+            b += "</div></details></div>";
         });
         b += "</div>";
         b += '<button type="button" class="crud-btn crud-add-response" data-i="' + i + '">+ Ajouter une réponse</button>';
@@ -128,13 +160,16 @@ function attachEditors(idx) {
                 sc.SceneIntroduction = this.value;
             } else if (type === "name") {
                 sc.Interactions[i].Name = this.value;
+                scheduleSceneGraphRebuild(idx);
             } else if (type === "text") {
                 sc.Interactions[i].Text = this.value;
                 sc.Interactions[i].Name = this.value.substring(0, 50);
+                scheduleSceneGraphRebuild(idx);
             } else if (type === "response") {
                 const r = parseInt(this.dataset.r);
                 sc.Interactions[i].Responses[r].Text = this.value;
                 sc.Interactions[i].Responses[r].Name = this.value.substring(0, 80);
+                scheduleSceneGraphRebuild(idx);
             }
             scheduleCacheSave();
         });
@@ -161,28 +196,32 @@ function attachEditors(idx) {
             const resp = sc.Interactions[i].Responses[r];
             resp[skill] = v;
             if (resp.SoftSkillDimensions) resp.SoftSkillDimensions[skill] = v;
+            const summary = document.querySelector(
+                '.score-summary[data-i="' + i + '"][data-r="' + r + '"]'
+            );
+            if (summary) summary.innerHTML = scoreSummaryHtml(resp);
+            scheduleSceneGraphRebuild(idx);
             scheduleCacheSave();
         });
     });
 
     document.querySelectorAll("#ed-content .next-id").forEach((el) => {
-        el.addEventListener("change", function () {
+        el.addEventListener("input", function () {
             const i = parseInt(this.dataset.i);
             const r = parseInt(this.dataset.r);
             const raw = (this.value || "").trim();
             if (raw === "") {
                 delete sc.Interactions[i].Responses[r].NextInteractionID;
+                scheduleSceneGraphRebuild(idx);
                 scheduleCacheSave();
                 return;
             }
-            const v = parseInt(raw, 10);
-            if (isNaN(v)) {
-                this.value = "";
-                delete sc.Interactions[i].Responses[r].NextInteractionID;
-                scheduleCacheSave();
+            const v = Number(raw);
+            if (!Number.isInteger(v)) {
                 return;
             }
             sc.Interactions[i].Responses[r].NextInteractionID = v;
+            scheduleSceneGraphRebuild(idx);
             scheduleCacheSave();
         });
     });
@@ -362,7 +401,7 @@ export function updateValidation() {
             for (const r of ia.Responses || []) {
                 const nid = r.NextInteractionID;
                 if (nid != null && nid !== -1 && !ids[nid]) {
-                    errs.push("EG-7: NextInteractionID " + nid + " invalide (scène " + sc.Title + ")");
+                    errs.push("Scène « " + sc.Title + " » : la réponse mène à l'interaction " + nid + ", qui n'existe pas");
                 }
             }
         }
@@ -373,6 +412,6 @@ export function updateValidation() {
         div.textContent = errs.join(" ; ");
     } else {
         div.className = "validation ok";
-        div.textContent = "EG-7 : Validation OK — NextInteractionID valides.";
+        div.textContent = "✓ Tous les enchaînements mènent à une interaction existante.";
     }
 }

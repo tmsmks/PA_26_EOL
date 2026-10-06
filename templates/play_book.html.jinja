@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ book.title }} — Parcours</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='play.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
+</head>
+<body class="play-menu">
+{% include "_userbar.html.jinja" %}
+<div class="menu-wrap">
+    <header class="menu-header">
+        <p class="eyebrow">Parcours de formation</p>
+        <h1>{{ book.title }}</h1>
+        <p class="menu-subtitle">{{ book.subtitle }}</p>
+        <p class="menu-audience">{{ book.audience }}</p>
+        {%- if book.description %}
+        <p class="menu-desc">{{ book.description }}</p>
+        {%- endif %}
+    </header>
+
+    <section class="session-banner" aria-label="Session">
+    {%- if current %}
+        <div>
+            <p class="session-banner-title">Session {{ current.number }} en cours</p>
+            <p class="session-banner-sub">{{ done | length }} chapitre{{ 's' if done | length > 1 }} sur {{ chapters | length }} terminé{{ 's' if done | length > 1 }} · démarrée le {{ current.started_at | date_fr }}. Chaque chapitre terminé est noté ; le bilan de la session s'affiche quand tous les chapitres sont terminés.</p>
+        </div>
+        <form method="post" action="{{ url_for('pages.play_restart', book_slug=book.slug) }}"
+              onsubmit="return confirm('Abandonner la session {{ current.number }} et repartir de zéro ? Les scénarios déjà joués dans cette session seront effacés.');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="ghost-btn small">Recommencer à zéro</button>
+        </form>
+    {%- elif last_completed %}
+        <div>
+            <p class="session-banner-title">Session {{ last_completed.number }} terminée · note {{ (last_completed.results or {}).get('global') | note }}/100</p>
+            <p class="session-banner-sub">Rejouez les chapitres que vous voulez améliorer : chacun garde son propre niveau{% if profile.global is not none %} (note du livre {{ profile.global | note }}/100, {{ profile.n_evaluated }}/{{ profile.n_chapters }} chapitres évalués){% endif %}.</p>
+        </div>
+        <a class="primary-btn small" href="{{ url_for('account.session_report', session_id=last_completed.id) }}">Voir le bilan</a>
+    {%- else %}
+        <div>
+            <p class="session-banner-title">Première session</p>
+            <p class="session-banner-sub">Chaque chapitre terminé est noté : jouez-les dans l'ordre de votre choix, et rejouez plus tard ceux que vous voulez améliorer. Dans un chapitre, seule votre première tentative de chaque scénario est notée.</p>
+        </div>
+    {%- endif %}
+    </section>
+
+    <ol class="chapter-list">
+    {%- for ch in chapters %}
+        <li class="chapter-item" data-chapter="{{ ch.id }}">
+            <a class="chapter-card" href="{{ url_for('pages.play_chapter', book_slug=book.slug, chapter_id=ch.id) }}">
+                <span class="chapter-num">{{ '%02d' % ch.id }}</span>
+                <span class="chapter-body">
+                    <span class="chapter-name">{{ ch.name }}</span>
+                    <span class="chapter-intro">{{ ch.intro }}</span>
+                    <span class="chapter-meta">
+                        <span>{{ ch.n_scenes }} scénario{{ 's' if ch.n_scenes > 1 else '' }}</span>
+                        <span>·</span>
+                        <span>environ {{ ch.minutes }} min</span>
+                        {%- if ch.id in done %}
+                        <span class="chapter-progress is-done">· ✓ terminé dans cette session</span>
+                        {%- endif %}
+                        {%- set lv = levels[ch.id] %}
+                        {%- if lv %}
+                        <span class="chapter-progress">· niveau {{ lv.level | note }}/100 ({{ lv.n_passages }} passage{{ 's' if lv.n_passages > 1 }} noté{{ 's' if lv.n_passages > 1 }})</span>
+                        {%- endif %}
+                    </span>
+                </span>
+                <span class="chapter-go" aria-hidden="true">›</span>
+            </a>
+        </li>
+    {%- endfor %}
+    </ol>
+
+    <footer class="menu-footer">
+        <a class="ghost-link" href="{{ url_for('pages.landing') }}">← Tous les livres</a>
+        {%- if current_user.is_trainer %}
+        <a class="ghost-link" href="{{ url_for('pages.book_index', book_slug=book.slug) }}">Interface d'édition</a>
+        {%- endif %}
+    </footer>
+</div>
+</body>
+</html>

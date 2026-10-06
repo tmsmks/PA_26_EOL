@@ -10,6 +10,7 @@ from repositories.chapters import ChapterRepository
 from services.enrichment import EnrichmentService, EnrichRequest
 from services.enrichment.backends import LLMBackendError
 from services.enrichment.context import InteractionNotFoundError
+from views.guards import trainer_required
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -25,6 +26,7 @@ def serve_images(filename: str):
 
 
 @api_bp.route("/save", methods=["POST"])
+@trainer_required
 def api_save():
     """Sauvegarde un chapitre dans le JSON du livre ciblé (écriture atomique)."""
     payload = request.get_json(silent=True)
@@ -37,16 +39,20 @@ def api_save():
 
     try:
         chapter = Chapter.from_dict(incoming[0])
-        filename = _repo.upsert_chapter(payload.get("book_slug"), chapter)
+        result = _repo.upsert_chapter(payload.get("book_slug"), chapter)
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except OSError as e:
         return jsonify({"error": f"Erreur d'écriture : {e}"}), 500
 
-    return jsonify({"message": f"Sauvegardé dans {filename}."})
+    filename = result["filename"]
+    archive = result.get("archive")
+    message = "Sauvegardé."
+    return jsonify({"message": message, "filename": filename, "archive": archive})
 
 
 @api_bp.route("/enrich", methods=["POST"])
+@trainer_required
 def api_enrich():
     """Propose de nouvelles réponses via LLM pour une interaction donnée."""
     payload = request.get_json(silent=True) or {}

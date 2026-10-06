@@ -1,0 +1,42 @@
+/* Palette commune aux trois facultés de médecine (UNIGE · UNIL · UZH).
+   Chargée avant toutes les autres feuilles : elles n'utilisent que ces jetons.
+
+   Relevé sur les feuilles de style officielles (octobre 2026) :
+     UNIL  primaire #0037EB, foncés #003D9C / #002664, neutres bleutés #EFF3F6 → #0A1F30
+     UZH   bleu #0028A5, bleu sourd #1B214A, vert #007E2A, rouge #B50000, orange #FC4C02
+     UNIGE framboise #D80669, médecine #9A0050, bleu #046FCB, ardoise #425878
+   UNIL et UZH partagent la même teinte (OKLCH 264°) ; le bleu et l'ardoise de
+   l'UNIGE sont à 253–258°. --brand est ce bleu commun, à mi-clarté entre UNIL
+   et UZH et un peu moins saturé. Le bordeaux de la Faculté de médecine UNIGE
+   sert d'accent secondaire (IA, points d'entrée). */
+
+:root {
+    --brand: #0040bb;
+    --brand-strong: #002d91;
+    --brand-soft: #eef4ff;
+    --brand-line: #bfd2f3;
+    --navy: #11254b;
+
+    --accent-2: #9a0050;
+    --accent-2-soft: #fcf0f5;
+
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface-2: #edf0f5;
+    --line: #dce2e9;
+    --line-strong: #c1c8d2;
+
+    --ink: #192230;
+    --ink-soft: #47505e;
+    --ink-faint: #656c78;
+
+    --pos: #007e2a;
+    --pos-soft: #e3f6e6;
+    --neg: #b50000;
+    --neg-soft: #ffeae8;
+    --warn: #ab4400;
+    --warn-soft: #ffeede;
+
+    --shadow: 0 1px 2px rgba(17, 37, 75, 0.06), 0 4px 16px -6px rgba(17, 37, 75, 0.12);
+    --shadow-hover: 0 2px 4px rgba(17, 37, 75, 0.06), 0 16px 34px -14px rgba(17, 37, 75, 0.25);
+}

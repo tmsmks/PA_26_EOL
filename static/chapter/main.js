@@ -1,6 +1,6 @@
 // Entry point — initialisation et wiring des event listeners.
 
-import { state } from "./store.js";
+import { config, state } from "./store.js";
 import {
     applyPanelVisibility,
     showScene,
@@ -15,10 +15,17 @@ import {
     scheduleCacheSave,
 } from "./persistence.js";
 
+function updateSaveButtonFile(name) {
+    const el = document.getElementById("save-btn-file");
+    if (!el || !name) return;
+    el.textContent = name;
+    config.bookJson = name;
+}
+
 function init() {
     if (typeof vis === "undefined") {
         state.container.innerHTML =
-            "<p style='color:#ef4444;padding:20px'>vis-network non chargé. Vérifiez votre connexion et rechargez.</p>";
+            "<p style='color:#b50000;padding:20px'>vis-network non chargé. Vérifiez votre connexion et rechargez.</p>";
         return;
     }
     restoreCacheFromLocalStorage();
@@ -34,7 +41,7 @@ function init() {
         } catch (err) {
             console.error("showScene:", err);
             state.container.innerHTML =
-                "<p style='color:#ef4444;padding:20px'>Erreur: " +
+                "<p style='color:#b50000;padding:20px'>Erreur: " +
                 String(err.message || err) + "</p>";
         }
     } else {
@@ -57,7 +64,7 @@ function runInit() {
         } else if (n > 60) {
             clearInterval(t);
             state.container.innerHTML =
-                "<p style='color:#ef4444;padding:20px'>vis-network timeout.</p>";
+                "<p style='color:#b50000;padding:20px'>vis-network timeout.</p>";
         }
     }, 100);
 }
@@ -141,6 +148,9 @@ function wireEventListeners() {
                 if (result.ok) {
                     statusEl.className = "save-ok";
                     statusEl.textContent = result.data.message || "Sauvegardé.";
+                    const savedAs =
+                        result.data.archive || result.data.filename || config.bookJson;
+                    updateSaveButtonFile(savedAs);
                 } else {
                     statusEl.className = "save-err";
                     statusEl.textContent =

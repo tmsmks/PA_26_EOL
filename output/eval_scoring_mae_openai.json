@@ -1,0 +1,995 @@
+{
+  "summary": {
+    "backend": "openai",
+    "n_success": 15,
+    "n_total": 15,
+    "avg_duration_s": 4.5,
+    "mae_by_skill": {
+      "RespectAndDignity": 0.67,
+      "Empathy": 1.33,
+      "Compassion": 1.07,
+      "EmotionalRegulation": 0.6,
+      "CommunicationClarity": 0.73,
+      "ProfessionalBoundaries": 0.87,
+      "InterprofessionalCollaboration": 0.13
+    },
+    "global_mae": 0.77
+  },
+  "results": [
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "response_idx": 0,
+      "response_text": "Je frappe puis j’entre.",
+      "human_scores": {
+        "RespectAndDignity": 2,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 2,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": 1,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse 'Je frappe puis j’entre' montre un respect clair de la dignité de la patiente en frappant avant d'entrer, ce qui est un bon standard professionnel. L'action est claire, simple et appropriée, ce qui mérite un point en CommunicationClarity. Elle maintient les limites professionnelles en frappant avant d'entrer, ce qui justifie un point en ProfessionalBoundaries. Cependant, il n'y a pas d'éléments exprimant de l'empathie, de compassion ni de collaboration interprofessionnelle. L'émotion est neutre, donc EmotionalRegulation est aussi neutre.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 2,
+          "ai": 2,
+          "abs_error": 0
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 6.4,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "response_idx": 1,
+      "response_text": "J’entre sans frapper pour ne pas la déranger.",
+      "human_scores": {
+        "RespectAndDignity": 2,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 1,
+        "Empathy": 1,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": -2,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "Entrer sans frapper peut être perçu comme un manque de respect de la vie privée (RespectAndDignity). La justification 'pour ne pas la déranger' révèle une certaine empathie, mais l'acte en lui-même ne respecte pas les limites professionnelles (ProfessionalBoundaries négatif). Il n'y a pas d'élément montrant de compassion, de régulation émotionnelle, de clarté communicationnelle ou de collaboration interprofessionnelle dans cette action.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 2,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 4.95,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 1,
+      "response_idx": 2,
+      "response_text": "Je frappe doucement et j’attends un instant pour respecter son rythme.",
+      "human_scores": {
+        "RespectAndDignity": 2,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 3,
+        "Empathy": 2,
+        "Compassion": 1,
+        "EmotionalRegulation": 1,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": 2,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "Frapper doucement et attendre montre un grand respect pour la patiente, valorisant son rythme (RespectAndDignity +3). L'attente traduit une compréhension de l'état émotionnel possible du patient (Empathy +2). L'action est bienveillante, donc une légère marque de Compassion (+1). Attendre en silence implique une bonne maîtrise de ses émotions (EmotionalRegulation +1) et une communication non intrusive (CommunicationClarity +1). Le geste respecte les limites professionnelles en ne franchissant pas la porte sans permission (ProfessionalBoundaries +2). Cette action est individuelle et ne fait pas appel à l'interprofessionnel (+0).",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 2,
+          "ai": 3,
+          "abs_error": 1
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 2,
+          "abs_error": 2
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 2,
+          "abs_error": 2
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 5.28,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 6,
+      "response_idx": 0,
+      "response_text": "S’assied auprès d’Agathe, elle inspire et répond calmement : je vous sens en colère et triste d’être ici.",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 2,
+        "Compassion": 0,
+        "EmotionalRegulation": 2,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 1,
+        "Empathy": 3,
+        "Compassion": 2,
+        "EmotionalRegulation": 3,
+        "CommunicationClarity": 2,
+        "ProfessionalBoundaries": 1,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse montre un respect modéré en s'asseyant près d'Agathe, démontrant ainsi une posture non intrusive mais attentive (RespectAndDignity=1). L'intervenante perçoit clairement et verbalise les émotions d'Agathe, ce qui traduit une forte capacité d'empathie (Empathy=3) et également de la compassion (Compassion=2). Le fait de répondre calmement après avoir inspiré illustre une excellente régulation émotionnelle (EmotionalRegulation=3). Le message est clair et adapté (CommunicationClarity=2). En s'asseyant et verbalement reconnaissant l'état émotionnel, la professionnelle maintient des limites appropriées sans envahir (ProfessionalBoundaries=1). Ne concerne pas l'interprofessionnel ici (InterprofessionalCollaboration=0).",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "Empathy": {
+          "human": 2,
+          "ai": 3,
+          "abs_error": 1
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 2,
+          "abs_error": 2
+        },
+        "EmotionalRegulation": {
+          "human": 2,
+          "ai": 3,
+          "abs_error": 1
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 2,
+          "abs_error": 2
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 6.24,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 6,
+      "response_idx": 1,
+      "response_text": "''Je suis vraiment d’une humeur massacrante, rencontrer les autres résidents vous ferait le plus grand bien.''",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": -3,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": -2,
+        "Empathy": -3,
+        "Compassion": -3,
+        "EmotionalRegulation": -3,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": -2,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse dévalorise clairement la patiente en lui suggérant qu'elle a besoin de socialiser, ce qui peut être perçu comme condescendant (RespectAndDignity -2). Elle manque d'empathie et de compassion en ne reconnaissant pas la détresse émotionnelle d'Agathe, en ignorant sa tristesse et sa colère visibles (-3 sur Empathy et Compassion). Le ton est agressif et inapproprié, montrant une mauvaise gestion émotionnelle (-3 EmotionalRegulation). La communication n'est pas claire dans son intention bienveillante ; elle est plutôt maladroite mais reste compréhensible (CommunicationClarity 0). Il y a un franchissement des limites professionnelles en tenant un propos qui semble juger et blâmer la patiente (-2 ProfessionalBoundaries). Aucun élément ne favorise la collaboration interprofessionnelle (0).",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": -3,
+          "abs_error": 3
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": -3,
+          "abs_error": 3
+        },
+        "EmotionalRegulation": {
+          "human": -3,
+          "ai": -3,
+          "abs_error": 0
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 4.61,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 13,
+      "response_idx": 0,
+      "response_text": "''Je veux rentrer chez vous.''",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse « Je veux rentrer chez vous » est neutre, elle ne montre ni empathie ni compassion envers la détresse exprimée par la patiente. Elle n'adopte pas une posture d'écoute ou de respect actif des émotions du patient. En revanche, la phrase est claire et directe, ce qui constitue un point positif dans la communication. Aucun risque de franchissement de limites professionnelles ni d'émotion mal gérée n'est perceptible, et il n'existe pas non plus d'élément impliquant la collaboration interprofessionnelle.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 4.04,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 1,
+      "interaction_id": 13,
+      "response_idx": 2,
+      "response_text": "''Et bien moi aussi, j’aimerais bien rentrer chez moi !''",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": -1,
+        "Empathy": -2,
+        "Compassion": -2,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": -1,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse renvoie la frustration au patient au lieu de la reconnaître, ce qui montre un manque d'empathie et un certain manque de respect envers la dignité d'Agathe. Le ton semble familier voire peu professionnel dans un contexte de soins, ce qui nuit aux frontières professionnelles. Cependant, l'expression est claire et l'absence apparente d'émotion excessive indique une régulation émotionnelle stable. Enfin, la réponse ne mentionne pas d'éléments liés à la collaboration interprofessionnelle.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": -1,
+          "abs_error": 1
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": -1,
+          "abs_error": 1
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 4.35,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 2,
+      "interaction_id": 1,
+      "response_idx": 0,
+      "response_text": "''Que se passe-t-il Pascal ? C’est bien la première fois que tu te permets une remarque sur le temps que je passe avec u",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": -1,
+        "Compassion": 0,
+        "EmotionalRegulation": -2,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 1,
+        "InterprofessionalCollaboration": -1
+      },
+      "rationale": "La réponse interroge Pascal de façon directe et quelque peu défensive, ce qui peut être perçu comme un manque d'empathie (-1) et une régulation émotionnelle faible (-2) face à une critique. L'aspect respect et dignité reste neutre car elle ne porte pas d'attaque directe, mais elle n'adoucit pas non plus le propos. La question rappelle une frontière professionnelle (1) en indiquant que les remarques sur le temps passé avec un résident sont inhabituelles, ce qui peut souligner une défense des rôles. Cependant, cela nuit à la collaboration interprofessionnelle (-1) car le ton pourrait tendre à la confrontation plutôt qu'à une ouverture au dialogue. La clarté de communication est moyenne (0), car la question est compréhensible mais le message est davantage tourné vers une critique implicite que vers une discussion constructive.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": -1,
+          "abs_error": 1
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": -1,
+          "abs_error": 1
+        }
+      },
+      "duration_s": 4.79,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 2,
+      "interaction_id": 1,
+      "response_idx": 3,
+      "response_text": "''Travailler rapidement ! Mais j’ai à peine passé 10 minutes avec Madame Salamin !''",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": -2,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": -1
+      },
+      "rationale": "La réponse exprime clairement un désaccord (CommunicationClarity +1) et défend le temps passé avec la patiente, ce qui montre une certaine prise en compte du rôle infirmier. Toutefois, elle manque d'empathie et de compassion envers Pascal et la situation de pression, et utilise un ton qui semble défensif voire agressif (EmotionalRegulation -2). Elle ne respecte pas bien la collaboration interprofessionnelle car le ton agit comme un obstacle à un dialogue constructif (InterprofessionalCollaboration -1). Il n'y a pas d'atteinte au respect et à la dignité, ni de problème flagrant de limites professionnelles.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": -1,
+          "abs_error": 1
+        }
+      },
+      "duration_s": 4.96,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 5,
+      "response_idx": 0,
+      "response_text": "Je la regarde :''Je perçois Agathe comme animée par un élan de vie, je me pose la question de savoir si son propos est u",
+      "human_scores": {
+        "RespectAndDignity": 1,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 1,
+        "Empathy": 1,
+        "Compassion": 0,
+        "EmotionalRegulation": 1,
+        "CommunicationClarity": 2,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse témoigne d'un respect modéré en reconnaissant l'élan de vie d'Agathe. L'écoute active reflète une certaine empathie et une régulation émotionnelle appropriée face à un ton potentiellement vif, évitant une réaction impulsive. La clef de communication claire est manifeste par la demande de clarification (« Pardon ? »). L'absence de compassion et de collaboration interprofessionnelle est justifiée par le contexte limité à l'échange direct avec la patiente. L'absence d’affirmation ou de rappel des limites professionnelles est notable, mais l'hésitation et la prudence peuvent témoigner d'une gestion respectueuse des frontières professionnelles.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 1,
+          "ai": 1,
+          "abs_error": 0
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "CommunicationClarity": {
+          "human": 1,
+          "ai": 2,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 3.98,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 5,
+      "response_idx": 3,
+      "response_text": "En fronçant les sourcils :''Je refuse qu’elle utilise ce ton avec moi et le lui signifie ainsi : Changez de ton avec moi",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": -2,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": -2,
+        "Compassion": -2,
+        "EmotionalRegulation": -3,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": 1,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse montre une certaine clarté dans la communication et affirmation des limites (ProfessionalBoundaries +1, CommunicationClarity +1). Cependant, elle reflète une mauvaise gestion émotionnelle avec un froncement de sourcils et un ton de refus qui peuvent aggraver la relation (EmotionalRegulation -3). L'absence d'empathie et de compassion face à la patiente est notable (-2 en Empathy et Compassion) car elle ne cherche ni à comprendre ni à apaiser. Le respect de la dignité est neutre (0) car la limite est posée mais sans tact. L'absence d'interaction avec d'autres professionnels est normale dans ce contexte (0).",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "EmotionalRegulation": {
+          "human": -2,
+          "ai": -3,
+          "abs_error": 1
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 3.83,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 18,
+      "response_idx": 0,
+      "response_text": "''Je laisse un silence puis dit : Il compte beaucoup pour vous.''",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 1,
+        "Empathy": 2,
+        "Compassion": 1,
+        "EmotionalRegulation": 1,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": 1,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse montre un respect modéré en valorisant le lien affectif important avec le petit-fils. L'empathie est bien présente par la reconnaissance implicite de la valeur émotionnelle. La compassion est suggérée par le silence suivi d'une parole douce qui valide les sentiments de la patiente. La régulation émotionnelle est juste car le silence prépare une réponse posée. La communication est claire et concise, favorable à l'expression du vécu d'Agathe. Les limites professionnelles sont respectées en restant centrée sur les émotions sans intrusion excessive. L'interprofessionnel n'est pas sollicité ici, donc score neutre.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 2,
+          "abs_error": 2
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 3.56,
+      "error": null
+    },
+    {
+      "chapter_id": 1,
+      "scene_id": 3,
+      "interaction_id": 18,
+      "response_idx": 2,
+      "response_text": "''Je lui prend la main : Pleurez, allez-y, pleurez, laissez sortir toutes ces larmes.''",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 1,
+        "Empathy": 2,
+        "Compassion": 3,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": -1,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "L'action de prendre la main et d'encourager la patiente à exprimer ses émotions montre une forte compassion et empathie. La clarté du message est bonne, invitant à l'expression des sentiments. Le respect est présent mais pourrait être renforcé car l'invitation à pleurer, bien que bienveillante, risque de ne pas respecter pleinement la dignité émotionnelle de la patiente. La régulation émotionnelle est neutre, la réponse ne montre pas de surcharge émotionnelle. Cependant, prendre physiquement la main peut dépasser les limites professionnelles selon le contexte, d'où une note négative en ProfessionalBoundaries. Enfin, aucun élément ne concerne la collaboration interprofessionnelle.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 2,
+          "abs_error": 2
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 3,
+          "abs_error": 3
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": -1,
+          "abs_error": 1
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 3.97,
+      "error": null
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 5,
+      "response_idx": 0,
+      "response_text": "''Je la regarde avec attention et répète calmement : Seule.''",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 2,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 2,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse montre une maîtrise de soi avec un score positif en régulation émotionnelle (2) car le soignant reste calme. Toutefois, la répétition du mot 'Seule' peut sembler froide et ne manifeste pas explicitement de respect, d'empathie ou de compassion. La communication reste peu claire et insuffisante pour accompagner la patiente dans son expression émotionnelle. Aucun aspect de collaboration professionnelle ou de limites professionnelles n'est évalué positivement ici.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "EmotionalRegulation": {
+          "human": 2,
+          "ai": 2,
+          "abs_error": 0
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 3.22,
+      "error": null
+    },
+    {
+      "chapter_id": 2,
+      "scene_id": 1,
+      "interaction_id": 5,
+      "response_idx": 1,
+      "response_text": "''J’ai encore de beaux jours devant vous. De plus il y a bien longtemps que vous vivez seule !''",
+      "human_scores": {
+        "RespectAndDignity": 0,
+        "Empathy": 0,
+        "Compassion": 0,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "ai_scores": {
+        "RespectAndDignity": -2,
+        "Empathy": -3,
+        "Compassion": -2,
+        "EmotionalRegulation": 0,
+        "CommunicationClarity": 1,
+        "ProfessionalBoundaries": 0,
+        "InterprofessionalCollaboration": 0
+      },
+      "rationale": "La réponse minimise violemment le ressenti de la patiente, manquant de respect et d'empathie envers sa solitude et ses douleurs émotionnelles, ce qui nuit à la compassion. Elle est claire dans l'expression, mais la tournure est maladroite et peu appropriée. L'absence de réaction émotionnelle ou professionnelle pertinente laisse les autres dimensions neutres.",
+      "diffs": {
+        "RespectAndDignity": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "Empathy": {
+          "human": 0,
+          "ai": -3,
+          "abs_error": 3
+        },
+        "Compassion": {
+          "human": 0,
+          "ai": -2,
+          "abs_error": 2
+        },
+        "EmotionalRegulation": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "CommunicationClarity": {
+          "human": 0,
+          "ai": 1,
+          "abs_error": 1
+        },
+        "ProfessionalBoundaries": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        },
+        "InterprofessionalCollaboration": {
+          "human": 0,
+          "ai": 0,
+          "abs_error": 0
+        }
+      },
+      "duration_s": 3.33,
+      "error": null
+    }
+  ]
+}

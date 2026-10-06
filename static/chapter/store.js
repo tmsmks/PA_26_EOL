@@ -1,41 +1,25 @@
 // Store singleton — toutes les variables d'état de l'éditeur de chapitre.
 // Initialisé depuis window.PA_INIT (injecté par le template Jinja).
 
+import { emptyScores } from "../shared/skills.js";
+
 const init = window.PA_INIT || {};
 
 export const config = {
     chapterId: String(init.chapterId || ""),
     bookSlug: String(init.bookSlug || ""),
+    bookJson: String(init.bookJson || ""),
+    // Fichier source du livre, figé au chargement (bookJson, lui, affiche le
+    // nom de l'archive après une sauvegarde). Sert à valider le cache local.
+    bookSource: String(init.bookJson || ""),
     apiSaveUrl: init.apiSaveUrl || "/api/save",
     apiEnrichUrl: init.apiEnrichUrl || "/api/enrich",
     imagesBaseUrl: init.imagesBaseUrl || "/api/data/images/",
 };
 
-export const SCORE_SKILLS = [
-    "RespectAndDignity",
-    "Empathy",
-    "Compassion",
-    "EmotionalRegulation",
-    "CommunicationClarity",
-    "ProfessionalBoundaries",
-    "InterprofessionalCollaboration",
-];
-
-export const SKILL_LABELS_FR = {
-    RespectAndDignity: "Respect et dignité",
-    Empathy: "Empathie",
-    Compassion: "Compassion",
-    EmotionalRegulation: "Régulation émotionnelle",
-    CommunicationClarity: "Clarté communication",
-    ProfessionalBoundaries: "Frontières pro.",
-    InterprofessionalCollaboration: "Collab. interpro.",
-};
-
-function emptyScores() {
-    const obj = {};
-    for (const sk of SCORE_SKILLS) obj[sk] = 0;
-    return obj;
-}
+// Les 7 dimensions vivent dans shared/skills.js (partagé avec le parcours
+// joueur) ; on les ré-exporte pour ne rien casser des imports existants.
+export { SCORE_SKILLS, SKILL_LABELS_FR } from "../shared/skills.js";
 
 export const state = {
     chaptersData: init.chaptersData || { Chapters: [] },

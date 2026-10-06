@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Espace formateur — End of Life</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='play.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
+</head>
+<body class="play-menu">
+{% from "_export_form.html.jinja" import export_form %}
+{% include "_userbar.html.jinja" %}
+<main class="acc-wrap">
+    <nav class="acc-crumbs"><a href="{{ url_for('pages.landing') }}">← Tous les livres</a></nav>
+    <header class="acc-header">
+        <p class="eyebrow">Espace formateur</p>
+        <h1>Participant·e·s</h1>
+        <p class="acc-sub">{{ rows | length }} compte{{ 's' if rows | length > 1 }} · note du livre = moyenne des niveaux des chapitres évalués, nombre de chapitres évalués entre parenthèses.</p>
+    </header>
+
+    <section class="acc-card">
+        <div class="acc-toolbar">
+            <h2>Suivi</h2>
+            <input class="acc-search" id="search" type="search" placeholder="Nom ou identifiant…" aria-label="Rechercher un participant">
+        </div>
+        <div class="acc-table-wrap">
+        <table class="acc-table" id="participants">
+            <thead><tr>
+                <th>Participant</th>
+                <th class="num">Passages notés</th>
+                <th class="num">Sessions en cours</th>
+                {%- for b in books %}<th class="num">{{ b.title }}</th>{% endfor %}
+                <th>Dernière activité</th>
+            </tr></thead>
+            <tbody>
+            {%- for r in rows %}
+            <tr data-search="{{ (r.user.display_name ~ ' ' ~ r.user.username) | lower }}">
+                <td>
+                    <a href="{{ url_for('account.trainer_participant', user_id=r.user.id) }}">{{ r.user.display_name }}</a>
+                    <span class="muted">@{{ r.user.username }}{% if r.user.is_trainer %} · formateur·rice{% endif %}</span>
+                </td>
+                <td class="num">{{ r.n_passages or '—' }}</td>
+                <td class="num">{{ r.n_in_progress or '—' }}</td>
+                {%- for b in books %}
+                {%- set pf = r.profiles[b.slug] %}
+                <td class="num">{% if pf.global is not none %}{{ pf.global | note(1) }} <span class="muted">({{ pf.n_evaluated }}/{{ pf.n_chapters }})</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+                {%- endfor %}
+                <td class="muted nowrap">{{ r.last_activity | date_fr(true) }}</td>
+            </tr>
+            {%- else %}
+            <tr><td colspan="{{ 4 + books | length }}" class="muted">Aucun compte pour l'instant.</td></tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        </div>
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-chapters">
+        <div class="acc-toolbar">
+            <h2 id="h-chapters">Niveaux par chapitre</h2>
+            <form class="acc-inline-form" method="get" action="{{ url_for('account.trainer_dashboard') }}">
+                <label>Livre
+                    <select name="book" onchange="this.form.submit()">
+                        {%- for b in books %}
+                        <option value="{{ b.slug }}"{% if b.slug == detail_book.slug %} selected{% endif %}>{{ b.title }}</option>
+                        {%- endfor %}
+                    </select>
+                </label>
+                <noscript><button class="ghost-btn small" type="submit">Afficher</button></noscript>
+            </form>
+        </div>
+        <p class="acc-hint">Niveau de chaque chapitre (moyenne pondérée des passages notés) et, entre parenthèses, le nombre de passages notés. ▲ / ▼ : progression depuis le premier passage.</p>
+        <div class="acc-table-wrap">
+        <table class="acc-table" id="chapter-levels">
+            <thead><tr>
+                <th>Participant</th>
+                {%- for ch in detail_chapters %}<th class="num" title="{{ ch.Name }}">Ch. {{ ch.Id }}</th>{% endfor %}
+            </tr></thead>
+            <tbody>
+            {%- for r in rows if r.detail | selectattr('level') | list %}
+            <tr>
+                <td><a href="{{ url_for('account.trainer_participant', user_id=r.user.id) }}">{{ r.user.display_name }}</a></td>
+                {%- for c in r.detail %}
+                {%- set lv = c.level %}
+                <td class="num">
+                    {%- if lv %}{{ lv.level | note }} <span class="muted">({{ lv.n_passages }})</span>
+                    {%- if lv.progression is not none and lv.progression > 0 %} <span class="delta-up" title="Progression {{ lv.progression | round | int }} %">▲</span>
+                    {%- elif lv.progression is not none and lv.progression < 0 %} <span class="delta-down" title="Progression {{ lv.progression | round | int }} %">▼</span>{% endif %}
+                    {%- else %}<span class="muted">—</span>{% endif -%}
+                </td>
+                {%- endfor %}
+            </tr>
+            {%- else %}
+            <tr><td colspan="{{ 1 + detail_chapters | length }}" class="muted">Aucun chapitre noté dans ce livre pour l'instant.</td></tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        </div>
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-export">
+        <h2 id="h-export">Données brutes</h2>
+        <p class="acc-hint">Tout ce qui a été joué, une ligne par objet : comptes, sessions, chapitres, scènes et choix, avec un dictionnaire des colonnes. Le fichier Excel s'ouvre tel quel ; le CSV et le JSON servent aux autres outils (R, Python, SPSS…). Pseudonymiser remplace identifiants et noms par un code stable (P001…).</p>
+        {{ export_form(books=books) }}
+    </section>
+</main>
+<script>
+document.getElementById("search").addEventListener("input", function (e) {
+    var q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll("#participants tbody tr[data-search]").forEach(function (tr) {
+        tr.hidden = q !== "" && tr.dataset.search.indexOf(q) === -1;
+    });
+});
+</script>
+</body>
+</html>

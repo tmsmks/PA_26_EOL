@@ -39,21 +39,42 @@ BOOKS: list[Book] = [
             "soignant·e·s en formation continue."
         ),
         "audience": "Soignant·e·s en formation continue",
-        "json": "Chapters_v3-4-c_emotional-illustration.json",
+        "json": "chapter.json",
     },
     {
         "slug": "medstudents_y2",
         "title": "MedStudents Y2",
-        "subtitle": "Scénarios pédagogiques — 2ᵉ année de médecine",
+        "subtitle": "Le corps donné — 2ᵉ année de Bachelor",
         "description": (
-            "Un livre conçu pour les étudiant·e·s en 2ᵉ année de médecine. "
-            "Le joueur incarne Alex, en stage d'immersion hospitalière, et "
-            "travaille les compétences communicationnelles et éthiques "
-            "fondamentales du cursus pré-clinique (anamnèse, consentement, "
-            "secret médical)."
+            "Un livre conçu pour les étudiant·e·s en 2ᵉ année de médecine "
+            "(UNIL BMed2, UNIGE 2ᵉ Bachelor, UZH 2. Studienjahr). Une année "
+            "d'Alex, de la salle de dissection au cabinet de médecine de "
+            "famille de Montchéry : « Madame 14 », la donneuse de la table "
+            "14 ; Jeannine Pittet, 81 ans, ancienne sage-femme, qui a donné "
+            "son corps à la faculté sans le dire à son fils ; la table 14 et "
+            "ses fêlures. Des branches parallèles, des histoires annexes, et "
+            "des choix qui ont une mémoire d'un chapitre à l'autre."
         ),
-        "audience": "Étudiant·e·s en 2ᵉ année de médecine",
-        "json": "MedStudents_Y2_v1.json",
+        "audience": "Étudiant·e·s en 2ᵉ année de médecine (UNIL, UNIGE, UZH)",
+        "json": "MedStudents_Y2_v2.json",
+    },
+    {
+        "slug": "medstudents_y4",
+        "title": "MedStudents Y4",
+        "subtitle": "Six semaines au 3ᵉ étage — 1ʳᵉ année de Master",
+        "description": (
+            "Un livre conçu pour les étudiant·e·s en 1ʳᵉ année de Master de "
+            "médecine (UNIL M1 / UNIGE M1). Six semaines de stage d'Alex en "
+            "médecine interne, avec toujours la même équipe — médecin-chef, "
+            "assistant, infirmières, ASSC, co-stagiaire. Première annonce "
+            "grave, pacte de silence familial, incertitude diagnostique, fin "
+            "de vie d'un patient suivi depuis le premier jour, puis une nuit "
+            "de garde où une allergie non transmise peut tuer — et tout ce qui "
+            "s'ensuit : famille, avocate, revue d'incident. Les choix ont une "
+            "mémoire d'un chapitre à l'autre."
+        ),
+        "audience": "Étudiant·e·s en 1ʳᵉ année de Master de médecine (UNIL M1 / UNIGE M1)",
+        "json": "MedStudents_Y4_v2.json",
     },
 ]
 

@@ -8,10 +8,22 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import tempfile
+from datetime import datetime
+from typing import TypedDict
 
 from books import Book, chapters_path, get_book
 from domain.models import Chapter
+
+HISTORY_DIRNAME = "history"
+
+
+class UpsertResult(TypedDict):
+    """Résultat d'un upsert : nom du fichier modifié et de l'archive créée."""
+
+    filename: str
+    archive: str | None
 
 
 class ChapterRepository:
@@ -50,13 +62,20 @@ class ChapterRepository:
 
     def upsert_chapter(
         self, book_slug: str | None, chapter: Chapter | dict
-    ) -> str:
+    ) -> UpsertResult:
         """Insère ou met à jour un chapitre, écriture atomique.
 
-        Returns: le nom du fichier JSON modifié.
+        Avant d'écraser le fichier principal, l'ancienne version est archivée
+        dans le sous-dossier `history/` avec un suffixe horodaté
+        (`<basename>_<YY-MM-DD>.json`).
+
+        Returns: dict `{filename, archive}` avec le nom du JSON modifié et,
+        si une archive a été créée, son nom (sinon None).
         """
         book = get_book(book_slug)
         path = self._path_for(book)
+
+        archive_name = self._archive_existing(path)
 
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
@@ -76,7 +95,32 @@ class ChapterRepository:
             chapters_list.append(ch_dict)
 
         self._atomic_write_json(path, full)
-        return os.path.basename(path)
+        return {"filename": os.path.basename(path), "archive": archive_name}
+
+    @staticmethod
+    def _archive_path_for(path: str) -> str:
+        """Construit le chemin d'archive horodaté pour un JSON donné.
+
+        Format : `<dossier>/history/<basename>_<YY-MM-DD>.json`.
+        """
+        directory = os.path.dirname(path) or "."
+        base, ext = os.path.splitext(os.path.basename(path))
+        timestamp = datetime.now().strftime("%y-%m-%d")
+        history_dir = os.path.join(directory, HISTORY_DIRNAME)
+        return os.path.join(history_dir, f"{base}_{timestamp}{ext}")
+
+    def _archive_existing(self, path: str) -> str | None:
+        """Copie le JSON courant vers `history/` avant écrasement.
+
+        Retourne le nom de l'archive créée, ou None si le fichier n'existait pas.
+        Conserve les métadonnées (mtime, etc.) via `shutil.copy2`.
+        """
+        if not os.path.exists(path):
+            return None
+        archive_path = self._archive_path_for(path)
+        os.makedirs(os.path.dirname(archive_path), exist_ok=True)
+        shutil.copy2(path, archive_path)
+        return os.path.basename(archive_path)
 
     @staticmethod
     def _atomic_write_json(path: str, data: dict) -> None:

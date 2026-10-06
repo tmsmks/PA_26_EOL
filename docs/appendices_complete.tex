@@ -1,0 +1,953 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ANNEXES COMPLETES — projet PA 2026-01 (End of Life)
+%
+% Fichier unique regroupant toutes les annexes. A inserer dans le document
+% maitre apres \appendix :
+%   \clearpage\input{appendices/appendices_complete.tex}
+%
+% \appendix est deja actif dans le maitre : les \chapter sont numerotes en
+% lettres (A, B, C, ...). Packages requis (deja charges dans le maitre) :
+% listings, booktabs, longtable, url, caption, hyperref, fontspec (Arial),
+% csquotes.
+%
+% Convention : prose en UTF-8 accentue, blocs lstlisting en ASCII.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{How to run the project}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+This appendix describes how to install and run the administration platform developed in this project.
+
+\section{Prerequisites}
+
+\begin{itemize}
+    \item Python 3.11 or later
+    \item \texttt{pip} (Python package manager)
+    \item An OpenAI API key (if using the cloud LLM backend), or Ollama installed locally (if using the local backend)
+\end{itemize}
+
+\section{Installation}
+
+Clone the repository and install dependencies:
+
+\begin{lstlisting}[language=bash]
+cd PA_26_EOL/
+pip install -r requirements.txt
+\end{lstlisting}
+
+\section{Running the application}
+
+\begin{lstlisting}[language=bash]
+python app.py
+\end{lstlisting}
+
+The application will be available at \url{http://localhost:8765}. The landing page displays cards for each available book. Clicking a book opens the chapter index, and clicking a chapter opens the interactive graph editor.
+
+\section{Environment variables}
+
+The following environment variables can be set to configure the AI enrichment module:
+
+\begin{table}[!htbp]
+\centering
+\small
+\begin{tabular}{l l l}
+\toprule
+\textbf{Variable} & \textbf{Default} & \textbf{Description} \\
+\midrule
+\texttt{OPENAI\_API\_KEY} & --- & OpenAI API key \\
+\texttt{ENRICH\_BACKEND} & \texttt{openai} & \texttt{openai} or \texttt{ollama} \\
+\texttt{ENRICH\_OPENAI\_MODEL} & \texttt{gpt-4.1-mini} & OpenAI model name \\
+\texttt{ENRICH\_OLLAMA\_URL} & \texttt{http://localhost:11434/...} & Ollama endpoint \\
+\texttt{ENRICH\_OLLAMA\_MODEL} & \texttt{llama3.1:8b} & Ollama model name \\
+\texttt{ENRICH\_OLLAMA\_TIMEOUT} & \texttt{300} & Timeout in seconds \\
+\bottomrule
+\end{tabular}
+\caption{Environment variables for the AI enrichment module.}
+\end{table}
+
+\section{Running the tests}
+
+\begin{lstlisting}[language=bash]
+pytest
+\end{lstlisting}
+
+All 29 tests should pass. The test suite covers domain models (JSON round-trip), repository (atomic writes), graph service, validation EG-7, enrichment filtering, and request normalisation. The full test output is reproduced in Appendix~\ref{annexe:pytest}.
+
+The output is written to \texttt{output/graphes\_<slug>.md}.
+
+\section{Adding a new book}
+
+Adding a new pedagogical book requires only two steps:
+\begin{enumerate}
+    \item Place the JSON file in \texttt{data/chapters/}.
+    \item Add an entry in the \texttt{BOOKS} list in \texttt{books.py} with the slug, title, subtitle, description, audience, and JSON filename.
+\end{enumerate}
+No code modification is required.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Project architecture}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+This appendix presents the complete file structure of the project, organised according to the Clean Architecture principles described in Chapter~3.
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, xleftmargin=2em]
+PA_26_EOL/
+  app.py                       # Flask entry point (factory)
+  books.py                     # Single source of truth for books
+  domain/
+    models.py                  # Chapter, Scene, Interaction, Response, Actor
+    soft_skills.py             # Skill dimension constants
+  repositories/
+    chapters.py                # Atomic JSON read/write (Repository pattern)
+  services/
+    graph_service.py           # vis-network graph construction
+    validation_service.py      # EG-7 validation (NextInteractionID)
+    enrichment/                # AI enrichment sub-package
+      service.py               # EnrichmentService (facade)
+      context.py               # LLM context construction
+      prompt.py                # System + user message formatting
+      filtering.py             # Duplicate filtering
+      backends/                # Strategy pattern
+        base.py                # LLMBackend protocol
+        openai_backend.py
+        ollama_backend.py
+  views/
+    pages.py                   # HTML pages (Jinja2 Blueprints)
+    api.py                     # REST API (/save, /enrich, /images)
+  templates/                   # Jinja2 templates
+  static/                      # CSS + ES6 JS modules
+    chapter/
+      main.js, store.js, network.js, editor.js,
+      parcours.js, ai-modal.js, persistence.js, utils.js
+  tests/                       # pytest test suite (29 tests)
+  data/chapters/               # JSON source files
+  data/images/                 # Character illustrations
+  scripts/                     # Evaluation & build scripts
+  output/                      # Mermaid exports
+\end{lstlisting}
+
+\subsection*{API routes}
+
+\begin{table}[!htbp]
+\centering
+\small
+\begin{tabular}{l l l}
+\toprule
+\textbf{Method} & \textbf{URL} & \textbf{Description} \\
+\midrule
+\texttt{GET} & \texttt{/} & Landing page (book cards) \\
+\texttt{GET} & \texttt{/books/<slug>/} & Chapter index for a book \\
+\texttt{GET} & \texttt{/books/<slug>/chapters/<id>} & Graph editor for a chapter \\
+\texttt{POST} & \texttt{/api/save} & Atomic chapter save \\
+\texttt{POST} & \texttt{/api/enrich} & AI enrichment proposals \\
+\texttt{GET} & \texttt{/api/data/images/<filename>} & Character images \\
+\bottomrule
+\end{tabular}
+\caption{REST API routes exposed by the Flask server.}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Cahier des charges --- Int\'egration IA}
+\label{annexe:cdc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+This appendix reproduces the requirements specification (cahier des charges) defined in February 2025 for the AI integration into the End of Life serious game.
+
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{l l}
+\toprule
+\textbf{Projet} & End of Life v2.0 --- Serious Game soins palliatifs \\
+\textbf{Sous-projet} & Outils IA pour auteurs de sc\'enarios \\
+\textbf{Version} & 1.0 \\
+\textbf{Date} & F\'evrier 2025 \\
+\textbf{Statut} & Pr\'eparation d\'eploiement r\'eel \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{R\'esum\'e ex\'ecutif}
+
+Ce document d\'efinit les exigences pour l'int\'egration d'outils d'IA dans le projet \textbf{End of Life}, un jeu s\'erieux de formation en soins palliatifs. Les outils visent \`a \textbf{assister les formateurs} dans la cr\'eation et la maintenance des sc\'enarios, et non \`a modifier l'exp\'erience des joueurs en temps r\'eel.
+
+\textbf{\'Etape pr\'ealable :} Construction et visualisation du graphe des sc\'enarios (interactions $\rightarrow$ r\'eponses).
+
+\textbf{Deux fonctionnalit\'es principales :}
+\begin{enumerate}
+    \item \textbf{Enrichissement} --- G\'en\'erer de nouvelles r\'eponses possibles pour enrichir les interactions.
+    \item \textbf{Param\'etrage assist\'e (scoring)} --- Proposer des scores (comp\'etences soft) pour chaque r\'eponse du sc\'enario, avec justification.
+\end{enumerate}
+
+\section{Acteurs et b\'en\'eficiaires}
+
+\begin{table}[!htbp]
+\centering
+\small
+\begin{tabular}{l p{4.5cm} p{6cm}}
+\toprule
+\textbf{R\^ole} & \textbf{Description} & \textbf{Usage des outils IA} \\
+\midrule
+Formateur / Auteur & Expert m\'etier (soins palliatifs, p\'edagogie) & Validation des scores, g\'en\'eration de nouvelles r\'eponses, \'edition du JSON \\
+D\'eveloppeur & Maintenance technique, int\'egration & D\'eploiement, \'evolution des scripts et prompts \\
+Joueur / \'Etudiant & Utilisateur final du jeu & N'utilise pas les outils IA \\
+\bottomrule
+\end{tabular}
+\caption{Acteurs et b\'en\'eficiaires du projet.}
+\end{table}
+
+\section{Objectifs}
+
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{c p{12cm}}
+\toprule
+\textbf{Priorit\'e} & \textbf{Objectif} \\
+\midrule
+P0 & Construction du graphe et visualisation des sc\'enarios \\
+P1 & G\'en\'erer de nouvelles r\'eponses plausibles pour enrichir les interactions \\
+P1 & Proposer des scores + justifications pour toute r\'eponse \\
+P1 & Permettre un audit en lot du JSON actuel \\
+P2 & Interface web pour validation/correction \\
+\bottomrule
+\end{tabular}
+\caption{Objectifs du projet par priorit\'e.}
+\end{table}
+
+\section{Fonctionnalit\'es d\'etaill\'ees}
+
+\subsection{Module d'enrichissement}
+
+\begin{table}[!htbp]
+\centering
+\small
+\begin{tabular}{l p{11cm}}
+\toprule
+\textbf{\'El\'ement} & \textbf{D\'etail} \\
+\midrule
+Entr\'ees & Contexte sc\`ene (\texttt{SceneIntroduction}, \texttt{Title}), texte interaction, profil acteur (\texttt{Actor}), liste des r\'eponses existantes \\
+Sorties & Liste de r\'eponses + scores associ\'es + cat\'egorie (exemplaire, neutre, probl\'ematique) \\
+R\`egles & Conformit\'e d\'eontologique ; aucune insertion sans validation humaine ; pas de duplication \\
+\bottomrule
+\end{tabular}
+\caption{Sp\'ecification du module d'enrichissement.}
+\end{table}
+
+\subsection{Module de scoring}
+
+\begin{table}[!htbp]
+\centering
+\small
+\begin{tabular}{l p{11cm}}
+\toprule
+\textbf{\'El\'ement} & \textbf{D\'etail} \\
+\midrule
+Entr\'ees & Contexte sc\`ene, texte interaction, profil acteur, texte de la r\'eponse \\
+Sorties & Vecteur de scores ($-3$ \`a $+3$) sur 7 dimensions, justification textuelle \\
+R\`egles & Stabilit\'e sur appels r\'ep\'et\'es ; scores explicables ; r\'eponses inadapt\'ees clairement n\'egatives \\
+\bottomrule
+\end{tabular}
+\caption{Sp\'ecification du module de scoring.}
+\end{table}
+
+\subsection{R\'ef\'erentiel p\'edagogique (\'echelle $-3$ \`a $+3$)}
+
+\begin{table}[!htbp]
+\centering
+\small
+\begin{tabular}{l l l l}
+\toprule
+\textbf{Comp\'etence} & \textbf{Positif (+2/+3)} & \textbf{Neutre (0)} & \textbf{N\'egatif (-2/-3)} \\
+\midrule
+Authenticit\'e & Honn\^etet\'e, alignement & Neutre & Mensonge, d\'eni \\
+Respect & Autonomie, consentement & Formel & Imposition, infantilisation \\
+Compassion & Pr\'esence, bienveillance & Distance & Indiff\'erence, jugement \\
+Espoir & Lien sans promesses & \'Equilibr\'e & Faux espoirs, abattement \\
+Empathie & Validation des \'emotions & \'Ecoute neutre & Invalidation, centrage sur soi \\
+\bottomrule
+\end{tabular}
+\caption{R\'ef\'erentiel p\'edagogique des comp\'etences soft skills.}
+\end{table}
+
+\section{Contraintes techniques}
+
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{c p{12cm}}
+\toprule
+\textbf{ID} & \textbf{Contrainte} \\
+\midrule
+CT-1 & Pr\'eservation de l'int\'egrit\'e du JSON (\texttt{NextInteractionID}, Id uniques) \\
+CT-2 & Tra\c{c}abilit\'e des appels LLM ; mode batch possible \\
+CT-3 & RGPD : choix d'API conforme ou mod\`ele local pour donn\'ees sensibles \\
+CT-4 & Versioning du JSON et des propositions IA \\
+\bottomrule
+\end{tabular}
+\caption{Contraintes techniques.}
+\end{table}
+
+\section{Livrables}
+
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{c p{12cm}}
+\toprule
+\textbf{ID} & \textbf{Livrable} \\
+\midrule
+L1 & Script Python : lecture/\'ecriture du JSON \\
+L2 & Module graphe : construction, visualisation HTML (vis-network), export Mermaid, serveur Flask et API save \\
+L3 & Module enrichissement : g\'en\'eration de nouvelles r\'eponses \\
+L4 & Module scoring : appel LLM, sortie scores + justification \\
+L5 & Prompts et sch\'ema JSON pour l'enrichissement et le scoring \\
+L6 & Pipeline : enrichissement $\rightarrow$ scoring $\rightarrow$ export \\
+\bottomrule
+\end{tabular}
+\caption{Livrables du projet.}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Prompts LLM utilis\'es}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+Cette annexe reproduit les prompts exacts utilis\'es par le module d'enrichissement IA (fichier \texttt{services/enrichment/prompt.py}). Le syst\`eme utilise deux messages : un \textit{system message} fixe d\'efinissant le r\^ole et le format de sortie, et un \textit{user message} construit dynamiquement.
+
+\section{System Message}
+
+Le system message est identique pour toutes les requ\^etes d'enrichissement :
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+Tu es un assistant pedagogique specialise en communication en fin
+de vie. On te fournit le contexte complet d'une scene de
+simulation (EMS), une interaction precise et la liste des
+reponses deja existantes.
+
+Ta tache : proposer de nouvelles reponses plausibles que
+l'ACTEUR pourrait dire.
+
+Contraintes :
+- respecter la deontologie infirmiere et les bonnes pratiques
+  relationnelles ;
+- ne JAMAIS dupliquer les reponses deja existantes (meme sens,
+  meme tournure) ;
+- proposer pour chaque reponse :
+  - le texte exact de la replique (en francais, entre guillemets
+    francais) ;
+  - une categorie parmi : 'exemplaire', 'neutre',
+    'problematique' ;
+  - des scores SoftSkillDimensions OBLIGATOIRES couvrant les
+    7 dimensions :
+    RespectAndDignity, Empathy, Compassion,
+    EmotionalRegulation, CommunicationClarity,
+    ProfessionalBoundaries,
+    InterprofessionalCollaboration ;
+    chaque score est un entier de -3 a +3 ;
+  - des scores LegacyDimensions (Authenticity, Respect,
+    Compassion, Hope, Empathy), chacun de -3 a +3 ;
+  - un champ Rationale (1-2 phrases) justifiant brievement
+    le choix et les scores.
+
+Reponds STRICTEMENT en JSON de la forme :
+{ "responses": [ { "Text": ..., "Category": ...,
+  "Rationale": ...,
+  "SoftSkillDimensions": { ... 7 dimensions ... },
+  "LegacyDimensions": { ... } } ] }
+\end{lstlisting}
+
+\section{User Message (construit dynamiquement)}
+
+Le user message est assembl\'e par la fonction \texttt{format\_user\_message()} et comprend jusqu'\`a quatre sections, selon les param\`etres fournis par l'auteur :
+
+\begin{enumerate}
+    \item \textbf{Nombre de propositions} --- Sp\'ecifie combien de r\'eponses le LLM doit g\'en\'erer (typiquement 1 \`a 3).
+
+    \item \textbf{Suite narrative (optionnelle)} --- Si l'auteur a s\'electionn\'e une interaction suivante, le prompt indique au LLM le texte de cette interaction et lui demande de produire une r\'eplique qui y m\`ene naturellement, sans la r\'ep\'eter ni la \textit{spoiler}. Si \texttt{NextInteractionID = -1}, le prompt demande une r\'eponse pouvant cl\^oturer l'\'echange.
+
+    \item \textbf{Orientation soft skills (optionnelle)} --- Pour chaque dimension cibl\'ee, le prompt sp\'ecifie la valeur cible ($-3$ \`a $+3$) et impose une tol\'erance de $\pm 1$. Le texte de la r\'eplique doit concr\`etement traduire ces orientations.
+
+    \item \textbf{Consigne libre de l'auteur (optionnelle)} --- Un texte libre permettant d'imposer un ton ou un angle sp\'ecifique.
+\end{enumerate}
+
+Le contexte JSON complet de la sc\`ene est ajout\'e en fin de message.
+
+\section{Exemple concret}
+
+Voici un exemple de user message g\'en\'er\'e pour l'interaction \#1 de la sc\`ene Pr\'esentation, avec orientation \guillemotleft\ Tr\`es empathique\ \guillemotright{} (Empathy +3, Compassion +2, RespectAndDignity +2) :
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+Nombre de propositions demandees : EXACTEMENT 1.
+
+ORIENTATION CIBLEE (priorite forte) -- la reponse proposee doit
+ILLUSTRER le profil suivant sur l'echelle -3..+3 :
+  - RespectAndDignity (Respect et dignite) : cible = +2
+  - Empathy (Empathie) : cible = +3
+  - Compassion (Compassion) : cible = +2
+Les scores SoftSkillDimensions renvoyes DOIVENT correspondre a
+ce profil (tolerance +/-1 par dimension). Le texte de la
+replique doit concretement traduire ces orientations.
+
+Contexte JSON suivant :
+
+{
+  "scene_title": "Presentation",
+  "scene_introduction": "Il est 7h15. C'est l'heure de ...",
+  "interaction_id": 1,
+  "interaction_text": "Je suis devant la porte,...",
+  "actor": { "Name": "Claude" },
+  "existing_responses": [
+    { "Text": "Je frappe puis j'entre.", ... },
+    { "Text": "J'entre sans frapper ...", ... },
+    ...
+  ]
+}
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Format JSON narratif (extrait réel)}
+\label{annexe:json}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+Cette annexe reproduit un extrait \emph{réel} du fichier source
+\texttt{data/chapters/chapter.json} (livre \emph{End of Life}). Il illustre
+concrètement le modèle de données présenté au Chapitre~3
+(\texttt{Chapter $\rightarrow$ Scene $\rightarrow$ Interaction $\rightarrow$
+Response}) : une \texttt{Interaction} porte un \texttt{Actor} (avec son
+historique narratif), et chaque \texttt{Response} contient un
+\texttt{NextInteractionID} (l'arête du graphe) ainsi que les deux jeux de
+scores (\texttt{SoftSkillDimensions} à 7~axes et \texttt{LegacyDimensions}
+conservés pour la rétrocompatibilité Unity).
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+{
+  "Id": 1,
+  "Name": "1. Je suis devant la porte,...",
+  "Text": "''Je suis devant la porte,...''",
+  "Actor": {
+    "Id": 3,
+    "Name": "Claude",
+    "Age": 25,
+    "Role": "Infirmiere",
+    "History": "Travaille a 80%, mariee a un mecanicien des chemins de
+                fer. [...] Claude a vecu un deuil difficile : elle a
+                accompagne sa grand-maman morte en EMS dans des
+                conditions difficiles. Cette experience l'a beaucoup
+                touchee.",
+    "ImageName": "Claude.png"
+  },
+  "Responses": [
+    {
+      "Id": 1,
+      "Name": "Je frappe puis j'entre.",
+      "Text": "Je frappe puis j'entre.",
+      "NextInteractionID": 3,
+      "SoftSkillDimensions": {
+        "RespectAndDignity": 2, "Empathy": 0, "Compassion": 0,
+        "EmotionalRegulation": 0, "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0
+      },
+      "LegacyDimensions": {
+        "Authenticity": 0, "Respect": 1, "Compassion": 0,
+        "Hope": 0, "Empathy": 0
+      }
+    },
+    {
+      "Id": 3,
+      "Name": "Je frappe doucement et j'attends un instant...",
+      "Text": "Je frappe doucement et j'attends un instant pour
+               respecter son rythme.",
+      "NextInteractionID": 3,
+      "SoftSkillDimensions": {
+        "RespectAndDignity": 2, "Empathy": 0, "Compassion": 0,
+        "EmotionalRegulation": 0, "CommunicationClarity": 0,
+        "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0
+      },
+      "LegacyDimensions": {
+        "Authenticity": 1, "Respect": 2, "Compassion": 2,
+        "Hope": 1, "Empathy": 2
+      }
+    }
+  ],
+  "AgentFacialExpression": "Claude_neutral.png"
+}
+\end{lstlisting}
+
+\noindent Une valeur \texttt{NextInteractionID = -1} (non illustrée ici)
+représente une fin de branche narrative. Les champs non modélisés
+explicitement (par exemple \texttt{AgentFacialExpression}) sont préservés lors
+du \emph{round-trip} JSON, ce qui évite toute perte d'information spécifique
+à Unity ou Naninovel.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Export Mermaid d'un scénario}
+\label{annexe:mermaid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+Le module d'export (\texttt{exporters/mermaid.py}) produit une représentation
+textuelle et versionnable des graphes narratifs, rendue directement par GitHub.
+Voici l'export complet de la scène \enquote{1.1 Accueil dans le service} du
+livre \emph{MedStudents Y2} (fichier \texttt{output/graphes\_medstudents\_y2.md}).
+Chaque n\oe ud \texttt{I$n$} est une interaction (acteur entre parenthèses) ;
+chaque arête porte le début du texte de la réponse correspondante.
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+flowchart TD
+    I1["(Dr Moreau) << Bienvenue, Alex ! Je vais vous confier vot..."]
+    I2["(Alex) Vous etes devant la chambre 204. Que faites-..."]
+    I3["(Dr Moreau) << C'est honnete de votre part de le dire. Po..."]
+    I4["(Monsieur Bernard) << Entrez, entrez... >>"]
+    I5["(Monsieur Bernard) << Vous auriez pu attendre que je dise 'oui'..."]
+    I6["(Monsieur Bernard) << Bon, asseyez-vous. Qu'est-ce que vous voul..."]
+
+    I1 -->|"<< Merci Dr Moreau. ..."| I2
+    I1 -->|"<< D'accord, j'y vai..."| I2
+    I1 -->|"<< Je prefererais qu..."| I3
+    I2 -->|"Je frappe deux fois..."| I4
+    I2 -->|"J'entre directement..."| I5
+    I2 -->|"Je frappe, j'ouvre ..."| I4
+    I3 -->|"<< Merci, je serai p..."| I2
+    I4 -->|"<< Bonjour Monsieur ..."| I6
+    I4 -->|"<< Bonjour, je suis ..."| I6
+    I4 -->|"<< Salut Monsieur, j..."| I5
+    I5 -->|"<< Vous avez raison,..."| I6
+    I5 -->|"<< Je suis presse, ..."| I6
+    I5 -->|"<< Ce n'est pas grav..."| I6
+\end{lstlisting}
+
+\noindent L'export complet des deux livres totalise plus de 1900 lignes Mermaid
+réparties sur 21 scènes ; seul un scénario est reproduit ici à titre
+d'illustration.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Extraits de code significatifs}
+\label{annexe:code}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+Cette annexe reproduit trois extraits de code représentatifs des choix
+d'architecture décrits au Chapitre~3.
+
+\section{Écriture atomique (pattern Repository)}
+
+Garantit qu'une interruption pendant la sauvegarde ne laisse jamais un fichier
+JSON partiellement corrompu (\texttt{repositories/chapters.py}).
+
+\begin{lstlisting}[language=Python, basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+@staticmethod
+def _atomic_write_json(path: str, data: dict) -> None:
+    """Ecriture atomique : write-then-rename via os.replace (POSIX atomic)."""
+    directory = os.path.dirname(path) or "."
+    os.makedirs(directory, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(
+        prefix=os.path.basename(path) + ".", suffix=".tmp", dir=directory,
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except Exception:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+\end{lstlisting}
+
+\section{Protocole des backends LLM (pattern Strategy)}
+
+Interface commune à tous les backends, qui rend le module IA indépendant du
+fournisseur (\texttt{services/enrichment/backends/base.py}).
+
+\begin{lstlisting}[language=Python, basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+@runtime_checkable
+class LLMBackend(Protocol):
+    """Strategie d'appel a un LLM pour l'enrichissement.
+
+    Une implementation recoit le system message et le user message, retourne
+    le contenu textuel du choix principal (souvent un JSON). Les erreurs
+    reseau / quota / format DOIVENT lever LLMBackendError.
+    """
+    name: str
+
+    def complete_json(self, system_msg: str, user_msg: str) -> str:
+        """Demande une completion JSON au LLM. Retourne le contenu brut."""
+        ...
+\end{lstlisting}
+
+\noindent Deux implémentations concrètes respectent ce protocole :
+\texttt{OpenAIBackend} (API distante) et \texttt{OllamaBackend} (modèle local).
+Le choix se fait par variable d'environnement, sans modifier le reste du code.
+
+\section{Source de vérité unique des livres}
+
+Ajouter un nouveau livre pédagogique ne demande qu'une entrée dans la liste
+\texttt{BOOKS} de \texttt{books.py} ; aucun autre fichier n'est à modifier.
+
+\begin{lstlisting}[language=Python, basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+BOOKS: list[Book] = [
+    {
+        "slug": "end_of_life",
+        "title": "End of Life",
+        "subtitle": "Communication en fin de vie -- EMS",
+        "description": "Le livre historique du projet. Le joueur incarne
+                        Claude, infirmier.ere en EMS [...]",
+        "audience": "Soignant.e.s en formation continue",
+        "json": "chapter.json",
+    },
+    {
+        "slug": "medstudents_y2",
+        "title": "MedStudents Y2",
+        "subtitle": "Scenarios pedagogiques -- 2e annee de medecine",
+        "description": "Un livre concu pour les etudiant.e.s en 2e annee
+                        de medecine [...]",
+        "audience": "Etudiant.e.s en 2e annee de medecine",
+        "json": "MedStudents_Y2_v1.json",
+    },
+]
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{R\'esultats d\'etaill\'es des \'evaluations IA}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+Cette annexe pr\'esente les donn\'ees brutes des trois campagnes d'\'evaluation du module d'Intelligence Artificielle d\'ecrites au Chapitre~4.
+
+
+\section{Conformit\'e des g\'en\'erations orient\'ees (50 g\'en\'erations, OpenAI)}
+
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{l r}
+\toprule
+\textbf{M\'etrique} & \textbf{Valeur} \\
+\midrule
+Backend & openai \\
+G\'en\'erations totales & 50 \\
+Succ\`es & 50 / 50 \\
+Erreurs LLM & 0 \\
+Doublons filtr\'es & 0 \\
+Temps moyen & 4.6~s \\
+Conformit\'e exacte & 100~\% \\
+Conformit\'e $\pm 1$ & 100~\% \\
+\bottomrule
+\end{tabular}
+\caption{Synth\`ese de la conformit\'e sur 50 g\'en\'erations (backend OpenAI, gpt-4.1-mini).}
+\end{table}
+
+
+\subsection{D\'etail des 50 g\'en\'erations}
+
+\begin{longtable}{p{1.8cm} p{2.2cm} p{3.2cm} p{5.5cm} l r}
+\toprule
+\textbf{Inter.} & \textbf{Profil} & \textbf{Orientation} & \textbf{Texte g\'en\'er\'e} & \textbf{Cat.} & \textbf{Temps} \\
+\midrule
+\endhead
+
+Ch1 Sc1 I1 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Je m'assure de frapper doucement et j'attends patiemment votre si...} & exem & 8.2s \\
+Ch1 Sc1 I1 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Je suis devant la porte, j'entre directement pour gagner du temps.\ \guillemotright{}} & prob & 4.4s \\
+Ch1 Sc1 I1 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Je viens de terminer avec une autre patiente, je suis là maintena...} & neut & 3.9s \\
+Ch1 Sc1 I1 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Je sais que ce moment est délicat pour vous, Agathe, alors je vai...} & exem & 7.4s \\
+Ch1 Sc1 I1 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Je toque avant d'entrer.\ \guillemotright{}} & neut & 3.5s \\
+Ch1 Sc1 I6 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Je remarque que cette période vous semble difficile et que vous p...} & exem & 4.7s \\
+Ch1 Sc1 I6 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Pourquoi me le demander ? Vous n'y croyez pas non plus, n'est-ce ...} & neut & 4.2s \\
+Ch1 Sc1 I6 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Je ne sais pas trop, pourquoi me posez-vous cette question ?\ \guillemotright{}} & neut & 3.5s \\
+Ch1 Sc1 I6 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Vous semblez porter un poids très lourd, et si vous voulez, on pe...} & prob & 4.8s \\
+Ch1 Sc1 I6 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Je ne saurais pas vraiment dire ce que vous ressentez maintenant,...} & neut & 3.6s \\
+Ch1 Sc1 I13 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Je comprends combien ce désir de partir est important pour vous, ...} & exem & 4.6s \\
+Ch1 Sc1 I13 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Vous devez rester ici, c'est comme ça. Ce n'est pas la peine de s...} & prob & 4.5s \\
+Ch1 Sc1 I13 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Vous avez exprimé votre envie de rentrer chez vous.\ \guillemotright{}} & neut & 3.3s \\
+Ch1 Sc1 I13 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Je ressens vraiment votre envie de retourner chez vous. Parfois, ...} & neut & 4.2s \\
+Ch1 Sc1 I13 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Madame Salamin, pour l'instant, rester ici est la consigne médica...} & neut & 3.7s \\
+Ch1 Sc2 I1 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Pascal, je comprends la pression du service, mais chaque résident...} & exem & 5.8s \\
+Ch1 Sc2 I1 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Franchement, Pascal, je fais ce que je peux, mais ce genre de pre...} & neut & 5.1s \\
+Ch1 Sc2 I1 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Je prends note de ta remarque, Pascal, et je vais revoir l'organi...} & neut & 3.8s \\
+Ch1 Sc2 I1 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Je comprends que tu sois sous pression, Pascal. Prendre un moment...} & exem & 4.4s \\
+Ch1 Sc2 I1 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Pascal, je prends note de ta demande. Je m'assurerai d'être plus ...} & neut & 4.1s \\
+Ch1 Sc3 I1 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Bonjour Agathe, je suis Claude, je suis là pour m'occuper de votr...} & exem & 3.9s \\
+Ch1 Sc3 I1 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{Je frappe à peine, je n'ai pas vraiment le temps de prévenir.} & prob & 6.5s \\
+Ch1 Sc3 I1 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{Je me tiens à l'entrée, attendant qu'Agathe soit prête.} & neut & 3.6s \\
+Ch1 Sc3 I1 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Je sais que vous préférez parfois la tranquillité, mais je viens ...} & neut & 3.9s \\
+Ch1 Sc3 I1 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Je toque à la porte en annonçant clairement mon arrivée\ \guillemotright{}} & exem & 5.0s \\
+Ch1 Sc3 I18 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Je vois que cela vous touche profondément, Agathe. Prenez votre t...} & exem & 4.1s \\
+Ch1 Sc3 I18 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Ce n'est pas la peine de pleurer autant, ça ne changera rien à vo...} & prob & 3.8s \\
+Ch1 Sc3 I18 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Je suis là, prenez votre temps.\ \guillemotright{}} & neut & 3.1s \\
+Ch1 Sc3 I18 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Vous avez traversé tant de choses, et je ressens toute la peine d...} & exem & 4.5s \\
+Ch1 Sc3 I18 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Je vais préparer tout ce qu'il faut pour le soin, vous pouvez vou...} & neut & 4.2s \\
+Ch2 Sc1 I5 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Je comprends à quel point cette solitude vous pèse, Agathe. Vous ...} & exem & 3.7s \\
+Ch2 Sc1 I5 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Ce n'est pas anormal de se sentir abandonnée, mais vos enfants on...} & prob & 3.4s \\
+Ch2 Sc1 I5 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Vous traversez un moment difficile. Que souhaitez-vous que je fas...} & neut & 2.9s \\
+Ch2 Sc1 I5 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Je comprends profondément ce que vous ressentez, c'est tellement ...} & exem & 6.8s \\
+Ch2 Sc1 I5 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Vous dites que vous aimeriez rejoindre votre mari. Est-ce que vou...} & neut & 4.4s \\
+Ch2 Sc1 I12 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Je comprends que cette peur vous envahisse, Agathe. C'est une réa...} & exem & 4.7s \\
+Ch2 Sc1 I12 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Ce n'est pas grave d'avoir peur, mais il faut que vous compreniez...} & prob & 5.1s \\
+Ch2 Sc1 I12 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Je note votre inquiétude. Nous allons continuer à suivre votre si...} & neut & 5.6s \\
+Ch2 Sc1 I12 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Je comprends que cette peur soit immense pour vous. Sachez que je...} & exem & 3.5s \\
+Ch2 Sc1 I12 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Je comprends votre inquiétude. Voici les étapes que nous allons s...} & neut & 3.7s \\
+Ch3 Sc1 I1 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Agathe, je suis vraiment heureuse d'être là avec vous. Je sais qu...} & exem & 3.8s \\
+Ch3 Sc1 I1 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Oui, je suis venue parce que c'est écrit dans mon planning, rien ...} & prob & 4.0s \\
+Ch3 Sc1 I1 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Bonjour Agathe. Je suis là si vous souhaitez parler.\ \guillemotright{}} & neut & 4.0s \\
+Ch3 Sc1 I1 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Agathe, je suis vraiment là pour vous écouter, sans juger ni solu...} & exem & 7.5s \\
+Ch3 Sc1 I1 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Bonjour Agathe. Je suis venue vérifier que tout est conforme au p...} & neut & 4.7s \\
+Ch3 Sc1 I15 & Très empathique & Emp +3, Comp +2, R\&D +2 & \scriptsize{\guillemotleft\ Je vous entends et je comprends que cela doit être très difficile...} & exem & 5.4s \\
+Ch3 Sc1 I15 & Problématique & Emp -2, R\&D -2, ComCl -1 & \scriptsize{\guillemotleft\ Vous voulez que je vous fasse une injection, c'est ça ? Je ne sui...} & prob & 5.9s \\
+Ch3 Sc1 I15 & Neutre & Emp 0, Comp 0, R\&D 0 & \scriptsize{\guillemotleft\ Pouvez-vous m'en dire un peu plus sur ce que vous attendez de cet...} & neut & 4.1s \\
+Ch3 Sc1 I15 & Empathique mais intrusif & Emp +3, ProfB -2 & \scriptsize{\guillemotleft\ Je comprends tellement votre douleur et votre souhait, et si c'ét...} & exem & 9.4s \\
+Ch3 Sc1 I15 & Clair mais froid & ComCl +3, Emp -1, Comp -1 & \scriptsize{\guillemotleft\ Je comprends votre demande, mais je dois vérifier avec l'équipe m...} & neut & 4.0s \\
+\bottomrule
+\caption{D\'etail des 50 g\'en\'erations orient\'ees. Cat. = cat\'egorie (exem = exemplaire, neut = neutre, prob = probl\'ematique).}
+\end{longtable}
+
+
+\subsection{Enregistrement JSON brut (g\'en\'eration orient\'ee)}
+
+Pour illustrer la tra\c{c}abilit\'e (contrainte CT-2), voici un enregistrement
+complet tel qu'\'ecrit dans \texttt{output/eval\_ai\_compliance\_openai.json}.
+Le champ \texttt{orientation} fixe les cibles demand\'ees ; le champ
+\texttt{proposal.SoftSkillDimensions} montre les scores effectivement renvoy\'es
+par le LLM (conformes \`a $\pm 1$).
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+{
+  "chapter_id": 1, "scene_id": 1, "interaction_id": 1,
+  "orientation_label": "Tres empathique",
+  "orientation": { "Empathy": 3, "Compassion": 2, "RespectAndDignity": 2 },
+  "success": true, "error": null, "duration_s": 8.19,
+  "proposal": {
+    "Text": "<< Je m'assure de frapper doucement et j'attends patiemment
+             votre signal avant d'entrer, afin de respecter votre espace
+             et votre rythme. >>",
+    "Category": "exemplaire",
+    "SoftSkillDimensions": {
+      "RespectAndDignity": 2, "Empathy": 3, "Compassion": 2,
+      "EmotionalRegulation": 1, "CommunicationClarity": 2,
+      "ProfessionalBoundaries": 2, "InterprofessionalCollaboration": 0
+    },
+    "LegacyDimensions": {
+      "Authenticity": 2, "Respect": 3, "Compassion": 3, "Hope": 1, "Empathy": 3
+    },
+    "Rationale": "La reponse traduit un respect clair pour le rythme de la
+                  patiente [...]"
+  }
+}
+\end{lstlisting}
+
+
+\section{Scoring assist\'e --- Comparaison scores humains vs IA}
+
+
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{l r}
+\toprule
+\textbf{Dimension} & \textbf{MAE} \\
+\midrule
+RespectAndDignity & 0.67 \\
+Empathy & 1.33 \\
+Compassion & 1.07 \\
+EmotionalRegulation & 0.60 \\
+CommunicationClarity & 0.73 \\
+ProfessionalBoundaries & 0.87 \\
+InterprofessionalCollaboration & 0.13 \\
+\midrule
+\textbf{Moyenne globale} & \textbf{0.77} \\
+\bottomrule
+\end{tabular}
+\caption{MAE par dimension (15 r\'eponses, backend OpenAI, temps moyen : 4.5~s/r\'eponse).}
+\end{table}
+
+
+\subsection{D\'etail par r\'eponse \'evalu\'ee}
+
+\begin{longtable}{p{1.4cm} p{3.6cm} p{2.5cm} p{2.5cm} p{2.5cm} r}
+\toprule
+\textbf{R\'ef.} & \textbf{Texte r\'eponse} & \textbf{Humain} & \textbf{IA} & \textbf{$|\Delta|$} & \textbf{t} \\
+\midrule
+\endhead
+
+Ch1 I1 R0 & \scriptsize{Je frappe puis j'entre.} & \scriptsize{2|0|0|0|0|0|0} & \scriptsize{2|0|0|0|1|1|0} & \scriptsize{0|0|0|0|1|1|0} & 6.4s \\
+Ch1 I1 R1 & \scriptsize{J'entre sans frapper pour ne pas la déranger.} & \scriptsize{2|0|0|0|0|0|0} & \scriptsize{1|1|0|0|0|-2|0} & \scriptsize{1|1|0|0|0|2|0} & 5.0s \\
+Ch1 I1 R2 & \scriptsize{Je frappe doucement et j'attends un instant pour res...} & \scriptsize{2|0|0|0|0|0|0} & \scriptsize{3|2|1|1|1|2|0} & \scriptsize{1|2|1|1|1|2|0} & 5.3s \\
+Ch1 I6 R0 & \scriptsize{S'assied auprès d'Agathe, elle inspire et répond cal...} & \scriptsize{0|2|0|2|0|0|0} & \scriptsize{1|3|2|3|2|1|0} & \scriptsize{1|1|2|1|2|1|0} & 6.2s \\
+Ch1 I6 R1 & \scriptsize{''Je suis vraiment d'une humeur massacrante, rencont...} & \scriptsize{0|0|0|-3|0|0|0} & \scriptsize{-2|-3|-3|-3|0|-2|0} & \scriptsize{2|3|3|0|0|2|0} & 4.6s \\
+Ch1 I13 R0 & \scriptsize{''Je veux rentrer chez vous.''} & \scriptsize{0|0|0|0|0|0|0} & \scriptsize{0|0|0|0|1|0|0} & \scriptsize{0|0|0|0|1|0|0} & 4.0s \\
+Ch1 I13 R2 & \scriptsize{''Et bien moi aussi, j'aimerais bien rentrer chez mo...} & \scriptsize{0|0|0|0|0|0|0} & \scriptsize{-1|-2|-2|0|0|-1|0} & \scriptsize{1|2|2|0|0|1|0} & 4.3s \\
+Ch1 I1 R0 & \scriptsize{''Que se passe-t-il Pascal ? C'est bien la première ...} & \scriptsize{0|0|0|0|0|0|0} & \scriptsize{0|-1|0|-2|0|1|-1} & \scriptsize{0|1|0|2|0|1|1} & 4.8s \\
+Ch1 I1 R3 & \scriptsize{''Travailler rapidement ! Mais j'ai à peine passé 10...} & \scriptsize{0|0|0|0|0|0|0} & \scriptsize{0|0|0|-2|1|0|-1} & \scriptsize{0|0|0|2|1|0|1} & 5.0s \\
+Ch1 I5 R0 & \scriptsize{Je la regarde :''Je perçois Agathe comme animée par ...} & \scriptsize{1|0|0|0|1|0|0} & \scriptsize{1|1|0|1|2|0|0} & \scriptsize{0|1|0|1|1|0|0} & 4.0s \\
+Ch1 I5 R3 & \scriptsize{En fronçant les sourcils :''Je refuse qu'elle utilis...} & \scriptsize{0|0|0|-2|0|0|0} & \scriptsize{0|-2|-2|-3|1|1|0} & \scriptsize{0|2|2|1|1|1|0} & 3.8s \\
+Ch1 I18 R0 & \scriptsize{''Je laisse un silence puis dit : Il compte beaucoup...} & \scriptsize{0|0|0|0|0|0|0} & \scriptsize{1|2|1|1|1|1|0} & \scriptsize{1|2|1|1|1|1|0} & 3.6s \\
+Ch1 I18 R2 & \scriptsize{''Je lui prend la main : Pleurez, allez-y, pleurez, ...} & \scriptsize{0|0|0|0|0|0|0} & \scriptsize{1|2|3|0|1|-1|0} & \scriptsize{1|2|3|0|1|1|0} & 4.0s \\
+Ch2 I5 R0 & \scriptsize{''Je la regarde avec attention et répète calmement :...} & \scriptsize{0|0|0|2|0|0|0} & \scriptsize{0|0|0|2|0|0|0} & \scriptsize{0|0|0|0|0|0|0} & 3.2s \\
+Ch2 I5 R1 & \scriptsize{''J'ai encore de beaux jours devant vous. De plus il...} & \scriptsize{0|0|0|0|0|0|0} & \scriptsize{-2|-3|-2|0|1|0|0} & \scriptsize{2|3|2|0|1|0|0} & 3.3s \\
+\bottomrule
+\caption{D\'etail du scoring assist\'e : scores humains vs IA sur 15 r\'eponses. Ordre des dimensions : R\&D = RespectAndDignity, Emp = Empathy, Comp = Compassion, Emo = EmotionalRegulation, Com = CommunicationClarity, Pro = ProfessionalBoundaries, Int = InterprofessionalCollaboration.}
+\end{longtable}
+
+
+\subsection{Enregistrement JSON brut (scoring assist\'e)}
+
+Voici un enregistrement complet tel qu'\'ecrit dans
+\texttt{output/eval\_scoring\_mae\_openai.json}. On y trouve les scores humains
+de r\'ef\'erence, les scores propos\'es par l'IA, la justification textuelle et
+le temps de r\'eponse.
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+{
+  "chapter_id": 1, "scene_id": 1, "interaction_id": 6, "response_idx": 0,
+  "response_text": "S'assied aupres d'Agathe, elle inspire et repond
+                    calmement : je vous sens en colere et triste d'etre ici.",
+  "human_scores": {
+    "RespectAndDignity": 0, "Empathy": 2, "Compassion": 0,
+    "EmotionalRegulation": 2, "CommunicationClarity": 0,
+    "ProfessionalBoundaries": 0, "InterprofessionalCollaboration": 0
+  },
+  "ai_scores": {
+    "RespectAndDignity": 1, "Empathy": 3, "Compassion": 2,
+    "EmotionalRegulation": 3, "CommunicationClarity": 2,
+    "ProfessionalBoundaries": 1, "InterprofessionalCollaboration": 0
+  },
+  "rationale": "La reponse montre un respect modere en s'asseyant pres
+    d'Agathe (RespectAndDignity=1). L'intervenante percoit et verbalise les
+    emotions d'Agathe, ce qui traduit une forte empathie (Empathy=3) et de
+    la compassion (Compassion=2). Repondre calmement apres avoir inspire
+    illustre une excellente regulation emotionnelle (EmotionalRegulation=3).
+    [...]",
+  "duration_s": 6.24,
+  "error": null
+}
+\end{lstlisting}
+
+
+\subsection{Exemples de justifications g\'en\'er\'ees par le LLM}
+
+\noindent\textbf{R\'eponse :} \guillemotleft\ Je frappe puis j'entre.\ \guillemotright{}\\
+\textit{La réponse 'Je frappe puis j'entre' montre un respect clair de la dignité de la patiente en frappant avant d'entrer, ce qui est un bon standard professionnel. L'action est claire, simple et appropriée, ce qui mérite un point en CommunicationClarity. Elle maintient les limites professionnelles en frappant avant d'entrer, ce qui justifie un point en ProfessionalBoundaries. Cependant, il n'y a pas d'éléments exprimant de l'empathie, de compassion ni de collaboration interprofessionnelle. L'émotion est neutre, donc EmotionalRegulation est aussi neutre.}
+\vspace{3mm}
+
+\noindent\textbf{R\'eponse :} \guillemotleft\ J'entre sans frapper pour ne pas la déranger.\ \guillemotright{}\\
+\textit{Entrer sans frapper peut être perçu comme un manque de respect de la vie privée (RespectAndDignity). La justification 'pour ne pas la déranger' révèle une certaine empathie, mais l'acte en lui-même ne respecte pas les limites professionnelles (ProfessionalBoundaries négatif). Il n'y a pas d'élément montrant de compassion, de régulation émotionnelle, de clarté communicationnelle ou de collaboration interprofessionnelle dans cette action.}
+\vspace{3mm}
+
+\noindent\textbf{R\'eponse :} \guillemotleft\ Je frappe doucement et j'attends un instant pour respecter son rythme.\ \guillemotright{}\\
+\textit{Frapper doucement et attendre montre un grand respect pour la patiente, valorisant son rythme (RespectAndDignity +3). L'attente traduit une compréhension de l'état émotionnel possible du patient (Empathy +2). L'action est bienveillante, donc une légère marque de Compassion (+1). Attendre en silence implique une bonne maîtrise de ses émotions (EmotionalRegulation +1) et une communication non intrusive (CommunicationClarity +1). Le geste respecte les limites professionnelles en ne franchissant pas la porte sans permission (ProfessionalBoundaries +2). Cette action est individuelle et ne fait pas appel à l'interprofessionnel (+0).}
+\vspace{3mm}
+
+\noindent\textbf{R\'eponse :} \guillemotleft\ S'assied auprès d'Agathe, elle inspire et répond calmement : je vou...\ \guillemotright{}\\
+\textit{La réponse montre un respect modéré en s'asseyant près d'Agathe, démontrant ainsi une posture non intrusive mais attentive (RespectAndDignity=1). L'intervenante perçoit clairement et verbalise les émotions d'Agathe, ce qui traduit une forte capacité d'empathie (Empathy=3) et également de la compassion (Compassion=2). Le fait de répondre calmement après avoir inspiré illustre une excellente régulation émotionnelle (EmotionalRegulation=3). Le message est clair et adapté (CommunicationClarity=2). En s'asseyant et verbalement reconnaissant l'état émotionnel, la professionnelle maintient des limites appropriées sans envahir (ProfessionalBoundaries=1). Ne concerne pas l'interprofessionnel ici (InterprofessionalCollaboration=0).}
+\vspace{3mm}
+
+\noindent\textbf{R\'eponse :} \guillemotleft\ ''Je suis vraiment d'une humeur massacrante, rencontrer les autres ...\ \guillemotright{}\\
+\textit{La réponse dévalorise clairement la patiente en lui suggérant qu'elle a besoin de socialiser, ce qui peut être perçu comme condescendant (RespectAndDignity -2). Elle manque d'empathie et de compassion en ne reconnaissant pas la détresse émotionnelle d'Agathe, en ignorant sa tristesse et sa colère visibles (-3 sur Empathy et Compassion). Le ton est agressif et inapproprié, montrant une mauvaise gestion émotionnelle (-3 EmotionalRegulation). La communication n'est pas claire dans son intention bienveillante ; elle est plutôt maladroite mais reste compréhensible (CommunicationClarity 0). Il y a un franchissement des limites professionnelles en tenant un propos qui semble juger et blâmer la patiente (-2 ProfessionalBoundaries). Aucun élément ne favorise la collaboration interprofessionnelle (0).}
+\vspace{3mm}
+
+
+\section{Comparaison des backends LLM (OpenAI vs Ollama)}
+
+Les deux backends ont \'et\'e \'evalu\'es sur 10 prompts identiques.
+
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{l r r}
+\toprule
+\textbf{Crit\`ere} & \textbf{OpenAI (gpt-4.1-mini)} & \textbf{Ollama (llama3.1:8b)} \\
+\midrule
+Succ\`es & 10/10 & 10/10 \\
+JSON valide & 10/10 & 10/10 \\
+Temps moyen & 9.2~s & 98.2~s \\
+Conformit\'e $\pm 1$ & 100.0~\% & 91.3~\% \\
+Donn\'ees locales & Non & Oui \\
+\bottomrule
+\end{tabular}
+\caption{Synth\`ese de la comparaison des backends LLM.}
+\end{table}
+
+
+\subsection{D\'etail par prompt}
+
+\begin{longtable}{p{2.5cm} p{2.5cm} p{4cm} r p{4cm} r}
+\toprule
+\textbf{Prompt} & \textbf{Orientation} & \textbf{OpenAI --- Texte} & \textbf{t} & \textbf{Ollama --- Texte} & \textbf{t} \\
+\midrule
+\endhead
+
+\scriptsize{Empathique --- Présentation I1} & \scriptsize{Emp +2, R\&D +2, Comp +1} & \scriptsize{\guillemotleft\ Bonjour Madame Salamin, je suis Claude, votre infi...} & 4s & \scriptsize{''Je vais d'abord vérifier si elle souhaite qu'on fr...} & 147s \\
+\scriptsize{Problématique --- Présentat...} & \scriptsize{Emp -2, R\&D -1} & \scriptsize{\guillemotleft\ D'après moi, vous semblez préférer rester seule pl...} & 9s & \scriptsize{Puis-je vous laisser votre espace pour un moment, ma...} & 64s \\
+\scriptsize{Très compassionnel --- I13} & \scriptsize{Emp +3, Comp +3} & \scriptsize{\guillemotleft\ Je ressens à quel point c'est difficile pour vous,...} & 8s & \scriptsize{Je comprends vos souffrances, Agathe. Rentrer chez s...} & 61s \\
+\scriptsize{Professionnel --- Pascal I1} & \scriptsize{ComCl +2, ProfB +2} & \scriptsize{\guillemotleft\ Je comprends l'importance de respecter les délais,...} & 5s & \scriptsize{Je comprends vos contraintes, mais nous devons égale...} & 67s \\
+\scriptsize{Régulé --- Les soins I5} & \scriptsize{EmoReg +2, Emp +1} & \scriptsize{Je prends une profonde inspiration avant de répondre...} & 26s & \scriptsize{''Je comprends qu'un ton un peu vif ne vous dit rien...} & 121s \\
+\scriptsize{Compassionnel débordant ---...} & \scriptsize{Comp +3, Emp +3, EmoReg -1} & \scriptsize{\guillemotleft\ Je comprends que c'est difficile, et c'est normal ...} & 9s & \scriptsize{(vide)} & 206s \\
+\scriptsize{Neutre --- Lieu de vie I5} & \scriptsize{Emp 0, Comp 0} & \scriptsize{\guillemotleft\ Je comprends que vous vous sentiez seule, c'est un...} & 6s & \scriptsize{(vide)} & 61s \\
+\scriptsize{Collaboratif --- Lieu de vi...} & \scriptsize{IntCo +2, ComCl +2} & \scriptsize{<<Je comprends que cette peur vous affecte profondéme...} & 11s & \scriptsize{Pascal a souhaité que nous discutions de votre entou...} & 75s \\
+\scriptsize{Empathique --- Dyspnée I1} & \scriptsize{Emp +2, Comp +2, R\&D +2} & \scriptsize{\guillemotleft\ Agathe, cela me touche profondément de vous voir c...} & 7s & \scriptsize{Je tiens à vous savoir, Agathe, que je suis là pour ...} & 92s \\
+\scriptsize{Cadré --- Dyspnée I15} & \scriptsize{ProfB +3, EmoReg +2} & \scriptsize{\guillemotleft\ Je comprends votre demande, mais je ne peux pas fa...} & 8s & \scriptsize{Je comprends votre peur, mais je dois vous assurer q...} & 88s \\
+\bottomrule
+\caption{Comparaison c\^ote \`a c\^ote des r\'eponses g\'en\'er\'ees par les deux backends sur 10 prompts identiques.}
+\end{longtable}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Sortie de la suite de tests}
+\label{annexe:pytest}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\renewcommand{\thepage}{\thechapter-\arabic{page}}
+
+Sortie complète de la commande \texttt{pytest -v}. Les 29~tests couvrent les six
+composants critiques du système et passent intégralement.
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, frame=single, breaklines=true, xleftmargin=1em]
+tests/test_chapter_repository.py::test_load_chapters_returns_typed_chapters    PASSED
+tests/test_chapter_repository.py::test_upsert_chapter_writes_atomically        PASSED
+tests/test_chapter_repository.py::test_upsert_chapter_appends_when_missing      PASSED
+tests/test_chapter_repository.py::test_upsert_no_partial_write_on_failure       PASSED
+tests/test_chapter_repository.py::test_upsert_archives_previous_version         PASSED
+tests/test_chapter_repository.py::test_upsert_first_time_no_archive             PASSED
+tests/test_domain_models.py::test_actor_roundtrip_with_extras                   PASSED
+tests/test_domain_models.py::test_response_score_falls_back_to_flat_field       PASSED
+tests/test_domain_models.py::test_chapter_roundtrip_preserves_unknown_scene_extras PASSED
+tests/test_domain_models.py::test_real_books_full_roundtrip[chapter.json]       PASSED
+tests/test_domain_models.py::test_real_books_full_roundtrip[MedStudents_Y2_v1.json] PASSED
+tests/test_enrichment_filtering.py::test_removes_exact_duplicate                PASSED
+tests/test_enrichment_filtering.py::test_case_insensitive_duplicate             PASSED
+tests/test_enrichment_filtering.py::test_strips_whitespace                      PASSED
+tests/test_enrichment_filtering.py::test_skips_empty_text_candidates            PASSED
+tests/test_enrichment_request.py::test_required_ids_must_be_present             PASSED
+tests/test_enrichment_request.py::test_orientation_clamped_to_minus_three_to_three PASSED
+tests/test_enrichment_request.py::test_orientation_unknown_skill_is_ignored     PASSED
+tests/test_enrichment_request.py::test_n_proposals_clamped_to_one_three         PASSED
+tests/test_enrichment_request.py::test_next_interaction_id_invalid_becomes_none PASSED
+tests/test_graph_service.py::test_build_scene_graph_node_count_and_root_marking PASSED
+tests/test_graph_service.py::test_build_scene_graph_edges_and_curves            PASSED
+tests/test_graph_service.py::test_build_scene_graph_response_with_invalid_next_id_is_skipped PASSED
+tests/test_graph_service.py::test_parcours_lists_all_interactions_once          PASSED
+tests/test_graph_service.py::test_parcours_response_payload_includes_target_and_edge_for_valid_next PASSED
+tests/test_validation_service.py::test_no_errors_when_all_ids_valid             PASSED
+tests/test_validation_service.py::test_no_errors_when_next_id_is_minus_one      PASSED
+tests/test_validation_service.py::test_no_errors_when_next_id_is_none           PASSED
+tests/test_validation_service.py::test_error_when_next_id_unknown               PASSED
+
+======================== 29 passed in 0.58s ========================
+\end{lstlisting}

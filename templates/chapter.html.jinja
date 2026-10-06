@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>End of Life — Chapitre {{ chapter.Id }} : {{ chapter.Name }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='chapter.css') }}">
 </head>
 <body>
@@ -18,21 +20,24 @@
         {%- endfor %}
         </select>
         <h3>Scénarios du chapitre {{ chapter.Id }}</h3>
-        <input type="text" class="search" id="search" placeholder="EG-3 : Recherche par texte">
+        <input type="text" class="search" id="search" placeholder="Rechercher un scénario…">
         {%- for sd in scenes_data %}
         <button class="scene-btn" data-idx="{{ loop.index0 }}">{{ sd.title }}</button>
         {%- endfor %}
     </div>
     <div class="sidebar-actions">
-        <button class="export" id="save-btn">Valider et sauvegarder dans {{ book.json }}</button>
+        <button class="export" id="save-btn" type="button">
+            <span class="save-btn-label">Sauvegarder</span>
+            <span class="save-btn-file" id="save-btn-file">{{ book.json }}</span>
+        </button>
         <button class="export export-secondary" id="export-btn">Télécharger (JSON)</button>
         <div id="save-status"></div>
     </div>
 </div>
 <div class="main">
     <div class="panel-toggles">
-        <button class="panel-toggle-btn" id="toggle-left-panel" type="button">Masquer</button>
-        <button class="panel-toggle-btn" id="toggle-right-panel" type="button">Masquer</button>
+        <button class="panel-toggle-btn" id="toggle-left-panel" type="button">‹ Masquer la liste</button>
+        <button class="panel-toggle-btn" id="toggle-right-panel" type="button">Masquer l'éditeur ›</button>
     </div>
     <div id="network"></div>
     <div class="hint">Molette : zoom — Glisser : déplacer — Survol nœud : infobulle complète</div>
@@ -62,6 +67,7 @@
 window.PA_INIT = {
     chapterId: {{ chapter.Id | tojson }},
     bookSlug: {{ book.slug | tojson }},
+    bookJson: {{ book.json | tojson }},
     chaptersData: {{ chapters_payload | tojson }},
     scenesData: {{ scenes_data | tojson }},
     apiSaveUrl: {{ url_for('api.api_save') | tojson }},

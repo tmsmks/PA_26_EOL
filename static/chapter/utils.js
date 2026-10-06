@@ -51,9 +51,11 @@ export function getNextResponseId(interaction) {
 }
 
 export function getInteractionIdFromNodeId(nodeId, nodesDS) {
-    if (!nodeId || !nodesDS) return "";
-    const node = nodesDS.get(nodeId);
-    if (node && node.interaction_id != null) return String(node.interaction_id);
+    if (!nodeId) return "";
+    if (nodesDS) {
+        const node = nodesDS.get(nodeId);
+        if (node && node.interaction_id != null) return String(node.interaction_id);
+    }
     const raw = String(nodeId);
     const pos = raw.lastIndexOf("_I");
     if (pos >= 0) return raw.substring(pos + 2);

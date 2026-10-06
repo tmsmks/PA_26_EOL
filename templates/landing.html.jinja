@@ -4,17 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>End of Life — Serious games pour la formation en santé</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
 </head>
 <body>
+{% include "_userbar.html.jinja" %}
 <div class="wrap">
     <header>
-        <span class="eyebrow">Serious games · Éditeur graphique</span>
-        <h1>End of Life — Atelier des scénarios</h1>
+        <span class="eyebrow">Serious games · Formation en santé</span>
+        <h1>End of Life</h1>
         <p class="tagline">
-            Une plateforme d'édition et de visualisation des scénarios de simulation
-            pédagogique. Chaque livre réunit plusieurs chapitres, scènes et interactions
-            pour travailler les compétences relationnelles et éthiques en santé.
+            Des scénarios de simulation pour travailler les compétences relationnelles
+            et éthiques en santé. Choisissez un livre, jouez ses chapitres et recevez
+            un bilan à la fin de chaque parcours.
         </p>
     </header>
     <main class="cards">
@@ -25,29 +28,29 @@
         {%- else %}
             {%- set href = url_for('pages.book_index', book_slug=b.slug) %}
         {%- endif %}
-        <a class="book-card book-card-{{ b.slug }}" href="{{ href }}">
+        <div class="book-card book-card-{{ b.slug }}">
             <div class="card-header">
-                <span class="card-tag">Livre</span>
                 <h2>{{ b.title }}</h2>
                 <p class="card-subtitle">{{ b.subtitle }}</p>
             </div>
-            <p class="card-desc">{{ b.description }}</p>
+            <p class="card-desc" title="{{ b.description }}">{{ b.description }}</p>
             <div class="card-meta">
                 <span class="meta-audience">{{ b.audience }}</span>
             </div>
             <div class="card-stats">
                 <div><span class="n">{{ s.n_chapters }}</span><span class="l">chapitres</span></div>
-                <div><span class="n">{{ s.n_scenes }}</span><span class="l">scènes</span></div>
-                <div><span class="n">{{ s.n_interactions }}</span><span class="l">interactions</span></div>
+                <div><span class="n">{{ s.n_scenes }}</span><span class="l">scénarios</span></div>
+                <div><span class="n">{{ s.duration }}</span><span class="l">durée estimée</span></div>
             </div>
-            <div class="card-cta">Ouvrir le graphe →</div>
-        </a>
+            <div class="card-actions">
+                <a class="cta-play" href="{{ url_for('pages.play_book', book_slug=b.slug) }}">▶ Jouer le parcours</a>
+                {%- if current_user and current_user.is_trainer %}
+                <a class="cta-edit" href="{{ href }}">Éditer →</a>
+                {%- endif %}
+            </div>
+        </div>
     {%- endfor %}
     </main>
-    <footer>
-        Données JSON stockées dans <code>data/chapters/</code> · Sauvegarde via <code>/api/save</code> ·
-        Enrichissement IA via <code>/api/enrich</code> (backend OpenAI ou Ollama local)
-    </footer>
 </div>
 </body>
 </html>

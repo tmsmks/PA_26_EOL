@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ 'Connexion' if mode == 'login' else 'Créer un compte' }} — End of Life</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='play.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
+</head>
+<body class="play-menu">
+<main class="auth-wrap">
+    <a class="ghost-link" href="{{ url_for('pages.landing') }}">← Accueil</a>
+    <div class="auth-card">
+        <p class="eyebrow">End of Life · Parcours de formation</p>
+        {%- if mode == 'login' %}
+        <h1>Connexion</h1>
+        <p class="auth-lead">Retrouvez vos sessions, vos bilans et votre progression, sur n'importe quel appareil.</p>
+        {%- else %}
+        <h1>Créer un compte</h1>
+        <p class="auth-lead">Votre compte garde l'historique de vos sessions et permet au feedback de tenir compte de vos parcours précédents.</p>
+        {%- endif %}
+
+        {%- if error %}
+        <p class="form-error" role="alert">{{ error }}</p>
+        {%- endif %}
+
+        <form method="post" class="auth-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {%- if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            {%- if mode == 'login' %}
+            <label>Identifiant
+                <input name="username" value="{{ username }}" autocomplete="username" autocapitalize="none" required autofocus>
+            </label>
+            <label>Mot de passe
+                <input type="password" name="password" autocomplete="current-password" required>
+            </label>
+            <button class="primary-btn" type="submit">Se connecter</button>
+            {%- else %}
+            <label>Nom affiché
+                <input name="display_name" value="{{ form.display_name }}" autocomplete="name" maxlength="80" placeholder="Prénom Nom">
+            </label>
+            <label>Identifiant
+                <input name="username" value="{{ form.username }}" autocomplete="username" autocapitalize="none"
+                       pattern="[A-Za-z0-9][A-Za-z0-9._\-]{2,39}" required>
+                <span class="field-hint">3 à 40 caractères : lettres sans accent, chiffres, « . », « _ » ou « - ». Enregistré en minuscules.</span>
+            </label>
+            <label>Mot de passe
+                <input type="password" name="password" autocomplete="new-password" minlength="8" required>
+                <span class="field-hint">Au moins 8 caractères.</span>
+            </label>
+            <label>Confirmer le mot de passe
+                <input type="password" name="password_confirm" autocomplete="new-password" minlength="8" required>
+            </label>
+            {%- if needs_code %}
+            <label>Code d'inscription
+                <input name="registration_code" autocomplete="off" required>
+                <span class="field-hint">Fourni par votre formateur·rice.</span>
+            </label>
+            {%- endif %}
+            <button class="primary-btn" type="submit">Créer mon compte</button>
+            {%- endif %}
+        </form>
+
+        <p class="auth-switch">
+        {%- if mode == 'login' %}
+            Pas encore de compte ? <a href="{{ url_for('auth.register_page', next=next) }}">Créer un compte</a>
+        {%- else %}
+            Déjà inscrit·e ? <a href="{{ url_for('auth.login', next=next) }}">Se connecter</a>
+        {%- endif %}
+        </p>
+        {%- if mode == 'login' %}
+        <p class="field-hint">Mot de passe oublié ? Votre formateur·rice peut vous en attribuer un nouveau.</p>
+        {%- endif %}
+    </div>
+</main>
+</body>
+</html>

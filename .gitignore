@@ -26,3 +26,12 @@ env/
 
 # Build statique legacy (supprimé : Flask est désormais 100% dynamique)
 output/graphes/
+
+# Archives horodatées des JSON de chapitres (créées par ChapterRepository)
+data/chapters/history/
+
+# Base SQLite locale et clé secrète générée (comptes, sessions)
+instance/
+
+# Réglages Claude Code personnels (hook du journal de développement)
+.claude/settings.local.json

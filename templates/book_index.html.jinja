@@ -3,10 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <title>{{ book.title }} — Chapitres</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='book_index.css') }}">
 </head>
 <body>
 <a class="back" href="{{ url_for('pages.landing') }}">← Page d'accueil</a>
+<a class="back" href="{{ url_for('pages.play_book', book_slug=book.slug) }}" style="float:right">▶ Parcours joueur</a>
 <h1>{{ book.title }}</h1>
 <p class="sub">{{ book.subtitle }}</p>
 <ul>
