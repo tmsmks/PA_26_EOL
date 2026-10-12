@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clé de cotation — End of Life</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='play.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
+</head>
+<body class="play-menu">
+{% include "_userbar.html.jinja" %}
+<main class="acc-wrap">
+    <nav class="acc-crumbs"><a href="{{ url_for('account.trainer_dashboard') }}">← Espace formateur</a></nav>
+    <header class="acc-header">
+        <p class="eyebrow">Espace formateur</p>
+        <h1>Clé de cotation</h1>
+        <p class="acc-sub">Faire valider par un panel d'experts les points donnés à chaque réponse (−3 à +3 sur 7 compétences). <span class="acc-badge is-live">Clé provisoire</span> : les points du jeu sont ceux de la clé actuelle du livre (ci-dessous « auteur ») tant que le panel ne l'a pas validée. Pour MedStudents Y2, c'est la clé cotée par Claude en deux tours (docs/MedStudents_Y2_v2_cle.md).</p>
+    </header>
+
+    {%- for category, message in get_flashed_messages(with_categories=true) %}
+    <p class="{{ 'form-ok' if category == 'ok' else 'form-error' }}" role="status">{{ message }}</p>
+    {%- endfor %}
+
+    <section class="acc-card" aria-labelledby="h-book">
+        <div class="acc-toolbar">
+            <h2 id="h-book">{{ book.title }}</h2>
+            <form class="acc-inline-form" method="get" action="{{ url_for('expert_key.index') }}">
+                <label>Livre
+                    <select name="book" onchange="this.form.submit()">
+                        {%- for b in books %}
+                        <option value="{{ b.slug }}"{% if b.slug == book.slug %} selected{% endif %}>{{ b.title }}</option>
+                        {%- endfor %}
+                    </select>
+                </label>
+                <noscript><button class="ghost-btn small" type="submit">Afficher</button></noscript>
+            </form>
+        </div>
+        <ol class="acc-steps">
+            <li><strong>Télécharger la grille</strong> et l'envoyer aux experts (au moins 5 : médecin de famille, infirmier·ère, enseignant·e en communication médicale, psychologue, médecin assistant·e). Elle ne montre pas les points de l'auteur.</li>
+            <li><strong>Chaque expert cote seul</strong> chaque réponse de −3 à +3, la marque « critique » au besoin et la justifie en une phrase.</li>
+            <li><strong>Importer les grilles remplies</strong> : l'accord entre experts et les réponses à revoir s'affichent ci-dessous.</li>
+            <li><strong>Tour 2</strong> : envoyer la synthèse, puis une nouvelle grille « tour 2 » pour les réponses à revoir (méthode Delphi).</li>
+        </ol>
+        <p class="acc-hint">{{ n_items }} réponses aux points de choix dans ce livre. Pour alléger la charge, répartissez les chapitres entre experts (chaque chapitre coté par au moins 3 experts), ou faites coter un échantillon tiré au hasard, le même pour tous.</p>
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-grid">
+        <h2 id="h-grid">1. Grille pour les experts</h2>
+        <form class="acc-inline-form" method="get" action="{{ url_for('expert_key.grid', book_slug=book.slug) }}">
+            <label>Chapitre
+                <select name="chapter">
+                    <option value="">Tous ({{ n_items }} réponses)</option>
+                    {%- for ch in chapters %}
+                    <option value="{{ ch.id }}">{{ ch.id }}. {{ ch.name }} ({{ ch.n_items }} réponses, {{ ch.n_points }} points de choix)</option>
+                    {%- endfor %}
+                </select>
+            </label>
+            <label>Points de choix
+                <select name="sample">
+                    {%- for s in samples %}
+                    <option value="{{ s }}">{{ 'Tous' if not s else s ~ ' par chapitre, au hasard' }}</option>
+                    {%- endfor %}
+                </select>
+            </label>
+            <label>Tour
+                <select name="round">
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                </select>
+            </label>
+            <button class="primary-btn small" type="submit">Télécharger la grille (.xlsx)</button>
+        </form>
+        <details class="acc-table-view">
+            <summary>Voir la grille ancrée ({{ rubric_status }})</summary>
+            <div class="acc-table-wrap">
+            <table class="acc-table">
+                <thead><tr><th>Compétence</th><th>−3</th><th>0</th><th>+3</th></tr></thead>
+                <tbody>
+                {%- for k in skills %}
+                <tr>
+                    <td><strong>{{ labels[k] }}</strong><br><span class="muted">{{ rubric[k].anchor }}</span></td>
+                    <td>{{ rubric[k]['-3'] }}</td><td>{{ rubric[k]['0'] }}</td><td>{{ rubric[k]['+3'] }}</td>
+                </tr>
+                {%- endfor %}
+                </tbody>
+            </table>
+            </div>
+        </details>
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-import">
+        <h2 id="h-import">2. Importer les grilles remplies</h2>
+        <p class="acc-hint">Le nom de l'expert et le tour sont lus dans la feuille « consignes ». Réimporter la grille d'un expert remplace ses cotes de ce tour.</p>
+        <form class="acc-inline-form" method="post" enctype="multipart/form-data" action="{{ url_for('expert_key.upload', book_slug=book.slug) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>Grilles (.xlsx)
+                <input type="file" name="grids" accept=".xlsx" multiple required>
+            </label>
+            <button class="primary-btn small" type="submit">Importer</button>
+        </form>
+        {%- if summary %}
+        <div class="acc-table-wrap">
+        <table class="acc-table">
+            <thead><tr><th>Tour</th><th>Expert</th><th class="num">Réponses cotées</th><th>Importée le</th><th></th></tr></thead>
+            <tbody>
+            {%- for s in summary %}
+            <tr>
+                <td>{{ s.round }}</td>
+                <td>{{ s.expert }}</td>
+                <td class="num">{{ s.n }}</td>
+                <td class="muted nowrap">{{ s.uploaded_at | date_fr(true) }}</td>
+                <td class="num">
+                    <form method="post" action="{{ url_for('expert_key.remove', book_slug=book.slug) }}" onsubmit="return confirm('Supprimer les cotes de {{ s.expert }} (tour {{ s.round }}) ?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="expert" value="{{ s.expert }}">
+                        <input type="hidden" name="round" value="{{ s.round }}">
+                        <button type="submit" class="link-btn">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        </div>
+        {%- else %}
+        <p class="acc-empty">Aucune grille importée pour ce livre.</p>
+        {%- endif %}
+    </section>
+
+    {%- if result %}
+    <section class="acc-card" aria-labelledby="h-agreement">
+        <div class="acc-toolbar">
+            <h2 id="h-agreement">3. Accord entre experts</h2>
+            {%- if rounds | length > 1 %}
+            <form class="acc-inline-form" method="get" action="{{ url_for('expert_key.index') }}">
+                <input type="hidden" name="book" value="{{ book.slug }}">
+                <label>Tour
+                    <select name="round" onchange="this.form.submit()">
+                        {%- for r in rounds %}<option value="{{ r }}"{% if r == round %} selected{% endif %}>{{ r }}</option>{% endfor %}
+                    </select>
+                </label>
+            </form>
+            {%- endif %}
+        </div>
+        <p class="acc-hint">Tour {{ round }} · {{ result.experts | length }} expert{{ 's' if result.experts | length > 1 }} · {{ result.n_rated }} réponses cotées, dont {{ result.n_complete }} par tous les experts (base du calcul). ICC(2,1) = fiabilité de la cote d'un seul expert ; ICC(2,k) = fiabilité de la moyenne des experts. Seuils de Koo & Li : &lt; 0,5 faible · 0,5–0,75 modéré · 0,75–0,9 bon · ≥ 0,9 excellent. Objectif : au moins 0,75.</p>
+        <div class="acc-table-wrap">
+        <table class="acc-table">
+            <thead><tr><th>Compétence</th><th class="num">Réponses</th><th class="num">ICC(2,1)</th><th>Niveau</th><th class="num">ICC(2,k)</th><th>Niveau</th></tr></thead>
+            <tbody>
+            {%- for a in result.agreement %}
+            <tr{% if a.skill == 'Total' %} class="is-total"{% endif %}>
+                <td>{{ a.label }}</td>
+                <td class="num">{{ a.n_items }}</td>
+                <td class="num">{{ '%.2f' % a.icc_single if a.icc_single is not none else '—' }}</td>
+                <td>{{ a.level_single }}</td>
+                <td class="num">{{ '%.2f' % a.icc_average if a.icc_average is not none else '—' }}</td>
+                <td>{{ a.level_average }}</td>
+            </tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        </div>
+        <p class="acc-hint"><strong>{{ result.n_to_review }}</strong> réponse{{ 's' if result.n_to_review > 1 }} à revoir (experts qui s'écartent de 3 points ou plus, ou médiane qui s'écarte de l'auteur de 2 points ou plus) · <strong>{{ result.n_critical }}</strong> jugée{{ 's' if result.n_critical > 1 }} critique{{ 's' if result.n_critical > 1 }} par la majorité.</p>
+        {%- set review = result.rows | selectattr('to_review') | list %}
+        {%- if review %}
+        <div class="acc-table-wrap">
+        <table class="acc-table">
+            <thead><tr><th>Réponse</th><th>Divergences</th><th>Écarts à l'auteur</th><th class="num">Total auteur</th><th class="num">Total médian</th></tr></thead>
+            <tbody>
+            {%- for r in review[:15] %}
+            <tr>
+                <td><span class="muted">{{ r.item.ref }} · {{ r.item.scene }}</span><br>{{ r.item.text | truncate(140) }}</td>
+                <td>{% for k in r.disagreement %}{{ labels[k] }}{% if not loop.last %}, {% endif %}{% else %}—{% endfor %}</td>
+                <td>{% for k in r.author_gap %}{{ labels[k] }}{% if not loop.last %}, {% endif %}{% else %}—{% endfor %}</td>
+                <td class="num">{{ r.item.author_total }}</td>
+                <td class="num">{{ r.median_total }}</td>
+            </tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        </div>
+        {%- if review | length > 15 %}<p class="acc-hint">… et {{ review | length - 15 }} autre(s) dans la synthèse.</p>{% endif %}
+        {%- endif %}
+        <a class="primary-btn small" style="align-self:flex-start" href="{{ url_for('expert_key.synthesis', book_slug=book.slug, round=round) }}">Télécharger la synthèse du tour {{ round }} (.xlsx)</a>
+    </section>
+    {%- endif %}
+</main>
+</body>
+</html>

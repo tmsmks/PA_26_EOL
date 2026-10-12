@@ -38,6 +38,32 @@
         </p>
     </header>
 
+    {#- Feedback d'abord (proposition v3) : ce qui était attendu et pourquoi, avant les notes. #}
+    {%- macro why(part) %}
+    {%- if part.rationale %}<p class="moment-why"><span class="who">Pourquoi</span><span>{{ part.rationale | e }}</span></p>{% endif %}
+    {%- endmacro %}
+    {%- set criticals = results.critical or [] %}
+    {%- if criticals %}
+    <section class="acc-card crit-card" aria-labelledby="h-critical">
+        <h2 id="h-critical">Réponses critiques <span class="crit-count">{{ criticals | length }}</span></h2>
+        <p class="acc-hint">Une réponse critique met en danger le patient ou un tiers, ou enfreint la loi ou une règle déontologique essentielle. Pour chacune : la réponse attendue, et pourquoi. Les justifications viennent de la clé de cotation, encore provisoire.</p>
+        <ul class="moments">
+        {%- for m in criticals %}
+            <li class="moment is-critical">
+                <span class="moment-where">Chapitre {{ m.chapter_id }} · {{ m.scene_title }}</span>
+                <p class="moment-prompt">{% if m.actor %}{{ m.actor }} : {% endif %}{{ m.prompt | truncate(220) | quoted }}</p>
+                <p class="moment-line"><span class="who">Votre réponse</span><span>{{ m.choice.text | truncate(200) | quoted }} <span class="crit-tag">Critique</span></span></p>
+                {{- why(m.choice) }}
+                {%- if m.gap > 0 %}
+                <p class="moment-line"><span class="who">Plus ajustée</span><span>{{ m.best.text | truncate(200) | quoted }}</span></p>
+                {{- why(m.best) }}
+                {%- endif %}
+            </li>
+        {%- endfor %}
+        </ul>
+    </section>
+    {%- endif %}
+
     <section class="kpi-row" aria-label="Chiffres clés">
         <div class="kpi">
             <span class="kpi-label">Note de la session</span>
@@ -75,7 +101,7 @@
 
     <section class="acc-card" aria-labelledby="h-profile">
         <h2 id="h-profile">Profil de compétences</h2>
-        <p class="acc-hint">Qualité de vos choix par compétence, sur 100 : chaque réponse est comparée aux réponses proposées au même moment. 100 = la meilleure réponse à chaque fois, 0 = la pire ; répondre au hasard donne environ 50.</p>
+        <p class="acc-hint">Qualité de vos choix par compétence, sur 100 : chaque réponse est comparée aux réponses proposées au même moment. 100 = la meilleure réponse à chaque fois, 0 = la pire ; répondre au hasard donne environ 50. Clé de cotation provisoire : les points des réponses n'ont pas encore été validés par un panel d'experts.</p>
         <div class="chart-legend">
             <span><i class="key-bar" aria-hidden="true"></i>Session {{ bs.number }}</span>
             {%- if prev %}<span><i class="key-tick" aria-hidden="true"></i>Session {{ prev.number }}</span>{% endif %}
@@ -135,12 +161,14 @@
                         <span class="moment-where">Chapitre {{ m.chapter_id }} · {{ m.scene_title }}</span>
                         <p class="moment-prompt">{% if m.actor %}{{ m.actor }} : {% endif %}{{ m.prompt | truncate(220) | quoted }}</p>
                         <p class="moment-line"><span class="who">Votre réponse</span><span>{{ m.choice.text | truncate(200) | quoted }}</span><span class="pts {{ 'pos' if m.choice.total > 0 else ('neg' if m.choice.total < 0 else '') }}">{{ '%+d' % m.choice.total }}</span></p>
+                        {{- why(m.choice) }}
                         <p class="moment-line"><span class="who">Plus ajustée</span><span>{{ m.best.text | truncate(200) | quoted }}</span><span class="pts pos">{{ '%+d' % m.best.total }}</span></p>
+                        {{- why(m.best) }}
                     </li>
                 {%- endfor %}
                 </ul>
                 {%- else %}
-                <p class="acc-empty">Aucun écart important : vos choix étaient proches des meilleures réponses.</p>
+                <p class="acc-empty">{% if criticals %}En dehors des réponses critiques, aucun autre écart important.{% else %}Aucun écart important : vos choix étaient proches des meilleures réponses.{% endif %}</p>
                 {%- endif %}
             </div>
             <div>
@@ -152,6 +180,7 @@
                         <span class="moment-where">Chapitre {{ m.chapter_id }} · {{ m.scene_title }}</span>
                         <p class="moment-prompt">{% if m.actor %}{{ m.actor }} : {% endif %}{{ m.prompt | truncate(220) | quoted }}</p>
                         <p class="moment-line"><span class="who">Votre réponse</span><span>{{ m.choice.text | truncate(200) | quoted }}</span><span class="pts pos">{{ '%+d' % m.choice.total }}</span></p>
+                        {{- why(m.choice) }}
                     </li>
                 {%- endfor %}
                 </ul>

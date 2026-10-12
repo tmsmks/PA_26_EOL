@@ -9,6 +9,15 @@
         "import app; app.app.run(host='127.0.0.1', port=8790)"
       ],
       "port": 8790
+    },
+    {
+      "name": "eol-jetable",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": [
+        "-c",
+        "import os, tempfile; os.environ['DATABASE_URL'] = 'sqlite:///' + os.path.join(tempfile.mkdtemp(prefix='eol_jetable_'), 'eol.db'); import app; print('Base jetable :', os.environ['DATABASE_URL'], flush=True); app.app.run(host='127.0.0.1', port=8791)"
+      ],
+      "port": 8791
     }
   ]
 }

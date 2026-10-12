@@ -27,6 +27,7 @@ from domain.soft_skills import SOFT_SKILL_LABELS, SOFT_SKILLS
 from exporters.tables import Table
 from repositories.orm import BookSession, ChapterPassage, User
 from services.history_service import chapter_progress
+from services.expert_key_service import CRITICAL_PROVISIONAL_TOTAL
 from services.scoring_service import MIN_SKILL_EVIDENCE, TEXT_MAX, choice_quality
 from services.session_service import as_utc, results_from_passages
 
@@ -83,7 +84,7 @@ LEVEL_COLUMNS = [
     ("niveau", "Moyenne pondérée des passages comptés : le n-ième pèse 1 + 0,25 × (n − 1)."),
     ("fourchette", "Demi-largeur de l'intervalle de confiance à 95 % du niveau, en points."),
     ("progression", "Changement normalisé entre le 1ᵉʳ passage et le niveau, en % de ce qui restait "
-                    "à gagner (Marx & Cummings 2007) ; vide avec un seul passage."),
+                    "à gagner (Nissen et al. 2018) ; vide avec un seul passage."),
     ("premier_passage", "Qualité des choix au 1ᵉʳ passage compté (« score à froid »)."),
     ("dernier_passage", "Qualité des choix au dernier passage compté."),
     ("passages_notes", "Passages comptés."),
@@ -190,6 +191,11 @@ CHOICE_COLUMNS = ATTEMPT_COLUMNS + [
     ("meilleur_total", "Total de cette meilleure réponse."),
     ("ecart", "meilleur_total − total : 0 = meilleur choix possible à cette étape."),
     ("qualite", "Qualité du choix : (total − pire_total) / (meilleur_total − pire_total) × 100."),
+    ("critique", "1 si la réponse choisie est marquée critique dans la clé du livre (champ Critical)."),
+    ("critique_provisoire", "1 si elle est critique dans la clé, ou vaut −7 ou moins au total "
+                            "(repère provisoire en attendant le panel d'experts)."),
+    ("justification", "Justification de la réponse choisie dans la clé du livre (champ Rationale) ; "
+                      "vide si la clé n'en donne pas, ou pour un choix enregistré avant le 13.10.2026."),
 ]
 
 def _remarks(spacing_days: int) -> list[str]:
@@ -439,6 +445,10 @@ def build_export(
                     "meilleur_total": best["total"],
                     "ecart": best["total"] - choice["total"],
                     "qualite": round(100 * (choice["total"] - worst) / span, 1) if span > 0 else None,
+                    "critique": bool(choice.get("critical")),
+                    "critique_provisoire": bool(choice.get("critical"))
+                    or choice["total"] <= CRITICAL_PROVISIONAL_TOTAL,
+                    "justification": choice.get("rationale") or "",
                 })
 
     tables = [

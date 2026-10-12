@@ -12,7 +12,7 @@
 {% from "_export_form.html.jinja" import export_form %}
 {% include "_userbar.html.jinja" %}
 <main class="acc-wrap">
-    <nav class="acc-crumbs"><a href="{{ url_for('pages.landing') }}">← Tous les livres</a></nav>
+    <nav class="acc-crumbs"><a href="{{ url_for('pages.landing') }}">← Tous les livres</a><a href="{{ url_for('expert_key.index') }}">Clé de cotation (validation par des experts) →</a></nav>
     <header class="acc-header">
         <p class="eyebrow">Espace formateur</p>
         <h1>Participant·e·s</h1>

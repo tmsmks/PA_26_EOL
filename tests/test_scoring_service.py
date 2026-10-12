@@ -12,8 +12,10 @@ from services.scoring_service import (
     normalized_change,
     option_stats,
     passage_results,
+    quoted,
     rank_skills,
     replay_scene,
+    scene_review,
     session_results,
     session_weight,
     skill_bounds,
@@ -243,3 +245,90 @@ def test_session_results_ranks_chapters_to_rework():
     assert res["chapters"][0]["global"] > res["chapters"][1]["global"]
     assert res["chapters_to_rework"][0] == 2
     assert res["moments"]["missed"][0]["chapter_id"] == 2
+
+
+# --- Justification et réponses critiques (feedback d'abord) ----------------
+
+def _keyed_scene() -> Scene:
+    """Comme _scene, avec la clé : justification partout, la pire réponse du
+    2ᵉ choix est critique."""
+    def r(next_id, why, critical=False, **scores):
+        extra = {"Rationale": why, **({"Critical": True} if critical else {})}
+        return Response(Text=f"r→{next_id} {why}", NextInteractionID=next_id,
+                        SoftSkillDimensions=scores, _extra=extra)
+
+    return Scene(
+        Id=1,
+        Title="Clé",
+        Interactions=[
+            Interaction(Id=1, Text="Bonjour", Actor=Actor(Name="Mme A"), Responses=[
+                r(2, "Accueille l'émotion.", Empathy=2), r(-1, "Coupe court.", Empathy=-1),
+            ]),
+            Interaction(Id=2, Text="Et alors ?", Responses=[
+                r(-1, "Respecte le secret.", RespectAndDignity=1),
+                r(-1, "Viole le secret médical.", critical=True, RespectAndDignity=-3),
+                r(-1, "Reste vague.", RespectAndDignity=-1),
+            ]),
+        ],
+    )
+
+
+def test_trace_keeps_rationale_of_chosen_and_best_response():
+    step = replay_scene(_keyed_scene(), 1, [0, 1]).trace[1]
+    assert step["choice"]["rationale"] == "Viole le secret médical."
+    assert step["choice"]["critical"] is True
+    assert step["best"]["rationale"] == "Respecte le secret."
+    # Livre sans clé : justification vide, rien d'inventé.
+    plain = replay_scene(_scene(), 1, [0, 0]).trace[0]
+    assert plain["choice"]["rationale"] == "" and plain["best"]["rationale"] == ""
+
+
+def test_scene_review_puts_critical_answers_first_then_largest_gaps():
+    trace = replay_scene(_keyed_scene(), 1, [0, 1]).trace
+    review = scene_review(trace)
+    assert len(review) == 1  # le 1ᵉʳ choix était le meilleur : rien à reprendre
+    item = review[0]
+    assert item["choice"]["critical"] and not item["is_best"]
+    assert item["choice"]["rationale"] == "Viole le secret médical."
+    assert item["best"]["rationale"] == "Respecte le secret."
+
+    missed = scene_review(replay_scene(_keyed_scene(), 1, [0, 2]).trace)
+    assert [i["choice"]["rationale"] for i in missed] == ["Reste vague."]
+    assert not missed[0]["choice"]["critical"]
+
+    # Tous les choix étaient les meilleurs : le plus décisif, avec son pourquoi.
+    best = scene_review(replay_scene(_keyed_scene(), 1, [0, 0]).trace)
+    assert len(best) == 1 and best[0]["is_best"]
+    assert best[0]["choice"]["rationale"] == "Respecte le secret."  # écart 4 > 3
+
+    # Au plus `limit` choix, mais toutes les réponses critiques.
+    crit = trace[1]
+    many = [crit, crit, crit, crit] + [replay_scene(_keyed_scene(), 1, [1]).trace[0]]
+    assert len(scene_review(many, limit=3)) == 4
+
+
+def test_scene_review_ignores_books_without_key():
+    assert scene_review(replay_scene(_scene(), 1, [1]).trace) == []
+
+
+def test_session_lists_critical_answers_apart_from_missed_moments():
+    attempts = [
+        {"chapter_id": 1, "scene_title": "Clé", "trace": replay_scene(_keyed_scene(), 1, [0, 1]).trace},
+        {"chapter_id": 2, "scene_title": "Clé", "trace": replay_scene(_keyed_scene(), 1, [1]).trace},
+    ]
+    res = session_results([Chapter(Id=1, Name="Un"), Chapter(Id=2, Name="Deux")], attempts)
+    assert [(c["chapter_id"], c["choice"]["rationale"]) for c in res["critical"]] == [
+        (1, "Viole le secret médical.")]
+    assert res["critical"][0]["gap"] == 4
+    # La réponse critique (écart 4) n'est pas répétée parmi les occasions manquées.
+    assert all(not m["choice"]["critical"] for m in res["moments"]["missed"])
+    assert [m["choice"]["rationale"] for m in res["moments"]["missed"]] == ["Coupe court."]
+
+
+def test_quoted_does_not_wrap_a_gesture_that_carries_its_own_speech():
+    assert quoted("Bonjour.") == "« Bonjour. »"
+    assert quoted("« Bonjour. »") == "« Bonjour. »"
+    assert quoted("« Bonjour, je…") == "« Bonjour, je… »"  # tronquée
+    gesture = "Poser la main sur son téléphone. « Range-le. »"
+    assert quoted(gesture) == gesture
+    assert quoted("Poser la main. « Range-le, et…") == "Poser la main. « Range-le, et… »"

@@ -21,6 +21,10 @@ Scoring v2 (docs/Scoring_v2_recherche_et_plan.md, § 3) :
 5. `book_profile` : la note du livre est la moyenne des niveaux des
    chapitres évalués (poids égaux) ; le profil par compétence est pondéré
    par le nombre de choix qui mettent chaque compétence en jeu.
+6. Feedback : chaque pas de la trace garde la justification de la clé
+   (`rationale`) de la réponse choisie et de la meilleure, et le drapeau
+   « critique ». `scene_review` en tire le retour de fin de scène ; le bilan
+   liste les réponses critiques (`critical_choices`). Pas de plafond de note.
 """
 from __future__ import annotations
 
@@ -76,17 +80,26 @@ def total(scores: Mapping[str, int]) -> int:
 
 
 def quoted(text: str) -> str:
-    """Entoure de guillemets français, sauf si la réplique les porte déjà."""
+    """Entoure de guillemets français, sauf si la réplique les porte déjà.
+
+    Un geste suivi d'une parole (« Poser la main… « Range-le. » ») garde ses
+    propres guillemets : on ne l'entoure pas une seconde fois.
+    """
     text = str(text or "").strip()
-    if not text.startswith("«"):
+    if "«" not in text:
         return f"« {text} »"
     # Réplique tronquée : le guillemet fermant a sauté.
-    return text if text.endswith("»") else text + " »"
+    return text if text.count("«") <= text.count("»") else text + " »"
 
 
 def _clip(text: str) -> str:
     text = " ".join(str(text or "").split())
     return text if len(text) <= TEXT_MAX else text[: TEXT_MAX - 1] + "…"
+
+
+def _rationale(r: Response) -> str:
+    """Justification d'une phrase de la clé de cotation (vide si le livre n'en a pas)."""
+    return _clip(r._extra.get("Rationale") or "")
 
 
 def _next_id(r: Response) -> int | None:
@@ -201,8 +214,20 @@ def replay_scene(scene: Scene, entry_id: int, choices: list[int]) -> SceneRun:
             "actor": ia.Actor.Name,
             "prompt": _clip(ia.Text),
             "n_options": len(ia.Responses),
-            "choice": {"index": idx, "text": _clip(chosen.Text), "scores": sc, "total": totals[idx]},
-            "best": {"index": best_idx, "text": _clip(ia.Responses[best_idx].Text), "total": totals[best_idx]},
+            "choice": {
+                "index": idx,
+                "text": _clip(chosen.Text),
+                "scores": sc,
+                "total": totals[idx],
+                "critical": bool(chosen._extra.get("Critical")),
+                "rationale": _rationale(chosen),
+            },
+            "best": {
+                "index": best_idx,
+                "text": _clip(ia.Responses[best_idx].Text),
+                "total": totals[best_idx],
+                "rationale": _rationale(ia.Responses[best_idx]),
+            },
             **option_stats(ia.Responses),
         })
         nid = _next_id(chosen)
@@ -311,28 +336,90 @@ def chapters_to_rework(
     return [cid for _, cid in ranked[:limit]]
 
 
+def _located_steps(attempts: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Pas des traces, avec leur chapitre, leur scène et l'écart au meilleur choix."""
+    return [
+        {
+            **st,
+            "chapter_id": a["chapter_id"],
+            "scene_title": a.get("scene_title", ""),
+            "gap": st["best"]["total"] - st["choice"]["total"],
+        }
+        for a in attempts
+        for st in a.get("trace") or []
+    ]
+
+
+def critical_choices(attempts: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Réponses critiques choisies, dans l'ordre du jeu (proposition v3 : listées)."""
+    return [s for s in _located_steps(attempts) if s["choice"].get("critical")]
+
+
 def key_moments(
-    attempts: Iterable[Mapping[str, Any]], n_missed: int = 5, n_good: int = 3
+    attempts: Iterable[Mapping[str, Any]],
+    n_missed: int = 5,
+    n_good: int = 3,
+    exclude_critical: bool = False,
 ) -> dict[str, list[dict[str, Any]]]:
-    """Occasions manquées (plus gros écart au meilleur choix) et réussites."""
-    steps: list[dict[str, Any]] = []
-    for a in attempts:
-        for st in a.get("trace") or []:
-            gap = st["best"]["total"] - st["choice"]["total"]
-            steps.append({
-                **st,
-                "chapter_id": a["chapter_id"],
-                "scene_title": a.get("scene_title", ""),
-                "gap": gap,
-            })
+    """Occasions manquées (plus gros écart au meilleur choix) et réussites.
+
+    `exclude_critical` : les réponses critiques, listées à part, ne sont pas
+    reprises parmi les occasions manquées.
+    """
+    steps = _located_steps(attempts)
     missed = sorted(
-        (s for s in steps if s["gap"] >= MISSED_MIN_GAP), key=lambda s: -s["gap"]
+        (
+            s for s in steps
+            if s["gap"] >= MISSED_MIN_GAP and not (exclude_critical and s["choice"].get("critical"))
+        ),
+        key=lambda s: -s["gap"],
     )[:n_missed]
     good = sorted(
         (s for s in steps if s["gap"] <= 0 and s["choice"]["total"] >= GOOD_MIN_TOTAL),
         key=lambda s: -s["choice"]["total"],
     )[:n_good]
     return {"missed": missed, "good": good}
+
+
+def scene_review(trace: Iterable[Mapping[str, Any]], limit: int = 3) -> list[dict[str, Any]]:
+    """Retour de fin de scène : les choix les plus décisifs, avec la justification.
+
+    Feedback d'abord (proposition v3, § 2.7) : ce qui était attendu et pourquoi.
+    Seuls les choix dont la clé donne une justification sont retenus. Toutes les
+    réponses critiques d'abord, puis les écarts au meilleur choix (du plus grand
+    au plus petit), jusqu'à `limit` ; sans écart, le choix le plus décisif.
+    """
+    steps = [st for st in trace if (st.get("choice") or {}).get("rationale")]
+
+    def gap(st: Mapping[str, Any]) -> int:
+        return st["best"]["total"] - st["choice"]["total"]
+
+    def span(st: Mapping[str, Any]) -> int:
+        lo, hi = st.get("total_bounds") or [0, 0]
+        return hi - lo
+
+    critical = [st for st in steps if st["choice"].get("critical")]
+    missed = sorted(
+        (st for st in steps if gap(st) > 0 and not st["choice"].get("critical")),
+        key=lambda st: (-gap(st), -span(st)),
+    )
+    picked = critical + missed[: max(0, limit - len(critical))]
+    if not picked and steps:
+        picked = [max(steps, key=span)]
+    return [
+        {
+            "actor": st.get("actor") or "",
+            "prompt": st.get("prompt") or "",
+            "is_best": gap(st) <= 0,
+            "choice": {
+                "text": st["choice"]["text"],
+                "critical": bool(st["choice"].get("critical")),
+                "rationale": st["choice"]["rationale"],
+            },
+            "best": {"text": st["best"]["text"], "rationale": st["best"].get("rationale") or ""},
+        }
+        for st in picked
+    ]
 
 
 def session_results(
@@ -369,7 +456,8 @@ def session_results(
         "strengths": strengths,
         "weaknesses": weaknesses,
         "chapters_to_rework": chapters_to_rework(chapter_rows, weaknesses),
-        "moments": key_moments(attempts),
+        "critical": critical_choices(attempts),
+        "moments": key_moments(attempts, exclude_critical=True),
         "n_scenes": len(attempts),
     }
 

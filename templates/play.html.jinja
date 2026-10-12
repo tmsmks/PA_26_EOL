@@ -17,6 +17,43 @@
         <span class="hud-chapter">Chapitre {{ chapter.Id }} · {{ chapter.Name }}</span>
         <span class="hud-scene" id="hud-scene"></span>
     </div>
+    {#- Lecture audio : affichée par audio.js si le navigateur sait lire à voix haute. #}
+    <div class="audio-ctl" id="audio-ctl" data-state="off" hidden>
+        <button type="button" class="hud-icon audio-toggle" id="audio-toggle" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="speaker" d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path class="wave wave-1" d="M15.5 9a4 4 0 0 1 0 6"/><path class="wave wave-2" d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+            <span class="audio-label">Écouter</span>
+        </button>
+        <button type="button" class="hud-icon" id="audio-pause" hidden>
+            <svg class="ico-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg>
+            <svg class="ico-play" viewBox="0 0 24 24" aria-hidden="true"><path class="solid" d="M8 5.5v13l10.5-6.5z"/></svg>
+        </button>
+        <button type="button" class="hud-icon" id="audio-replay" aria-label="Relire depuis le début (R)" title="Relire depuis le début (R)" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4v4.5H9"/></svg>
+        </button>
+        <details class="audio-settings" id="audio-settings">
+            <summary class="hud-icon" aria-label="Réglages de la lecture audio" title="Réglages de la lecture audio">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
+            </summary>
+            <div class="audio-panel" role="group" aria-label="Réglages de la lecture audio">
+                <p class="audio-panel-title">Lecture audio</p>
+                <label class="audio-field">Voix
+                    <select id="audio-voice"></select>
+                </label>
+                <label class="audio-field">Vitesse
+                    <select id="audio-rate"></select>
+                </label>
+                <label class="audio-check"><input type="checkbox" id="audio-choices"> Lire aussi les réponses proposées</label>
+                <fieldset class="audio-field">
+                    <legend>Écriture inclusive (« seul·e »)</legend>
+                    <label class="audio-check"><input type="radio" name="audio-agreement" value="f"> lue au féminin (« seule »)</label>
+                    <label class="audio-check"><input type="radio" name="audio-agreement" value="m"> lue au masculin (« seul »)</label>
+                </fieldset>
+                <button type="button" class="ghost-btn audio-test" id="audio-test">Tester la voix</button>
+                <p class="audio-note audio-warning" id="audio-engine-note" hidden></p>
+                <p class="audio-note">Les voix naturelles sont créées par le serveur ; celles de l'appareil changent d'un navigateur à l'autre. Raccourcis : <b>L</b> écouter ou arrêter · <b>P</b> pause · <b>R</b> relire.</p>
+            </div>
+        </details>
+    </div>
     <div class="hud-progress" aria-hidden="true"><span id="hud-bar"></span></div>
 </div>
 
@@ -78,6 +115,13 @@
             <p class="eyebrow">Fin du scénario</p>
             <h2 id="debrief-title"></h2>
             <p class="debrief-lead" id="debrief-lead"></p>
+            {#- Ce qui était attendu, et pourquoi : rempli par main.js à l'enregistrement de la scène. #}
+            <section class="review" id="debrief-review" aria-labelledby="review-title" aria-live="polite" hidden>
+                <h3 class="review-title" id="review-title">Ce qui était attendu</h3>
+                <p class="review-hint">Les choix les plus décisifs du scénario, avec la justification de la clé de cotation (provisoire).</p>
+                <ul class="moments" id="review-list"></ul>
+                <p class="review-hint" id="review-critical-note" hidden>Réponse critique : elle met en danger le patient ou un tiers, ou enfreint la loi ou une règle déontologique essentielle.</p>
+            </section>
             <div class="bars" id="debrief-bars"></div>
             <p class="save-status" id="save-status" hidden></p>
             <div class="debrief-actions">
@@ -92,6 +136,7 @@
             <p class="eyebrow">Chapitre terminé</p>
             <h1 id="end-title"></h1>
             <p class="end-score" id="end-score" hidden></p>
+            <p class="session-note">Clé de cotation provisoire, en attente de validation par un panel d'experts.</p>
             <div class="bars" id="end-bars"></div>
             <p class="save-status" id="end-status" hidden></p>
             <div class="debrief-actions">
@@ -106,7 +151,7 @@
 
 </main>
 
-<p class="keyhint" id="keyhint">Chiffres <b>1-9</b> pour choisir · <b>Entrée</b> pour continuer</p>
+<p class="keyhint" id="keyhint">Chiffres <b>1-9</b> pour choisir · <b>Entrée</b> pour continuer<span id="keyhint-audio" hidden> · <b>L</b> pour écouter</span></p>
 
 <script>
 window.PA_PLAY = {
@@ -119,6 +164,8 @@ window.PA_PLAY = {
     chapterCount: {{ chapter_count | tojson }},
     session: {{ session_info | tojson }},
     startSessionUrl: {{ url_for('session_api.start_session', book_slug=book.slug) | tojson }},
+    ttsVoicesUrl: {{ url_for('tts.voices') | tojson }},
+    ttsSpeakUrl: {{ url_for('tts.speak') | tojson }},
     imagesBaseUrl: {{ url_for('api.serve_images', filename='') | tojson }}
 };
 </script>

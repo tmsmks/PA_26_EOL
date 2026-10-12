@@ -11,7 +11,7 @@ from repositories.orm import BookSession, ChapterPassage
 from repositories.passages import PassageRepository
 from repositories.sessions import SessionRepository
 from services.history_service import chapter_progress, completed_with_results
-from services.scoring_service import InvalidPathError, weighted_profile
+from services.scoring_service import InvalidPathError, scene_review, weighted_profile
 from services.session_service import PlaySessionService, SessionError
 from views.guards import current_user, login_required
 
@@ -125,7 +125,12 @@ def record_attempt(session_id: int):
         flags=payload.get("flags"),
         passage_id=passage_id,
     )
-    return jsonify({"counted": attempt.counted, "attempt_no": attempt.attempt_no})
+    return jsonify({
+        "counted": attempt.counted,
+        "attempt_no": attempt.attempt_no,
+        # Retour de fin de scène : ce qui était attendu, et pourquoi.
+        "review": scene_review(attempt.trace or []),
+    })
 
 
 @session_api_bp.route("/sessions/<int:session_id>/complete-chapter", methods=["POST"])

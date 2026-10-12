@@ -62,23 +62,23 @@ Claude Code bloque la fin d'une réponse tant que le journal n'a pas été compl
 | **18 → 23 sept.** | Nouvelle mission : des livres pour les étudiant·e·s en médecine. Analyse des programmes de trois facultés. | 18 plans d'études officiels · indices de divergence entre facultés · plan de 6 livres · livre 4 v1 (217 interactions) · parcours joueur séparé de l'éditeur · support de présentation pour le professeur |
 | **24 → 27 sept.** | Narration ambitieuse et suivi des joueur·euse·s | Livre 4 v2 (6 chapitres, erreur médicale et ses conséquences) · moteur d'« états narratifs » · 4 à 6 réponses par choix · tableaux comparatifs des matières · comptes, historique, note pondérée, feedback IA · données de démonstration |
 | **28 sept. → 5 oct.** | Qualité, contenu et données | Palette d'interface tirée des trois universités · refonte ergonomique · diagnostic d'un bug de perte de données dans l'éditeur · livre 2 v2 « Le corps donné » (43 scènes) · export Excel/CSV/JSON · recherche bibliographique et plan de scoring v2 |
-| **6 oct. →** | Un scoring fondé sur la recherche | Journal de développement · scoring v2, étape 1 : note par choix (100 atteignable, ≈ 50 au hasard), passage de chapitre comme unité de note, niveau, progression et fiabilité par chapitre |
+| **6 oct. →** | Un scoring fondé sur la recherche | Journal de développement · scoring v2, étape 1 : note par choix (100 atteignable, ≈ 50 au hasard), passage de chapitre comme unité de note, niveau, progression et fiabilité par chapitre · étape 2 : outils de validation de la clé par un panel d'experts (grille à l'aveugle, ICC, Delphi) · livre 2 refondu en 5 chapitres (509 interactions), clé de notation auditée et contrôlée au build · bibliographie réduite à 33 articles en libre accès, proposition de scoring v3 · clé du livre 2 cotée par Claude (2 017 réponses) |
 
 ### 1.2 Avant / après en chiffres
 
 **Contenu des livres**
 
-| Livre | Avant (mi-septembre) | Après (5 octobre) |
+| Livre | Avant (mi-septembre) | Après (10 octobre) |
 |---|---|---|
 | `end_of_life` (référence historique) | 5 ch. · 17 scènes · 416 interactions · 1 378 réponses | inchangé |
-| `medstudents_y2` (livre 2) | v1 pilote : 3 ch. · 4 scènes · 22 interactions · 51 réponses | **v2 « Le corps donné » : 6 ch. · 43 scènes · 463 interactions · 1 812 réponses** |
+| `medstudents_y2` (livre 2) | v1 pilote : 3 ch. · 4 scènes · 22 interactions · 51 réponses | **v2 « Le corps donné » : 5 ch. · 36 scènes · 509 interactions · 2 068 réponses** (refonte du 10 oct. ; 6 ch. · 43 scènes · 463 interactions le 4 oct.) |
 | `medstudents_y4` (livre 4) | n'existait pas | v1 (18 sept.) : 4 ch. · 12 scènes · 217 interactions · 577 réponses → **v2 (27 sept.) : 6 ch. · 42 scènes · 576 interactions · 2 446 réponses** |
 
 **Application**
 
 | Indicateur | Avant | Après |
 |---|---|---|
-| Tests automatisés | 29 | **110** (tous verts au 6 octobre) |
+| Tests automatisés | 29 | **123** (tous verts au 10 octobre) |
 | Comptes utilisateur | aucun | participant·e / formateur·rice, mots de passe hachés |
 | Suivi des joueur·euse·s | aucun | sessions et passages de chapitre en base de données, niveau et progression par chapitre, bilan avec feedback IA |
 | Interface joueur | panneau « Parcours joueur » dans l'éditeur | pages `/play/…` dédiées, plein écran |
@@ -742,8 +742,8 @@ Les heures sont en heure suisse.
 - **Statut.** **Proposition, non implémentée.** Cinq décisions sont en attente de l'étudiant :
   la pondération, le délai de 7 jours entre deux passages notés, le plafonnement en cas d'erreur
   critique, la composition du panel d'experts et le poids des chapitres.
-- **Fichier.** [docs/Scoring_v2_recherche_et_plan.md](Scoring_v2_recherche_et_plan.md), avec 35
-  références vérifiées une à une. Les 12 principales sont en annexe A.
+- **Fichier.** [docs/Scoring_v2_recherche_et_plan.md](Scoring_v2_recherche_et_plan.md), avec 41
+  références vérifiées une à une (annoncées 35 par erreur à l'époque). Les 12 principales sont en annexe A.
 
 ### 2.19 — 6 oct. · Création du journal de développement et mise à jour automatique
 
@@ -883,6 +883,638 @@ Les heures sont en heure suisse.
     - les tests `test_scoring_service`, `test_session_flow`, `test_export` et `conftest` ;
     - `README.md`, `docs/Scoring_v2_recherche_et_plan.md`.
 
+### 2.21 — 6 oct. · Scoring v2, étape 2 : outils de validation de la clé par des experts
+
+- **Contexte.** Le travail a été commité par l'étudiant avant cette étape (commit `1f5a86b`).
+- **Besoin.** Les points des réponses (−3…+3 sur 7 compétences) ont été écrits par l'auteur
+  seul. La littérature sur les tests de jugement situationnel demande une clé établie par un
+  panel d'experts, avec un accord mesuré (plan de scoring, § 3.1). Il faut donc outiller cette
+  validation.
+- **Réalisation.**
+  1. **Grille ancrée provisoire** (`domain/expert_rubric.py`). Pour chaque compétence, ce que
+     valent −3, 0 et +3, ancré dans PROFILES, Kalamazoo et Calgary-Cambridge. S'y ajoute une
+     définition de la réponse « critique ».
+  2. **Grille Excel pour les experts**, téléchargeable depuis la nouvelle page « Clé de
+     cotation » de l'espace formateur (`/trainer/cle/`).
+     - Le périmètre se choisit : tout le livre, un chapitre, ou un échantillon de points de
+       choix tiré au hasard (graine fixe, le même pour tous les experts).
+     - La grille contient les consignes, la grille ancrée, puis une ligne par réponse avec sa
+       situation.
+     - Elle ne montre **pas les points de l'auteur** : la cotation se fait à l'aveugle.
+     - La saisie est contrôlée (entier de −3 à +3) ; colonnes « critique », « justification »
+       et « commentaire ».
+  3. **Import des grilles remplies**, plusieurs à la fois. Le nom de l'expert et le tour sont
+     lus dans la grille. Les erreurs sont signalées avec la ligne et la compétence concernées.
+     Réimporter la grille d'un expert remplace ses cotes de ce tour. Nouvelle table
+     `expert_ratings`.
+  4. **Accord entre experts**, par compétence et sur le total :
+     - ICC(2,1) et ICC(2,k) (deux facteurs, effets aléatoires, accord absolu) ;
+     - seuils de Koo & Li ;
+     - réponses à revoir : experts écartés de 3 points ou plus, ou médiane écartée de l'auteur
+       de 2 points ou plus ;
+     - réponses jugées critiques par la majorité.
+  5. **Synthèse Excel** d'un tour (feuilles « accord » et « reponses ») pour préparer le tour
+     suivant de la méthode Delphi.
+  6. **Champs `Critical` et `Rationale`** d'une réponse : lus par le jeu et ajoutés au
+     mini-langage du livre Y2. Le marqueur critique de la réponse choisie est gardé dans la
+     trace et exporté, avec un repère provisoire (total ≤ −7).
+  7. **Mention « clé provisoire »** sur la fin de chapitre, l'historique et le bilan de session.
+- **Choix et justifications.**
+  - **Cotation à l'aveugle**, pour que les experts ne s'alignent pas sur l'auteur.
+  - **ICC à accord absolu**, et non à cohérence : c'est la valeur des points qui compte, pas
+    seulement leur ordre.
+  - **ICC calculé sur les réponses cotées par tous les experts du tour.**
+  - **Une compétence laissée vide sur une réponse cotée vaut 0** (neutre ou pas en jeu), sinon
+    les grilles seraient très longues à remplir.
+  - **Charge de travail.** Le livre Y2 compte 1 776 réponses aux points de choix, soit 230 à
+    400 par chapitre. La page propose donc de répartir les chapitres entre experts (au moins 3
+    par chapitre) ou de travailler sur un échantillon.
+- **Résultats.** Trois experts simulés ont coté le chapitre 2 du Y2 (303 réponses), avec des
+  écarts aléatoires de ±1 autour de l'auteur.
+  - L'accord est bon à excellent sur la plupart des compétences, et sur le total (ICC(2,1) =
+    0,87).
+  - Il est faible pour la compassion (0,27) et la régulation émotionnelle (0,38). Ces
+    compétences valent souvent 0 dans la clé : le moindre écart y pèse donc lourd. C'est le
+    même constat que pour leur faible présence dans les choix (§ 2.18).
+- **Vérification.**
+  - **116 tests verts** (+ 6), dont le calcul de l'ICC vérifié sur l'exemple publié de Shrout &
+    Fleiss (1979) : ICC(2,1) = 0,29 et ICC(2,4) = 0,62. Les autres tests couvrent :
+    - la grille à l'aveugle et son aller-retour (remplie, puis relue) ;
+    - les valeurs refusées et les réponses d'une autre version du livre ;
+    - les divergences, les écarts à l'auteur et la majorité critique ;
+    - les droits d'accès, l'import, la synthèse et la suppression ;
+    - le marqueur critique dans l'export.
+  - **Dans le navigateur, sur une base jetable** : page « Clé de cotation » avec les cotes des
+    trois experts simulés.
+- **Limites.**
+  - La grille ancrée est un **brouillon** à faire valider par le panel.
+  - La **clé consensuelle n'est pas encore appliquée au livre** : les points du jeu restent ceux
+    de l'auteur.
+  - Il n'y a pas encore de grille de tour 2 pré-remplie avec la médiane du groupe.
+  - Les justifications des 1 776 réponses aux points de choix restent à écrire ; celles des
+    experts pourront servir de base.
+  - Le panel d'experts reste à constituer.
+- **Fichiers.**
+  - Nouveaux :
+    - `domain/expert_rubric.py`, `services/expert_key_service.py` ;
+    - `exporters/expert_key.py`, `repositories/expert_ratings.py`, `views/expert_key.py` ;
+    - `templates/expert_key.html.jinja`, `tests/test_expert_key.py`.
+  - Modifiés, code :
+    - `repositories/orm.py`, `services/scoring_service.py`, `services/export_service.py` ;
+    - `views/__init__.py`, `app.py`, `scripts/medstudents_y2_v2/dsl.py`.
+  - Modifiés, pages :
+    - `templates/trainer_dashboard`, `account_history`, `session_report`, `play` ;
+    - `static/account.css`.
+  - Modifiés, documentation :
+    - `README.md`, `docs/Scoring_v2_recherche_et_plan.md`.
+
+### 2.22 — 7 oct. · Bibliographie du scoring en PDF
+
+- **Besoin.** Avoir à part, dans un PDF, les recherches sur lesquelles repose le scoring (pour le
+  rapport et le mémoire).
+- **Réalisation.** [Scoring_v2_bibliographie.pdf](Scoring_v2_bibliographie.pdf), 5 pages :
+  - les 43 références, classées en 10 thèmes selon ce à quoi elles ont servi ;
+  - pour chacune, la référence complète, un lien cliquable (41 sur 43, dont les DOI vérifiés),
+    et une ligne « Ce que nous en retenons ».
+- **Correction au passage.** Le nombre de références avait été annoncé à 35 ; il y en avait 41
+  dans le plan, plus 2 sur l'ICC ajoutées le 6 oct., soit 43 (§ 6).
+- **Vérification.**
+  - Le PDF a été relu page par page en images, et ses 41 liens comptés.
+  - Les espaces insécables français sont en place (« », :, ;).
+- **Limites.**
+  - Le PDF est généré par un script temporaire (reportlab, hors du projet), à partir de la
+    bibliographie de `Scoring_v2_recherche_et_plan.md` (§ 7).
+  - Si cette bibliographie change, il faudra régénérer le PDF.
+- **Fichiers.** `docs/Scoring_v2_bibliographie.pdf` (nouveau).
+
+### 2.23 — 10 oct. · Livre 2 : cinq chapitres, 509 interactions, et audit de la clé de notation
+
+- **Besoin.** Demande de l'étudiant, pour le livre 2 « Le corps donné » :
+  - 5 chapitres d'environ 5 ou 6 scénarios, avec beaucoup d'interactions : environ 500 en tout ;
+  - rester fidèle au programme de 2ᵉ année des trois facultés, et à ce public ;
+  - des compétences bien réparties entre les réponses ;
+  - « prendre le temps de bien vérifier » le rejeu du score : comment les points sont répartis
+    entre les réponses, et si c'est juste.
+- **Audit du score, avant toute réécriture.** Des joueur·euse·s simulé·e·s ont joué tout le livre,
+  et chaque parcours a été rejoué par le vrai calcul serveur (`replay_scene`, puis
+  `choice_quality`).
+  - **Le rejeu est juste.** Le serveur rejoue les indices d'origine des réponses (l'ordre mélangé
+    à l'écran ne change rien) ; toujours la meilleure réponse = 100, toujours la pire = 0, au
+    hasard ≈ 48.
+  - **La clé de notation, elle, avait trois défauts :**
+    1. **Un indice de longueur.** La meilleure réponse était la plus longue dans 80 % des points
+       de choix. Choisir toujours la réponse la plus longue rapportait **89,5/100**, sans lire.
+    2. **La Compassion sous-mesurée** : 6 % des points positifs. Avec la Régulation
+       émotionnelle, elle restait parfois sous le seuil de 8 choix, donc non notée.
+    3. **Des parcours trop courts** : certains chapitres se finissaient avec trop peu de choix
+       pour noter chaque compétence.
+- **Réalisation.**
+  1. **Cinq chapitres** au lieu de six : 36 scènes écrites sur 30 emplacements (27 obligatoires,
+     3 annexes), soit 5 ou 6 scénarios joués par chapitre.
+     - Le vaccin et le téléphone deviennent une seule journée (2.1) ; le BLS passe au chapitre 2,
+       le patient standardisé au chapitre 3.
+     - La fermeture du cabinet, la chute et la dénutrition se rejoignent en 4.5 ; l'appel de
+       23 h passe au chapitre 4.
+     - L'examen et la dernière visite se rejoignent en 5.3 ; septembre devient l'épilogue de la
+       cérémonie. L'atelier de recherche et l'annexe du balcon sont retirés.
+  2. **509 interactions** (463 avant), 2 068 réponses, 424 points de choix.
+     - Chaque scène réécrite et allongée ; des rattrapages (le 144 appelé à minuit à Noël, le
+       réveil à 3 h 12 après le « bonne nuit » de Noah).
+     - Des nœuds d'entrée selon la mémoire : la lettre de 5.5 combine six post-scriptum et trois
+       issues de la nuit de Noah (27 points d'entrée générés par le code).
+  3. **Ancrage dans les programmes revu chapitre par chapitre** (modules BMed2 de l'UNIL, unités
+     de l'UNIGE, Humanbiologie et cours cliniques de l'UZH). Alex reste à sa place de 2ᵉ année :
+     écouter, transmettre, vérifier une identité, appeler le 144, dire « pause réelle ».
+  4. **Clé rééquilibrée.**
+     - Longueur des réponses : le rang de longueur de la meilleure réponse est réparti de 1 à 6.
+     - Une seule meilleure réponse par point de choix.
+     - Compassion : 48 gestes de soin concrets (rester auprès, prendre la main, accompagner,
+       appeler les secours) passent d'un point d'Empathie à un point de Compassion, à total
+       égal ; 36 meilleures réponses qui soulagent quelqu'un gagnent +1 en Compassion.
+     - Les parcours les plus courts sont allongés.
+  5. **Le build vérifie désormais la clé** (`scripts/build_medstudents_y2_v2.py`) et échoue si :
+     - un point de choix a deux meilleures réponses ;
+     - une stratégie fondée sur la longueur des réponses dépasse 62/100 sur un chapitre ;
+     - une compétence est en jeu dans moins de 8 choix sur le parcours le plus court d'un
+       chapitre.
+     Le rapport `docs/MedStudents_Y2_v2_soft_skills.md` gagne une section « Audit du score » :
+     tout le livre est joué (meilleure, pire, plus longue, plus courte, 100 parties au hasard
+     avec une graine fixe), puis rejoué par le calcul serveur.
+  6. **Lancement sur base jetable** : configuration `eol-jetable` dans `.claude/launch.json`,
+     qui crée une base SQLite neuve dans un dossier temporaire à chaque démarrage.
+- **Choix et justifications.**
+  - Le moteur ne fait varier une scène qu'à son début. Les fusions de scènes et les croisements
+    de mémoires passent donc par des points d'entrée, générés par le code quand deux dimensions
+    se croisent.
+  - Équilibrer les longueurs plutôt que raccourcir toutes les bonnes réponses : une première
+    correction (bonne réponse jamais la plus longue) avait créé l'indice inverse, « toujours la
+    2ᵉ plus longue » donnant 93/100.
+  - Compassion : reclassement à total constant (l'ordre des réponses ne bouge pas), puis +1
+    seulement sur des meilleures réponses (aucun ex aequo possible).
+  - Seuil de 62 : au hasard, on obtient environ 47 ; au-delà de 62, la forme des réponses
+    rapporterait 15 points de plus que le hasard.
+  - Rien n'a changé dans le calcul serveur, et aucun point n'est donné pour le nombre de
+    passages : seule la clé (le contenu) a été corrigée.
+- **Résultats (livre entier, rejeu serveur).**
+
+  | Mesure | Avant | Après |
+  |---|---:|---:|
+  | Toujours la réponse la plus longue | **89,5**/100 | 46,4 |
+  | La meilleure réponse est la plus longue | 80 % des points de choix | 29 % |
+  | Au hasard (moyenne de 100 parties) | ≈ 48 | 46,7 |
+  | Toujours la meilleure / la pire | 100 / 0 | 100 / 0 |
+  | Part de la Compassion dans les points positifs | 6 % | 11 % |
+  | Compétences non notées dans les parties au hasard | oui (CO, ER) | aucune |
+
+  - Points positifs du livre : Respect 15 %, Empathie 18 %, Compassion 11 %, Régulation
+    émotionnelle 11 %, Clarté 14 %, Limites professionnelles 16 %, Collaboration 15 %.
+  - Partie réelle du chapitre 5 : 86/100 ; la note stockée (85,8) est retrouvée à l'identique
+    en rejouant hors ligne les choix enregistrés.
+- **Vérification.**
+  - Build : 0 erreur, 0 avertissement.
+  - **123 tests verts** (+ 7) : 5 chapitres de 5 ou 6 scénarios, environ 500 interactions,
+    meilleure / pire / hasard par chapitre, indice de longueur, preuves par compétence,
+    répartition entre 10 et 20 %, et deux tests qui vérifient que le build refuse un ex aequo
+    et un indice de longueur.
+  - **Dans le navigateur, sur une base jetable** : chapitre 5 joué en entier (écran de départ,
+    branche « famille apaisée », examen quitté, fourgon, lettre, cérémonie avec le nom prononcé,
+    épilogue). Six incohérences relevées en jouant ont été corrigées (§ 6).
+  - Base locale lue en lecture seule : aucune partie ni cotation d'expert sur le livre 2, donc
+    aucune donnée à reprendre après la refonte.
+- **Limites.**
+  - Les chapitres 1 à 4 de la nouvelle version sont vérifiés par le build et les parties
+    simulées, pas encore joués à la main.
+  - La clé reste provisoire : elle doit être validée par le panel d'experts (étape 2).
+  - Au second passage par une boucle « on recommence », le simulateur essaie une autre réponse ;
+    un·e vrai·e joueur·euse peut tourner plus longtemps.
+  - Portraits : 138 images à produire.
+- **Fichiers.**
+  - Contenu : `scripts/medstudents_y2_v2/ch1.py` à `ch5.py` (réécrits), `book.py` ;
+    `ch6.py` supprimé.
+  - Outillage : `scripts/build_medstudents_y2_v2.py` (règles de la clé, audit du score) ;
+    `.claude/launch.json` (configuration `eol-jetable`).
+  - Générés : `data/chapters/MedStudents_Y2_v2.json`, `docs/MedStudents_Y2_v2_soft_skills.md`
+    et `.json`, `docs/MedStudents_Y2_v2_assets.md`.
+  - Tests : `tests/test_medstudents_y2_v2.py`.
+  - Documentation : `docs/MedStudents_Y2_v2_bible.md` (réécrite pour 5 chapitres),
+    `docs/Scoring_v2_recherche_et_plan.md` (§ 3.1, point 6 : aucun indice de forme),
+    `README.md` (contrôle de la clé).
+
+### 2.24 — 10 oct. · Lecture audio du parcours joueur
+
+- **Besoin.** Demande de l'étudiant : un participant peut préférer écouter plutôt que lire les
+  longs paragraphes ; la lecture audio rend le parcours plus fluide.
+- **Réalisation.**
+  - Bouton « Écouter » dans la barre du haut du jeu, avec pause, relecture et un panneau de
+    réglages : voix, vitesse, lire aussi les réponses proposées, accords de l'écriture inclusive
+    (« seul·e » lu au féminin ou au masculin). Raccourcis : L (écouter / arrêter), P (pause),
+    R (relire), Échap.
+  - Sont lus : l'accueil du chapitre, l'écran de départ, l'intro de chaque scénario, chaque
+    réplique (le nom du personnage seulement quand il change), le bilan de scène et la note du
+    chapitre ; les réponses en option, dans l'ordre affiché, avec leur numéro.
+  - `static/play/speech_text.js` (fonctions pures) prépare le texte : écriture inclusive,
+    titres (« Dre » → « Docteure »), heures (« 22 h 07 » → « 22 heures 7 »), cris en
+    capitales, emojis ; découpage en phrases de 180 caractères au plus.
+  - `static/play/audio.js` : lecteur (file de phrases, pause et reprise, relance d'une phrase
+    « perdue » par Safari ou Chrome, déverrouillage au premier geste pour iOS), meilleure voix
+    française choisie d'office, réglages gardés dans le navigateur.
+- **Choix et justifications.**
+  - Synthèse vocale du navigateur (Web Speech API) : gratuite, sans serveur ni clé, rien
+    n'est envoyé ; elle marche sur ordinateur et téléphone. Revers : la voix dépend de l'appareil.
+  - Accords au féminin par défaut, réglables (la majorité des étudiant·e·s en médecine sont des
+    femmes) ; le texte affiché ne change pas.
+  - Commandes cachées si le navigateur ne sait pas lire à voix haute.
+- **Vérification.**
+  - 8 tests JavaScript (`tests/js/speech_text.test.mjs`, lancés par pytest avec Node), dont un
+    balayage de tous les textes des trois livres : aucun « · », aucune abréviation, aucune
+    heure abrégée ni emoji dans le texte lu.
+  - Navigateur, base jetable : 180 voix détectées, « Thomas » choisie ; lecture réelle
+    phrase par phrase (événements de début et de fin), pause et reprise, écran de départ lu,
+    réglages mémorisés après rechargement. Corrigé au passage : Échap ne fermait pas le panneau
+    quand le focus était sur une case à cocher.
+- **Limites.** Une scène entière n'a pas été écoutée de bout en bout dans le navigateur ; pas de
+  vérification sur iPhone ni Android ; la qualité de la voix dépend de l'appareil (une synthèse
+  neuronale côté serveur serait meilleure, mais demande un service payant).
+- **Fichiers.** Nouveaux : `static/play/speech_text.js`, `static/play/audio.js`,
+  `tests/js/speech_text.test.mjs`, `tests/test_play_audio.py`. Modifiés :
+  `static/play/main.js`, `templates/play.html.jinja`, `static/play.css`.
+
+### 2.25 — 12 oct. · Voix naturelles pour la lecture audio
+
+- **Besoin.** Retour de l'étudiant : la voix « est trop robotisée » ; il veut une voix plus
+  fluide et plus agréable pour l'auditeur.
+- **Diagnostic.** La lecture utilisait les voix du navigateur. Sur l'appareil testé, la
+  meilleure voix française était « Thomas », une voix compacte du système : c'est elle qui
+  sonnait robotique. La qualité dépendait donc de chaque appareil.
+- **Pistes écartées.**
+  - `edge-tts` (voix d'Edge, gratuites) : accès non officiel ; Microsoft le refusait le jour même
+    (erreur 403, horloge vérifiée). Trop fragile pour un vrai déploiement.
+  - Voix Piper « tom » : modèle sous AGPL-3.0.
+- **Réalisation.**
+  1. **Voix neuronales locales (Piper)**, choisies par défaut : *Siwis* (féminine, corpus
+     sous CC BY 4.0), *Pierre* et *Jessica* (corpus UPMC, CC BY-SA 4.0). Gratuites, hors ligne :
+     le texte ne quitte pas le serveur. Débit un peu plus posé et court silence entre les phrases.
+  2. **Option Azure** (voix les plus naturelles, dont le français de Suisse : Ariane, Fabrice) :
+     il suffit de définir `AZURE_SPEECH_KEY` et `AZURE_SPEECH_REGION` ; le texte part alors
+     chez Microsoft. Les voix du navigateur restent le repli.
+  3. **Service** `services/tts_service.py` : cache des MP3 (même voix et même texte = un seul
+     fichier, `instance/tts/cache`), une seule synthèse pour deux demandes simultanées, texte
+     de 3 000 caractères au plus, 40 synthèses par minute et par participant, plafond quotidien
+     (`TTS_DAILY_CHARS`), chemins de cache vérifiés.
+  4. **Piper dans un processus séparé** (`scripts/tts_piper_worker.py`, sous GPL-3.0 comme
+     Piper) : les modèles restent chargés, une réplique se synthétise en moins de 0,1 s. Le
+     modèle est préchauffé à l'ouverture de la page de jeu.
+  5. **API** (`views/tts.py`, connexion requise) : liste des voix, synthèse, et extrait audio
+     servi par morceaux (requêtes partielles, nécessaires à Safari), en cache privé.
+  6. **Lecteur** (`static/play/audio.js`) : chaque écran est lu d'une traite par la voix
+     naturelle ; une première phrase courte fait démarrer la lecture vite, la suite et les
+     réponses se préparent et se téléchargent pendant ce temps. Pause et reprise exactes, vitesse
+     réglable sans changer le timbre, choix entre voix naturelles et voix de l'appareil,
+     repli automatique si le serveur ne répond pas.
+  7. Commande `flask --app app tts-install` pour télécharger les voix (environ 140 Mo).
+- **Résultats (navigateur, base jetable).** Entre le clic et le début de la voix : 0,76 s sur
+  un écran jamais lu, création de la session comprise (premier extrait prêt en 0,34 s) ;
+  contre 2 à 3 s avant le préchauffage et le découpage.
+- **Vérification.**
+  - **138 tests verts** (+ 12) : cache, validation, limites, chemins, choix du moteur, requête
+    Azure simulée (SSML, échappement, en-têtes), API (connexion, erreurs, requêtes partielles),
+    et une vraie synthèse Piper quand elle est installée.
+  - Navigateur, base jetable : voix *Siwis* choisie d'office, synthèse puis lecture (206),
+    pause et reprise sans nouvelle requête, réglages et repli vérifiés ; le processus Piper
+    s'arrête avec le serveur.
+- **Limites.**
+  - Piper est nettement plus naturel que les voix système, mais reste en dessous des voix
+    Azure ; le choix d'Azure (coût, envoi du texte chez Microsoft) revient à l'équipe.
+  - Un seul processus Piper : en classe entière, les premières lectures d'un même texte se
+    suivent. Le cache absorbe ensuite la charge ; un préremplissage du cache pour tout le livre
+    reste à faire.
+  - Le plafond et le compteur par minute sont en mémoire : ils valent par processus serveur.
+  - Pas encore écouté sur iPhone ni Android.
+- **Fichiers.** Nouveaux : `services/tts_service.py`, `views/tts.py`,
+  `scripts/tts_piper_worker.py`, `tests/test_tts.py`. Modifiés : `static/play/audio.js`,
+  `templates/play.html.jinja`, `static/play.css`, `app.py`, `views/__init__.py`,
+  `requirements.txt`, `README.md`, `tests/test_play_audio.py`.
+
+### 2.26 — 12 oct. · Bibliographie du scoring : articles à comité de lecture, en libre accès
+
+- **Besoin.** Deux demandes successives de l'étudiant :
+  1. ne garder que de « vrais papiers de recherche », publiés et validés, sans forums ni blogs ;
+  2. puis ne garder que des articles **gratuits** : le jury doit pouvoir cliquer sur le lien et
+     lire directement le PDF, sans payer ni passer par une page intermédiaire.
+- **Méthode.**
+  - Chaque référence a été contrôlée dans trois bases :
+    - Crossref : type de publication, revue, volume, pages, correctifs ;
+    - OpenAlex : versions en libre accès, rétractation ;
+    - PubMed : type d'article (étude, revue, commentaire…).
+  - **Critère 1, la publication.** Article d'une revue à comité de lecture, ou des actes d'une
+    conférence à comité de lecture (CHI). Sont acceptés les études empiriques, les
+    méta-analyses, les revues et les articles méthodologiques. Sont exclus les commentaires, les
+    chapitres de livres, les rapports techniques et les mini-revues d'opinion.
+  - **Critère 2, l'accès.** Un PDF gratuit et légitime : éditeur en libre accès, PubMed Central,
+    dépôt d'université, archive HAL ou page universitaire de l'auteur·e. Sont exclus
+    ResearchGate, Academia.edu, Semantic Scholar, gwern.net et les copies déposées sur des sites
+    de cours ou des sites personnels sans lien avec les auteur·e·s.
+  - Quand un article payant n'avait pas de version gratuite, il a été remplacé par un article
+    en libre accès qui appuie la même idée. Si aucun ne convenait, l'article a été retiré et le
+    texte du plan ajusté.
+- **Résultat : 43 → 33 références, toutes gratuites.**
+  - **Premier tri (publication).** 3 textes retirés, qui n'étaient pas des articles de
+    recherche :
+    - Eva (2003) : commentaire de 2 pages ;
+    - Shute (2011) : chapitre de livre, et le lien menait à un autre texte ;
+    - Cheng et al. (2026) : mini-revue. La phrase citée était un avis des auteurs ; un seul
+      relecteur, acceptée en 15 jours, jamais citée.
+  - **Second tri (accès).** 22 articles payants retirés. 13 articles en libre accès les
+    remplacent :
+
+    | Idée du plan | Article payant retiré | Remplaçant gratuit |
+    |---|---|---|
+    | Evidence-Centered Design | Mislevy et al. (2003) | Arieli-Attali et al. (2019), *Frontiers in Psychology* |
+    | Évaluation furtive | Shute (2011) | Shute et al. (2016), PDF de l'autrice |
+    | Spécificité du cas, généralisabilité | Eva (2003), Norman et al. (2006), Bloch & Norman (2012) | Trejo-Mejía et al. (2016), PubMed Central |
+    | Évaluation programmatique | van der Vleuten et al. (2012) | Heeneman et al. (2021), libre accès |
+    | Courbes d'apprentissage | Pusic et al. (2015) | Howard et al. (2023), PubMed Central |
+    | Gain et changement normalisés | Hake (1998), Marx & Cummings (2007) | Nissen et al. (2018), libre accès |
+    | Oubli | Arthur et al. (1998) | Legoux et al. (2021), PubMed Central |
+    | Méthode Delphi | Humphrey-Murto et al. (2017) | Jünger et al. (2017, CREDES), version acceptée |
+    | Kalamazoo | Makoul (2001) | Joyce et al. (2010), PubMed Central |
+    | Calgary-Cambridge | Kurtz et al. (2003) | Simmenroth-Nayda et al. (2014), libre accès |
+    | Erreurs non compensables | Payne et al. (2008) | Homer & Russell (2021), version acceptée |
+    | Seuils (Angoff) | McKinley & Norcini (2014) | Dwyer et al. (2016), libre accès |
+    | Validité (Kane) | Cook et al. (2015) | Cook & Hatala (2016), libre accès |
+    | Feedback | Hattie & Timperley (2007) | Wisniewski, Zierer & Hattie (2020), méta-analyse en libre accès |
+
+    Retirés sans remplaçant, car l'idée reste appuyée par un autre article de la liste :
+    - Motowidlo et al. (1990) : l'origine du format est décrite par Patterson et al. (2016) ;
+    - Bergman et al. (2006) et McDaniel et al. (2011) : la cotation est traitée par de Leng et
+      al. (2017) et Weng et al. (2018) ;
+    - Shrout & Fleiss (1979) et McGraw & Wong (1996) : les formes de l'ICC sont décrites par
+      Koo & Li (2016) ;
+    - Cohen et al. (1999), sur l'échelle en pourcentage du maximum, et McGaghie et al. (2014),
+      sur la maîtrise : les deux points ont été reformulés sans citation.
+  - **Liens trouvés pour des articles déjà présents.**
+    - Les 5 articles de Lievens, Weng et Kepes ont un PDF direct au dépôt de la Singapore
+      Management University. Le lien de Lievens et al. (2005) mène à un manuscrit de l'auteur.
+    - Frary (1988) : module PDF sur le site du NCME, l'association qui édite la revue.
+    - Lee et al. (2020) : PDF en accès libre chez Wiley.
+  - **Liens erronés corrigés.** Pusic et al. (2015) et Michaud & Jucker-Kupper (2016) menaient
+    à un autre article ; Mislevy et al. (2003), à un rapport technique.
+- **Texte du plan ajusté** pour suivre les nouvelles sources : statut, § 2.1 à 2.9, § 3.1
+  (point 5), § 3.4 (tableau), § 3.6, § 7.
+- **Textes de l'application alignés.** Trois textes visibles citaient des articles retirés : la
+  définition d'une erreur critique (`domain/expert_rubric.py`), les remarques de l'export de la
+  clé d'experts (`exporters/expert_key.py`) et la colonne « progression » de l'export
+  (`services/export_service.py`). Les commentaires internes du code gardent les auteurs
+  d'origine des formules (Marx & Cummings, Shrout & Fleiss), qui sont l'attribution exacte ; le
+  test de l'ICC repose sur l'exemple publié par Shrout & Fleiss.
+- **Vérification.**
+  - Les 33 DOI existent, et aucun article n'est rétracté. Les correctifs publiés sont signalés
+    (erratum de Koo & Li 2016).
+  - **Les 33 liens ouvrent un PDF**, contrôlés un par un : 17 avec un simple téléchargement,
+    les 16 autres dans un navigateur, parce que ces sites bloquent les robots (SMU, PubMed
+    Central, BMC, HAL, Hogrefe, Taylor & Francis, Wiley). PubMed Central et HAL font d'abord une
+    vérification automatique de quelques secondes, sans rien à cliquer.
+  - Le PDF (5 pages) a été relu en images ; ses 33 liens sont identiques à ceux du § 7 et à
+    ceux qui ont été vérifiés.
+  - Les affirmations du plan ont été recontrôlées sur les résumés des articles, en particulier
+    pour les 13 nouveaux.
+  - **138 tests verts** (base jetable).
+- **Limites.**
+  - 7 liens mènent à une version acceptée (texte relu par les pairs, sans la mise en page de la
+    revue) et 1 à un manuscrit de l'auteur (Lievens et al. 2005). Ils sont signalés comme tels.
+  - Plusieurs remplaçants sont plus récents et moins cités que les classiques retirés. Ceux-ci
+    restent les sources d'origine ; on peut les citer dans le mémoire en précisant qu'ils sont
+    payants.
+  - Le PDF est encore produit par un script temporaire (reportlab, hors du projet), à partir
+    de la même liste que le § 7.
+- **Fichiers.** `docs/Scoring_v2_recherche_et_plan.md`, `docs/Scoring_v2_bibliographie.pdf`
+  (refait), `docs/Journal_de_developpement.md` (annexes A et B), `domain/expert_rubric.py`,
+  `exporters/expert_key.py`, `services/export_service.py`.
+
+### 2.27 — 12 oct. · Proposition de scoring v3, fondée sur la lecture des 33 articles
+
+- **Besoin.** Demande de l'étudiant : analyser les PDF de la bibliographie (« ces 32 PDF » ; la
+  liste en compte 33) et proposer un scoring adapté au modèle du jeu, bien expliqué, en
+  disant pour chaque choix sur quel article il s'appuie et pourquoi.
+- **Lecture.**
+  - Les 33 articles ont été lus en texte intégral : résumé, méthode utile, résultats et
+    discussion.
+  - Sources du texte :
+    - 22 PDF téléchargés, dont un scan passé en reconnaissance de caractères (Corbett &
+      Anderson) ;
+    - 8 textes de PubMed Central via Europe PMC ;
+    - 11 dans le navigateur (dépôt SMU, Hogrefe, Taylor & Francis, Wiley, PubMed Central).
+  - Correction trouvée au passage : l'article de Corbett & Anderson porte la date de **1995**,
+    pas 1994. Elle est corrigée dans le § 7 du plan, dans le texte du plan et dans le PDF.
+- **Simulation sur le livre 2** (base jetable, vrai calcul serveur), pour chiffrer la
+  proposition :
+  - 35 à 46 choix notés par passage de chapitre ;
+  - marge à 95 % du niveau : ±11,8 points avec 1 passage, ±8,4 avec 2, ±6,9 avec 3 ;
+  - au hasard, la meilleure réponse est choisie dans 20,6 % des cas ;
+  - fidélité moitié-moitié simulée de 0,85 : c'est un plafond, pas une mesure.
+- **Proposition** : [Scoring_v3_proposition.md](Scoring_v3_proposition.md). Elle garde
+  l'essentiel du v2 et en corrige trois points.
+  1. **Progression.** Gain en points, avec un « progrès net » seulement au-delà de la marge
+     et de l'effet de répétition attendu (un tiers d'écart-type). Elle remplace le gain
+     normalisé, qui est biaisé (Nissen et al. 2018).
+  2. **Bandes.** Seuils fixés par Angoff modifié, par année d'études (Dwyer et al. 2016). Une
+     bande n'est donnée que si la marge d'erreur tient dedans ; sinon, l'écran affiche
+     « entre deux bandes ».
+  3. **Affichage.** Le feedback riche en information d'abord, la note à la demande, aucune
+     comparaison entre étudiant·e·s (Wisniewski et al. 2020 ; Shute 2008).
+
+  Elle précise aussi :
+  - la clé : formation des cotateurs, médiane, consensus défini à l'avance ;
+  - la pondération selon l'âge du passage, avec une demi-vie de 90 jours (Legoux et al. 2021) ;
+  - le profil par compétence, présenté comme une tendance (Joyce et al. 2010) ;
+  - l'erreur critique : plafond, débriefing, puis levée par un passage propre.
+
+  Elle ajoute :
+  - le temps de réponse et les passages trop rapides (Baker et al. 2004) ;
+  - le taux de meilleure réponse, calculé en parallèle ;
+  - une règle conjonctive pour le livre (Homer & Russell 2021) ;
+  - un plan de validation chiffré selon Kane ;
+  - un tableau des paramètres et de leur calibrage ;
+  - une table des 33 articles, avec où et pourquoi chacun sert.
+- **Statut.** Proposition, **rien n'est implémenté**. Le plan v2 renvoie à ce document.
+- **Limites.**
+  - Aucun article ne porte sur un jeu à embranchements noté sur 7 compétences ; les choix
+    d'une scène ne sont pas indépendants, donc les marges sont sans doute sous-estimées.
+  - Les études sur la cotation portent sur des échelles de Likert : leurs leçons sont
+    transposées, sans preuve directe.
+  - La demi-vie, le seuil de temps et l'effet de répétition sont des points de départ, à
+    mesurer sur le pilote.
+- **Fichiers.**
+  - Nouveau : `docs/Scoring_v3_proposition.md`.
+  - Modifiés : `docs/Scoring_v2_recherche_et_plan.md` (statut, Corbett 1995, § 7) et
+    `docs/Scoring_v2_bibliographie.pdf` (Corbett 1995).
+
+### 2.28 — 12 oct. · Clé de cotation du livre 2, cotée par Claude
+
+- **Besoin.** Demande de l'étudiant : faire coter les réponses par un panel prendrait trop de
+  temps, il y en a beaucoup trop. Claude doit donc estimer lui-même les points de chaque
+  réponse, en analysant les systèmes de scoring, les chapitres et les programmes.
+- **Ampleur.** 424 points de choix, **2 017 réponses**. Pour chacune :
+  - 7 compétences cotées de −3 à +3 ;
+  - un drapeau « critique » ;
+  - une justification d'une phrase.
+- **Tour 1, à l'aveugle.**
+  - Le texte de chaque chapitre est coté sans aucun point, avec la grille ancrée
+    (`domain/expert_rubric.py`) et une consigne écrite.
+  - Chaque fichier est contrôlé : complet, lisible, justifié, sans ex aequo au meilleur.
+- **Comparaison avec la clé de l'auteur** (ICC(2,1), Koo & Li 2016) :
+  - ICC du total : **0,90** (de 0,87 à 0,92 selon le chapitre) ;
+  - même meilleure réponse dans **83 %** des points de choix ;
+  - la compassion est la seule compétence à l'accord modéré (0,51) ;
+  - 163 points de choix sont à revoir.
+- **Tour 2.** Revue des 163 points, la clé de l'auteur étant visible : 254 réponses révisées.
+  Règles harmonisées :
+  - appeler le 144 ou alerter relève de la collaboration, de la clarté et du rôle ; la
+    compassion est réservée à la présence et au soulagement ;
+  - mentir à l'institution est critique ;
+  - quand un autre professionnel mène, rester en retrait ;
+  - lever l'anonymat d'un donneur pour de bon est critique ;
+  - trahir le secret d'une mineure capable de discernement est critique.
+- **Tour 3, contraintes du build** : 28 réponses.
+  - La compassion (ch. 2, 4, 5) et la collaboration (ch. 5) étaient en jeu dans moins de 8
+    choix sur le parcours le plus court. La compétence a été ajoutée là où l'ancre de la
+    grille est réalisée et où l'auteur la mettait déjà en jeu.
+  - Les chapitres 1 à 3 ont retrouvé une réponse ≥ +9.
+- **Application au livre.**
+  - La clé est dans `data/keys/MedStudents_Y2_v2_cle.json`. Pour chaque réponse : cotes,
+    critique, justification, tour, et pour la traçabilité la cote de l'auteur et celle du
+    tour 1.
+  - `scripts/medstudents_y2_v2/key.py` l'applique à l'assemblage du livre (`book.py`). Les
+    sources ch1…ch5 gardent la clé de l'auteur.
+  - Si une réponse a été réécrite, ajoutée ou retirée depuis la cotation, le build s'arrête.
+  - Le JSON du livre porte maintenant `Critical` (114 réponses) et `Rationale` (toutes les
+    réponses des points de choix).
+- **Résultat.**
+  - Clé finale contre auteur : ICC 0,93 et même meilleure réponse dans 92 %. Ces chiffres ne
+    sont pas indépendants, car le tour 2 a vu l'auteur.
+  - Audit du score : au hasard ≈ 46/100 ; stratégies fondées sur la longueur ≤ 59/100 ;
+    chaque compétence notée sur tous les parcours.
+  - L'échelle est plus serrée que celle de l'auteur : meilleure réponse +4,8 en moyenne,
+    contre +6,1. D'où 49 avertissements « éventail étroit ». La note n'en dépend pas : elle
+    est relative à chaque point de choix.
+  - 140 tests verts (2 nouveaux : la clé couvre toutes les réponses ; une réponse réécrite
+    arrête le build).
+- **Limites.**
+  - Un seul cotateur, une IA, qui avait aussi aidé à écrire la clé de l'auteur : les biais
+    peuvent être partagés.
+  - Le tour 2 n'est pas à l'aveugle.
+  - Le tour 3 a été guidé par le build.
+  - La clé reste **provisoire**. Il est recommandé de faire relire par 2 ou 3
+    enseignant·e·s les 36 points dont la meilleure réponse a changé et les 114 réponses
+    critiques.
+- **Fichiers.**
+  - Nouveaux : `data/keys/MedStudents_Y2_v2_cle.json`, `scripts/medstudents_y2_v2/key.py`,
+    `docs/MedStudents_Y2_v2_cle.md`.
+  - Modifiés :
+    - `scripts/medstudents_y2_v2/book.py` (applique la clé) ;
+    - `tests/test_medstudents_y2_v2.py` (2 tests) ;
+    - `templates/expert_key.html.jinja` (la clé du jeu n'est plus forcément celle de
+      l'auteur) ;
+    - `data/README.md` ;
+    - `docs/Scoring_v2_recherche_et_plan.md` (statut).
+  - Régénérés par le build : `data/chapters/MedStudents_Y2_v2.json`,
+    `docs/MedStudents_Y2_v2_soft_skills.md` et `.json`.
+- **Suite (13 oct.).** La justification et le marquage critique sont montrés au joueur :
+  voir § 2.29.
+
+### 2.29 — 13 oct. · Le joueur voit la justification de la clé et les réponses critiques
+
+- **Besoin.**
+  - Depuis le § 2.28, chaque réponse du livre 2 a une justification d'une phrase
+    (`Rationale`) et, pour 114 d'entre elles, un drapeau « critique ». Le joueur ne les
+    voyait pas.
+  - La proposition v3 (§ 2.27, « feedback d'abord ») demande de montrer d'abord ce qui était
+    attendu et pourquoi, la note ensuite. Une réponse critique doit être signalée clairement.
+  - Le plafond de note en cas de réponse critique n'est **pas** appliqué : la décision est en
+    attente.
+- **Réalisation.**
+  - **Trace de chaque choix** (`replay_scene`) : la justification de la réponse choisie et
+    celle de la meilleure réponse s'ajoutent au drapeau critique, déjà présent. Pour un livre
+    sans clé, la justification est vide : rien n'est inventé.
+  - **Fin de scène** (« Ce qui était attendu ») :
+    - l'API d'enregistrement d'une scène renvoie les choix les plus décisifs
+      (`scene_review`) ;
+    - d'abord toutes les réponses critiques, puis les plus grands écarts au meilleur choix,
+      3 au plus ;
+    - si tous les choix étaient les meilleurs, le plus décisif, avec son « pourquoi » ;
+    - pour chacun : la réplique, la réponse choisie, sa justification, puis la réponse la
+      plus ajustée et sa justification ;
+    - la carte d'une réponse critique a un liseré rouge, l'étiquette « Critique » et une
+      définition en une phrase ;
+    - le bloc vient avant les barres de points ; la lecture audio le lit aussi.
+  - **Bilan de session** :
+    - une carte « Réponses critiques », avec leur nombre, vient **avant** les chiffres
+      clés : réponse choisie, réponse attendue, et pourquoi, sans points ;
+    - les moments clés (occasions manquées, réussites) affichent la justification sous
+      chaque réponse ;
+    - une réponse critique n'est pas répétée parmi les occasions manquées.
+  - **Feedback IA de fin de livre** : le prompt reçoit les justifications des moments clés et
+    les réponses critiques (8 au plus), avec une consigne : les nommer et expliquer pourquoi,
+    sans dramatiser ni juger la personne.
+  - **Export** : nouvelle colonne `justification` dans la table `choix`, à côté de
+    `critique`.
+- **Choix et justifications.**
+  - Le retour de fin de scène est calculé par le serveur, à partir de la scène rejouée. Il
+    n'est pas recalculé par le navigateur : une seule logique, testée en Python.
+  - Feedback après l'essai, riche en information (le quoi et le pourquoi) : Shute (2008),
+    Wisniewski et al. (2020).
+  - Formulation neutre : « Votre réponse », « Plus ajustée », « Pourquoi ». Pas de « vous
+    êtes », pas de comparaison entre étudiant·e·s.
+  - La définition d'une réponse critique est reprise de la grille
+    (`domain/expert_rubric.py`). La phrase sur la règle non compensatoire est omise : le
+    plafond n'existe pas encore.
+- **Corrections faites en vérifiant.**
+  - **Haut de l'écran inaccessible** : l'écran de fin de scène, plus haut que la fenêtre avec
+    le nouveau bloc, était centré verticalement. Son haut (titre, verdict) était coupé, sans
+    défilement possible. Le centrage passe par des marges automatiques.
+  - **Guillemets doublés** : un geste suivi d'une parole (« Poser la main… « Range-le. » »)
+    était entouré une seconde fois. Corrigé dans `quoted` (serveur) et dans le jeu.
+- **Résultats.**
+  - **146 tests verts** (6 nouveaux, 2 adaptés) :
+    - la trace garde les justifications ;
+    - l'ordre du retour de fin de scène ;
+    - rien pour un livre sans clé ;
+    - réponses critiques à part des occasions manquées ;
+    - guillemets ;
+    - parcours complet : API, bilan, prompt IA, export.
+- **Vérification.**
+  - Navigateur, base jetable (`eol-jetable`) : scène 1.1 du livre 2 jouée avec une réponse
+    critique (« Envoie-la-moi aussi, pour réviser. ») et deux réponses moyennes.
+  - Le retour de fin de scène montre 3 cartes : la critique d'abord.
+  - Le bilan (session en cours) montre la carte « Réponses critiques » avant les notes, et
+    les justifications dans les moments clés.
+  - Mise en page vérifiée sur ordinateur et sur mobile (375 px, sans défilement horizontal).
+    Aucune erreur dans la console.
+- **Limites.**
+  - Les choix enregistrés avant le 13 oct. n'ont pas de justification dans leur trace : ni
+    le bilan ni l'export ne la montrent pour eux. Les bilans de sessions déjà terminées
+    n'ont pas la carte « Réponses critiques ».
+  - Pas de plafond de note, pas d'alerte de débriefing pour le formateur (proposition v3,
+    étape A, points 6 et 8, en attente de décision).
+  - Le verdict de fin de scène (« Bon parcours dans l'ensemble… ») ne tient pas compte d'une
+    réponse critique.
+  - Les justifications sont celles de la clé provisoire, cotée par Claude (§ 2.28).
+- **Problème relevé, hors périmètre.** Flask n'échappe pas le HTML des gabarits
+  `.html.jinja` (l'échappement automatique ne vaut que pour `.html`). Un nom affiché
+  contenant du HTML s'exécuterait dans le tableau de bord du formateur. La nouvelle
+  justification est échappée explicitement ; le reste est à corriger (§ 7.1).
+- **Fichiers.**
+  - Modifiés :
+    - `services/scoring_service.py` : `rationale` dans la trace, `critical_choices`,
+      `scene_review`, `key_moments(exclude_critical=…)`, `quoted` ;
+    - `views/session_api.py` : `review` dans la réponse d'enregistrement d'une scène ;
+    - `services/feedback/prompt.py`, `services/export_service.py` ;
+    - `templates/session_report.html.jinja`, `templates/play.html.jinja` ;
+    - `static/play/main.js`, `static/play.css`, `static/account.css` ;
+    - `README.md` ;
+    - tests : `tests/test_scoring_service.py`, `tests/test_session_flow.py`,
+      `tests/test_passages.py`.
+
 ---
 
 ## 3. Architecture technique au 6 octobre 2026
@@ -891,11 +1523,11 @@ Les heures sont en heure suisse.
 
 | Couche | Ajouts pendant la période |
 |---|---|
-| **Domaine** (`domain/`) | Le format des livres s'enrichit, sans casser la compatibilité : états narratifs, conditions, emplacements, points d'entrée, bilans par issue, choix de départ, annexes |
-| **Dépôts** (`repositories/`) | `database.py` (moteur SQLAlchemy, SQLite ou PostgreSQL), `orm.py` (modèles `User`, `BookSession`, `ChapterPassage`, `SceneAttempt`), `users.py`, `sessions.py`, `passages.py` |
-| **Services** (`services/`) | `scoring_service` (qualité des choix, niveaux, profil du livre), `session_service` (sessions et passages), `history_service`, `scoring_upgrade` (reprise des données v1), `auth_service`, `feedback/` (IA et règles de secours), `export_service` ; extension de `graph_service` (contenu narratif servi au jeu) et de `validation_service` (points d'entrée) |
-| **Vues** (`views/`) | `auth`, `guards` (connexion, rôle, CSRF), `session_api`, `account` (historique, bilans, espace formateur, export) ; routes `/play/…` dans `pages` |
-| **Exporteurs** (`exporters/`) | `tables.py` : écriture xlsx, csv et json |
+| **Domaine** (`domain/`) | Le format des livres s'enrichit, sans casser la compatibilité : états narratifs, conditions, emplacements, points d'entrée, bilans par issue, choix de départ, annexes, réponses critiques et justifications ; `expert_rubric.py` (grille ancrée provisoire) |
+| **Dépôts** (`repositories/`) | `database.py` (moteur SQLAlchemy, SQLite ou PostgreSQL), `orm.py` (modèles `User`, `BookSession`, `ChapterPassage`, `SceneAttempt`, `ExpertRating`), `users.py`, `sessions.py`, `passages.py`, `expert_ratings.py` |
+| **Services** (`services/`) | `scoring_service` (qualité des choix, niveaux, profil du livre), `session_service` (sessions et passages), `history_service`, `scoring_upgrade` (reprise des données v1), `expert_key_service` (grille d'experts, accord ICC), `auth_service`, `feedback/` (IA et règles de secours), `export_service` ; extension de `graph_service` (contenu narratif servi au jeu) et de `validation_service` (points d'entrée) |
+| **Vues** (`views/`) | `auth`, `guards` (connexion, rôle, CSRF), `session_api`, `account` (historique, bilans, espace formateur, export), `expert_key` (validation de la clé) ; routes `/play/…` dans `pages` |
+| **Exporteurs** (`exporters/`) | `tables.py` : écriture xlsx, csv et json ; `expert_key.py` : grille d'experts et synthèse |
 | **Front** (`static/`) | `play/` (moteur et interface du jeu), `account/` (graphiques en JS natif, sans librairie), `shared/` (`skills.js`, `http.js` avec le jeton CSRF, `theme.css`) |
 | **Outillage** (`scripts/`) | DSL et build des livres Y4 v2 et Y2 v2, `seed_demo.py` |
 
@@ -909,6 +1541,7 @@ Les heures sont en heure suisse.
 | `/me` | « Mon parcours » |
 | `/sessions/<id>` | bilan d'une session |
 | `/trainer/` | espace formateur et export |
+| `/trainer/cle/` | validation de la clé de cotation par des experts |
 
 ### 3.3 Base de données
 
@@ -919,6 +1552,7 @@ Les heures sont en heure suisse.
 | `scene_attempts` | choix, scores, bornes des réponses proposées, tentative notée ou non |
 | `chapter_passages` | passage de chapitre : noté ou d'entraînement, dates, états de départ, résultats (scoring v2) |
 | `passage_attempts` | scènes jouées pendant chaque passage |
+| `expert_ratings` | cotes des experts : réponse, expert, tour, points, critique, justification |
 
 ### 3.4 Dépendances ajoutées
 
@@ -997,9 +1631,16 @@ Matière pour les chapitres « Conception » et « Discussion » du mémoire.
 | 27 sept. (comptes) | 78 | scoring, feedback, parcours complet via le client de test Flask |
 | 4 oct. (Y2 v2) | 89 | livre Y2 v2 (validation, branches, annexes, rapport à jour) |
 | 5 oct. (export) | 94 | export xlsx, csv et json, pseudonymisation |
-| 6 oct. (scoring v2) | **110** | qualité des choix, passages, règle d'espacement, niveaux, reprise v1 |
+| 6 oct. (scoring v2) | 110 | qualité des choix, passages, règle d'espacement, niveaux, reprise v1 |
+| 6 oct. (clé d'experts) | 116 | ICC (exemple de Shrout & Fleiss), grille à l'aveugle, import, synthèse, marqueur critique |
+| 10 oct. (Y2 refondu) | 123 | 5 chapitres de 5-6 scénarios, ~500 interactions, audit du score (meilleure, pire, hasard, longueur, preuves par compétence), le build refuse ex aequo et indice de longueur |
 
-Vérifié le 6 octobre : `110 passed`.
+| 10 oct. (lecture audio) | 126 | page de jeu avec la lecture audio, modules servis, 8 tests JavaScript de préparation du texte (via Node) |
+| 12 oct. (voix naturelles) | 138 | voix serveur : cache, validation, limites, choix du moteur, Azure simulé, API, synthèse Piper réelle |
+| 12 oct. (clé IA du Y2) | 140 | la clé couvre toutes les réponses des points de choix ; une réponse réécrite depuis la cotation arrête le build |
+| 13 oct. (justification au joueur) | **146** | justification dans la trace, retour de fin de scène, réponses critiques dans le bilan, prompt IA et export, guillemets |
+
+Vérifié le 13 octobre : `146 passed`.
 
 ### 5.2 Validation automatique des livres (au build)
 
@@ -1011,6 +1652,12 @@ Vérifié le 6 octobre : `110 passed`.
 - 4 à 6 réponses par point de choix.
 - Au moins une réponse très bonne (≥ +9) et une très mauvaise (≤ −7) par chapitre.
 - Rapport des soft skills régénéré à chaque build, et un test vérifie qu'il est à jour.
+- Depuis le 10 octobre (livre 2) : une seule meilleure réponse par point de choix ; aucune
+  stratégie fondée sur la longueur des réponses au-delà de 62/100 ; chaque compétence en jeu
+  dans au moins 8 choix sur le parcours le plus court ; audit du score (rejeu serveur) dans le
+  rapport.
+- Depuis le 12 octobre (livre 2) : la clé de cotation (`data/keys/`) est appliquée à
+  l'assemblage ; le build s'arrête si une réponse a changé depuis la cotation.
 
 ### 5.3 Vérifications dans le navigateur
 
@@ -1019,8 +1666,12 @@ Vérifié le 6 octobre : `110 passed`.
   espace formateur, CSRF, palette, mise en page sur ordinateur et mobile, export.
 - Faites le 6 octobre (scoring v2) : espace formateur, matrice des chapitres, historique et
   courbes, bilan de session, chapitre 4 du Y2 joué en entier puis rejoué en entraînement.
+- Faites le 10 octobre (Y2 refondu) : chapitre 5 joué en entier, puis ses choix rejoués hors
+  ligne pour retrouver la note stockée.
+- Faites le 13 octobre (justification au joueur) : scène 1.1 du Y2 jouée avec une réponse
+  critique ; retour de fin de scène et bilan de session, sur ordinateur et sur mobile.
 - **Non faites** :
-  - chapitres 2, 3, 5 et 6 du livre Y2 v2 joués à la main (moteur et parties simulées seulement) ;
+  - chapitres 1 à 4 du livre Y2 refondu joués à la main (build et parties simulées seulement) ;
   - feedback IA avec un vrai modèle ;
   - affichage de la heatmap sur des données réelles avant la refonte.
 
@@ -1050,6 +1701,14 @@ Vérifié le 6 octobre : `110 passed`.
 | 4 oct. | Aucun choix très mauvais au chapitre 5 du Y2 | 3 réponses durcies |
 | 5 oct. | Le scoring v1 donne 48/100 au hasard et plafonne à 83 | Plan de scoring v2 (§ 2.18), étape 1 implémentée (§ 2.20) |
 | 6 oct. | Reprise v1 exécutée par erreur sur la base locale avant la fin des tests | Résultat vérifié, cohérent ; la reprise garde désormais l'ancien bilan en entier ; tests isolés sur une base jetable |
+| 7 oct. | Le nombre de références du plan de scoring était annoncé à 35 ; il y en avait 41 | Corrigé : 43 avec les 2 références sur l'ICC |
+| 10 oct. | Clé du Y2 : choisir toujours la réponse la plus longue donnait 89,5/100 | Longueurs équilibrées ; règle bloquante au build (§ 2.23) |
+| 10 oct. | Première correction trop forte : « toujours la 2ᵉ plus longue » donnait 93/100 | Rangs de longueur répartis de 1 à 6 |
+| 10 oct. | Boucle « on recommence » du BLS : un·e joueur·euse simulé·e tournait à l'infini | Au second passage, le simulateur essaie une autre réponse |
+| 10 oct. | Six incohérences au chapitre 5, relevées en jouant (intro de la grange, fenêtre, invitation à la cérémonie, retour chez la Pre Vautier, capture d'écran, âge de Mme Rapin) | Corrigées |
+| 13 oct. | Fin de scène plus haute que la fenêtre : le haut (titre, verdict) était coupé, sans défilement | Centrage par marges automatiques (§ 2.29) |
+| 13 oct. | Guillemets doublés autour d'un geste suivi d'une parole | `quoted` ne réentoure plus un texte qui a ses guillemets (§ 2.29) |
+| 13 oct. | Gabarits `.html.jinja` rendus sans échappement HTML | Relevé, non corrigé (§ 7.1) |
 
 **Contraintes de méthode.** Plusieurs sessions ont été interrompues par les limites
 d'utilisation de l'assistant ou par des réponses coupées. Le travail a alors été découpé en
@@ -1065,17 +1724,21 @@ petites étapes, une scène à la fois, et validé à chaque étape.
   travail ne sont protégées par aucun historique.
 - [ ] **Refaire le correctif des brouillons de l'éditeur** (§ 2.15). En attendant, ne pas
   sauvegarder depuis l'éditeur un chapitre qui a été régénéré par un script.
+- [ ] **Activer l'échappement HTML des gabarits** (`.html.jinja`) : un nom affiché contenant
+  du HTML s'exécute aujourd'hui dans les pages du formateur. Relevé le 13 oct. (§ 2.29).
 
 ### 7.2 Contenu
 
-- [ ] **Portraits à produire** : 139 pour le Y2 v2, en priorité, et 135 pour le Y4 v2 si ce
+- [ ] **Portraits à produire** : 138 pour le Y2 v2, en priorité, et 135 pour le Y4 v2 si ce
   livre est conservé. Aucun n'existe : le jeu affiche les initiales.
 - [ ] **Relecture éthique** des scènes sensibles : échographie, erreur médicale, crise
   suicidaire, grossesse d'une mineure, anonymat du don.
 - [ ] **Validation par un·e référent·e pédagogique par faculté**, en particulier pour l'UNIGE,
   dont le détail de B2-B3 n'est pas public.
-- [ ] Jouer les chapitres 2 à 6 du Y2 v2 dans le navigateur.
-- [ ] Corriger l'écart entre la bible et le texte du Y2 (Bernard et Noah à la cérémonie).
+- [ ] Jouer les chapitres 1 à 4 du Y2 refondu dans le navigateur (le chapitre 5 l'a été le
+  10 oct.).
+- [x] Écart entre la bible et le texte du Y2 (Bernard et Noah à la cérémonie) : bible réécrite
+  avec la refonte du 10 oct. (§ 2.23).
 - [ ] Livres 1, 3, 5 et 6 du plan, à faire. Le livre 5 « Fin de vie » est identifié comme
   prioritaire.
 - [ ] Supprimer le livre Y4, comme prévu par l'étudiant.
@@ -1084,10 +1747,25 @@ petites étapes, une scène à la fois, et validé à chaque étape.
 
 - [x] Étape 1 du scoring v2 : note par choix, passage de chapitre, niveau, progression,
   fiabilité, profil du livre (§ 2.20).
-- [ ] Étape 2 : exporter et réimporter la clé de cotation pour un panel d'experts, accord (ICC),
-  champs « critique » et « justification », points affichés comme provisoires.
+- [x] Étape 2, outils : grille d'experts à l'aveugle, import, accord (ICC), synthèse Delphi,
+  champs « critique » et « justification », points affichés comme provisoires (§ 2.21).
+- [x] Audit de la clé du Y2 par simulation : indice de longueur supprimé, Compassion
+  rééquilibrée, chaque compétence notée sur tous les parcours ; contrôlé à chaque build
+  (§ 2.23).
+- [x] Clé du livre 2 cotée par Claude (tour à l'aveugle, revue des divergences, calibrage) et
+  appliquée au jeu, à titre provisoire (§ 2.28).
+- [ ] Faire relire par 2 ou 3 enseignant·e·s un échantillon ciblé de la clé du livre 2 : les
+  36 points dont la meilleure réponse diffère de l'auteur et les 114 réponses critiques.
+- [x] Afficher la justification de la clé et le marquage critique au joueur : fin de scène,
+  bilan de session, feedback IA et export (§ 2.29).
+- [ ] Appliquer le plafond en cas d'erreur critique, avec l'alerte de débriefing pour le
+  formateur (proposition v3, décision en attente).
+- [ ] Faire valider la grille ancrée ; coter de même le livre 4.
 - [ ] Étape 3 : bandes de niveau (Angoff), plafond en cas d'erreur critique, calibrage du
   coefficient 0,25, du délai de 7 jours et du seuil de 8 choix sur un pilote.
+- [ ] Décider de la proposition de scoring v3 (§ 2.27) ; l'étape A peut se faire sans
+  données : temps de réponse, gain en points, bandes avec marge, poids selon l'âge, feedback
+  d'abord.
 - [ ] Constituer un panel d'experts pour valider la clé de cotation. En attendant, les points
   actuels doivent être présentés comme provisoires.
 
@@ -1112,7 +1790,7 @@ petites étapes, une scène à la fois, et validé à chaque étape.
 | **Méthodologie** | Comparaison curriculaire en trois mesures (§ 2.2), analyse de sensibilité (§ 2.6), contrefactuel (§ 2.3), mesure du scoring avec des joueur·euse·s simulé·e·s (§ 2.18) |
 | **Conception** | Plan des 6 livres (§ 2.4), principes narratifs et pédagogiques (§ 4.1), états narratifs (§ 2.8), branches et annexes (§ 2.16), choix d'expérience joueur (§ 4.2) |
 | **Implémentation** | Architecture (§ 3), DSL et build (§ 4.3), comptes, sessions et feedback (§ 2.11), export (§ 2.17), identité visuelle (§ 2.13) |
-| **Validation et résultats** | Évolution des tests (§ 5.1), validation automatique (§ 5.2), chiffres des livres (§ 1.2), répartition des soft skills (§ 2.8) |
+| **Validation et résultats** | Évolution des tests (§ 5.1), validation automatique (§ 5.2), chiffres des livres (§ 1.2), répartition des soft skills (§ 2.8), audit de la clé de notation par joueur·euse·s simulé·e·s (§ 2.23) |
 | **Discussion** | Honnêteté sur la décision de retirer Zurich (§ 2.3), fragilité du chiffre d'immersion (§ 2.6), limites du scoring v1 (§ 2.18), deux codages curriculaires (§ 2.10) |
 | **Limites et perspectives** | § 7 : images, relecture éthique, référent·e·s, scoring v2, Zurich, mise en production |
 | **Méthode de travail** | Développement assisté par une IA de programmation (Claude Code) : à mentionner par transparence, avec le rôle de l'étudiant dans les décisions (périmètre, refus du livre 4 trop court, validation des sujets sensibles, choix des couleurs) |
@@ -1142,47 +1820,50 @@ petites étapes, une scène à la fois, et validé à chaque étape.
 
 ### Annexe A — Références principales pour le scoring
 
-La liste complète, soit 35 références, est dans
-[Scoring_v2_recherche_et_plan.md](Scoring_v2_recherche_et_plan.md).
+La liste complète est dans [Scoring_v2_recherche_et_plan.md](Scoring_v2_recherche_et_plan.md),
+§ 7 : 33 articles à comité de lecture, chacun avec un lien vers son PDF gratuit, depuis le tri du
+12 oct. (§ 2.26). Il y avait 43 références au 7 oct. (41 au 5 oct., plus 2 sur l'ICC le 6 oct.).
 
 **Noter les réponses**
 
 1. Patterson, Zibarras & Ashworth (2016). *Situational judgement tests in medical education and
    training: AMEE Guide No. 100.* Medical Teacher, 38(1), 3-17.
-2. Bergman, Drasgow et al. (2006). *Scoring situational judgment tests: Once you get the data,
-   your troubles begin.* International Journal of Selection and Assessment, 14(3), 223-235.
-3. Weng, Yang, Lievens & McDaniel (2018). *Optimizing the validity of situational judgment
+2. Weng, Yang, Lievens & McDaniel (2018). *Optimizing the validity of situational judgment
    tests: The importance of scoring methods.* Journal of Vocational Behavior, 104, 199-209.
-4. de Leng et al. (2017). *Scoring method of a Situational Judgment Test: influence on internal
+3. de Leng et al. (2017). *Scoring method of a Situational Judgment Test: influence on internal
    consistency reliability, adverse impact and correlation with personality?* Advances in
    Health Sciences Education, 22(2), 243-265.
 
 **Établir la clé avec des experts**
 
-5. Humphrey-Murto, Varpio, Gonsalves & Wood (2017). *Using consensus group methods such as
-   Delphi and Nominal Group in medical education research.* Medical Teacher, 39(1), 14-19.
+4. Jünger, Payne, Brine, Radbruch & Brearley (2017). *Guidance on Conducting and REporting
+   DElphi Studies (CREDES) in palliative care.* Palliative Medicine, 31(8), 684-706.
+5. Koo & Li (2016). *A guideline of selecting and reporting intraclass correlation coefficients
+   for reliability research.* Journal of Chiropractic Medicine, 15(2), 155-163.
 
-**Ramener les notes sur 100**
+**Fiabilité**
 
-6. Cohen, Cohen, Aiken & West (1999). *The problem of units and the circumstance for POMP.*
-   Multivariate Behavioral Research, 34(3), 315-346.
+6. Trejo-Mejía et al. (2016). *Reliability analysis of the objective structured clinical
+   examination using generalizability theory.* Medical Education Online, 21, 31650.
 
 **Suivre la progression**
 
-7. Pusic, Boutis, Hatala & Cook (2015). *Learning curves in health professions education.*
-   Academic Medicine, 90(8), 1034-1042.
-8. Marx & Cummings (2007). *Normalized change.* American Journal of Physics, 75(1), 87-91.
+7. Howard, Edwards, Boutis, Alexander & Pusic (2023). *Twelve tips for using learning curves in
+   health professions education research.* MedEdPublish, 13, 269.
+8. Nissen, Talbot, Nasim Thompson & Van Dusen (2018). *Comparison of normalized gain and
+   Cohen's d for analyzing gains on concept inventories.* Physical Review Physics Education
+   Research, 14(1), 010115.
 9. Pelánek (2017). *Bayesian knowledge tracing, logistic models, and beyond: an overview of
    learner modeling techniques.* User Modeling and User-Adapted Interaction, 27, 313-350.
 10. Lievens, Buyse & Sackett (2005). *Retest effects in operational selection settings:
-    Development and test of a framework.* Personnel Psychology.
+    Development and test of a framework.* Personnel Psychology, 58(4), 981-1007.
 
 **Erreurs critiques et validité**
 
-11. Payne et al. (2008). *Sharpening the eye of the OSCE with critical action analysis.*
-    Academic Medicine, 83(10).
-12. Cook, Brydges, Ginsburg & Hatala (2015). *A contemporary approach to validity arguments: a
-    practical guide to Kane's framework.* Medical Education, 49(6), 560-575.
+11. Homer & Russell (2021). *Conjunctive standards in OSCEs: The why and the how of number of
+    stations passed criteria.* Medical Teacher, 43(4), 448-455.
+12. Cook & Hatala (2016). *Validation of educational assessments: a primer for simulation and
+    beyond.* Advances in Simulation, 1, 31.
 
 ### Annexe B — Documents produits pendant la période
 
@@ -1198,6 +1879,9 @@ La liste complète, soit 35 références, est dans
 | [MedStudents_Y2_v2_soft_skills.md](MedStudents_Y2_v2_soft_skills.md) · `.json` | Répartition des soft skills du livre 2 v2 |
 | [MedStudents_Y2_v2_assets.md](MedStudents_Y2_v2_assets.md) | 139 portraits à produire |
 | [Scoring_v2_recherche_et_plan.md](Scoring_v2_recherche_et_plan.md) | Diagnostic, recherche et plan de scoring |
+| [Scoring_v2_bibliographie.pdf](Scoring_v2_bibliographie.pdf) | Les 33 articles du scoring, à comité de lecture et en libre accès, classés par usage, chacun avec le lien de son PDF (7 oct., refait le 12 oct.) |
+| [Scoring_v3_proposition.md](Scoring_v3_proposition.md) | Proposition de scoring v3 fondée sur la lecture des 33 articles, non implémentée (12 oct.) |
+| [MedStudents_Y2_v2_cle.md](MedStudents_Y2_v2_cle.md) | Clé de cotation du livre 2 cotée par Claude : méthode en trois tours, accord avec l'auteur, application au build, limites (12 oct.) |
 | [../README.md](../README.md) | Mis à jour : architecture, routes, comptes, base de données, export |
 
 **Pages privées sur claude.ai** (à partager depuis leur menu « Partager » si besoin) :

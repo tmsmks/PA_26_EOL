@@ -22,6 +22,7 @@ from sqlalchemy import (
     Integer,
     String,
     Table,
+    Text,
     UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -164,3 +165,27 @@ class SceneAttempt(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     session: Mapped[BookSession] = relationship(back_populates="attempts")
+
+
+class ExpertRating(Base):
+    """Cote d'un expert pour une réponse du livre (validation de la clé de cotation).
+
+    `ref` identifie la réponse : « c{chapitre}-s{scène}-i{interaction}-r{rang} »,
+    le rang commençant à 1 dans l'ordre du livre.
+    """
+
+    __tablename__ = "expert_ratings"
+    __table_args__ = (UniqueConstraint("book_slug", "ref", "expert", "round"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    book_slug: Mapped[str] = mapped_column(String(80), index=True)
+    ref: Mapped[str] = mapped_column(String(40))
+    expert: Mapped[str] = mapped_column(String(80))
+    round: Mapped[int] = mapped_column(Integer, default=1)
+    # Points par compétence (−3 à +3) ; une compétence laissée vide vaut 0.
+    scores: Mapped[dict[str, int]] = mapped_column(JSON, default=dict)
+    critical: Mapped[bool] = mapped_column(Boolean, default=False)
+    rationale: Mapped[str] = mapped_column(Text, default="")
+    comment: Mapped[str] = mapped_column(Text, default="")
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+

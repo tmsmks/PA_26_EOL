@@ -98,7 +98,7 @@
 
         <div class="acc-card">
             <h2>Profil de compétences</h2>
-            <p class="acc-hint">Qualité de {{ 'ses' if trainer_view else 'vos' }} choix par compétence, tous chapitres confondus : 100 = la meilleure réponse à chaque fois, 0 = la pire ; répondre au hasard donne environ 50. Une compétence est notée quand au moins {{ min_evidence }} choix la mettent en jeu.</p>
+            <p class="acc-hint">Qualité de {{ 'ses' if trainer_view else 'vos' }} choix par compétence, tous chapitres confondus : 100 = la meilleure réponse à chaque fois, 0 = la pire ; répondre au hasard donne environ 50. Une compétence est notée quand au moins {{ min_evidence }} choix la mettent en jeu. Clé de cotation provisoire : les points des réponses n'ont pas encore été validés par un panel d'experts.</p>
             <div data-chart="profile" data-book="{{ b.slug }}"></div>
         </div>
         {%- endif %}

@@ -8,6 +8,7 @@
 
 import { postJSON } from "../shared/http.js";
 import { SKILL_LABELS_FR } from "../shared/skills.js";
+import { createAudio } from "./audio.js";
 import {
     SCORE_SKILLS,
     appraise,
@@ -40,6 +41,21 @@ const game = createGame(init.scenesData || [], {
     flags: session ? session.flags : [],
     ownedFlags: meta.owned_flags || [],
 });
+
+// Lecture audio (si le navigateur sait lire à voix haute) : chaque écran lui est
+// décrit, il le lit quand le participant l'a activée.
+const audio = createAudio();
+// Dernier personnage annoncé : on ne répète pas son nom à chaque réplique.
+let lastSpeaker = null;
+
+/** Titre sans son numéro (« 5.1 La table de la cuisine » → « La table de la cuisine »). */
+function spokenTitle(title) {
+    return String(title || "").replace(/^\d+(?:\.\d+)*\s+/, "");
+}
+
+function numbered(texts) {
+    return texts.map((t, i) => "Réponse " + (i + 1) + " : " + t);
+}
 
 /* --- Synchronisation serveur --- */
 
@@ -78,9 +94,14 @@ function setStatus(el, text, tone) {
     el.hidden = !text;
 }
 
+// Fin de scène affichée en dernier : un retour arrivé en retard ne s'affiche
+// pas sur le bilan de la scène suivante.
+let reviewToken = 0;
+
 function recordScene() {
     const s = scene(game);
     const status = $("save-status");
+    const token = ++reviewToken;
     if (!session || !s || game.entryId === "") {
         setStatus(status, "", "");
         return;
@@ -96,7 +117,8 @@ function recordScene() {
     const send = () => {
         setStatus(status, "Enregistrement…", "");
         enqueue(() => postJSON(session.urls.attempts, body)).then(
-            (res) =>
+            (res) => {
+                if (token === reviewToken) renderReview(res.review);
                 setStatus(
                     status,
                     res.counted
@@ -105,7 +127,8 @@ function recordScene() {
                           ? "Passage d'entraînement : ce scénario est enregistré, sans être noté."
                           : "Scénario rejoué : seule votre première tentative est notée dans ce passage.",
                     res.counted ? "ok" : "info"
-                ),
+                );
+            },
             (err) => {
                 setStatus(status, "Non enregistré : " + err.message + " — cliquez pour réessayer.", "error");
                 status.onclick = () => {
@@ -180,6 +203,7 @@ function renderEndScore(p, progress) {
     }
     el.innerHTML = html;
     el.hidden = false;
+    audio.append({ parts: [el.textContent] });
 }
 
 const $ = (id) => document.getElementById(id);
@@ -327,6 +351,16 @@ function renderDialogue() {
     const box = $("choices");
     box.innerHTML = "";
     const responses = entry.responses || [];
+    const shuffled = stableShuffle(responses, (entry.node_id || "") + ":" + (passage ? passage.id : ""));
+
+    // Le nom du personnage n'est lu que quand l'interlocuteur change.
+    const announce = entry.actor && entry.actor !== lastSpeaker;
+    lastSpeaker = entry.actor || null;
+    audio.narrate({
+        parts: [announce ? entry.actor + "." : "", entry.text],
+        // Un seul bouton (« Continuer ») : rien à lire.
+        choices: shuffled.length > 1 ? numbered(shuffled.map((r) => r.text)) : [],
+    });
 
     if (!responses.length) {
         const btn = document.createElement("button");
@@ -337,7 +371,7 @@ function renderDialogue() {
         return;
     }
 
-    stableShuffle(responses, (entry.node_id || "") + ":" + (passage ? passage.id : "")).forEach((r, idx) => {
+    shuffled.forEach((r, idx) => {
         const btn = document.createElement("button");
         btn.className = "choice";
         btn.innerHTML =
@@ -355,6 +389,67 @@ function renderDialogue() {
 }
 
 /* --- Bilan --- */
+
+/** Guillemets français, sauf si la réplique les porte déjà (comme quoted côté serveur). */
+function quoted(text) {
+    const t = String(text || "").trim();
+    if (!t.includes("«")) return "« " + t + " »";
+    const count = (c) => t.split(c).length - 1;
+    return count("«") <= count("»") ? t : t + " »";
+}
+
+function clip(text, max) {
+    const t = String(text || "");
+    if (t.length <= max) return t;
+    const cut = t.slice(0, max);
+    const space = cut.lastIndexOf(" ");
+    return (space > max * 0.6 ? cut.slice(0, space) : cut) + "…";
+}
+
+function reviewLine(who, text, critical) {
+    return (
+        '<p class="moment-line"><span class="who">' + esc(who) + "</span><span>" +
+        esc(quoted(clip(text, 260))) +
+        (critical ? ' <span class="crit-tag">Critique</span>' : "") +
+        "</span></p>"
+    );
+}
+
+function reviewWhy(rationale) {
+    if (!rationale) return "";
+    return '<p class="moment-why"><span class="who">Pourquoi</span><span>' + esc(rationale) + "</span></p>";
+}
+
+// Feedback d'abord (proposition v3) : les choix décisifs de la scène, la
+// réponse attendue et sa justification, avant les points.
+function renderReview(items) {
+    const box = $("debrief-review");
+    const list = $("review-list");
+    list.innerHTML = "";
+    items = Array.isArray(items) ? items : [];
+    box.hidden = !items.length;
+    $("review-critical-note").hidden = !items.some((it) => it.choice.critical);
+    if (!items.length) return;
+    const spoken = ["Ce qui était attendu."];
+    items.forEach((it) => {
+        const li = document.createElement("li");
+        li.className = "moment" + (it.choice.critical ? " is-critical" : "");
+        li.innerHTML =
+            '<p class="moment-prompt">' + (it.actor ? esc(it.actor) + " : " : "") +
+            esc(quoted(clip(it.prompt, 220))) + "</p>" +
+            reviewLine(it.is_best ? "Votre réponse, la plus ajustée" : "Votre réponse", it.choice.text, it.choice.critical) +
+            reviewWhy(it.choice.rationale) +
+            (it.is_best ? "" : reviewLine("Plus ajustée", it.best.text, false) + reviewWhy(it.best.rationale));
+        list.appendChild(li);
+        spoken.push(
+            "Votre réponse" + (it.choice.critical ? ", réponse critique" : "") + " : " + it.choice.text,
+            it.choice.rationale ? "Pourquoi : " + it.choice.rationale : "",
+            it.is_best ? "" : "Réponse la plus ajustée : " + it.best.text,
+            !it.is_best && it.best.rationale ? "Pourquoi : " + it.best.rationale : ""
+        );
+    });
+    audio.append({ parts: spoken });
+}
 
 function renderBars(container, scores) {
     const max = Math.max(
@@ -388,12 +483,14 @@ function renderDebrief() {
     $("debrief-lead").textContent = verdict.lead;
     $("debrief-lead").className = "debrief-lead tone-" + verdict.tone;
     renderBars($("debrief-bars"), game.sceneScores);
+    renderReview([]);
 
     $("btn-next").textContent = hasNextScene(game)
         ? "Scénario suivant"
         : "Terminer le chapitre";
     recordScene();
     show("screen-debrief");
+    audio.narrate({ parts: ["Fin du scénario.", spokenTitle(s ? s.title : "") + ".", verdict.lead] });
 }
 
 function renderSceneIntro() {
@@ -402,17 +499,22 @@ function renderSceneIntro() {
     $("scene-counter").textContent =
         "Scénario " + sceneNumber(game) + " sur " + sceneCount(game);
     $("scene-title").textContent = s.title || "";
-    $("scene-intro").textContent = resolveEntry(game).intro;
+    const intro = resolveEntry(game).intro;
+    $("scene-intro").textContent = intro;
     updateHud();
     show("screen-scene-intro");
+    audio.narrate({
+        parts: ["Scénario " + sceneNumber(game) + " sur " + sceneCount(game) + ".", spokenTitle(s.title) + ".", intro],
+    });
 }
 
 function renderEnd() {
     $("end-title").textContent = init.chapterName || "Chapitre terminé";
     renderBars($("end-bars"), game.chapterScores);
     $("hud-bar").style.width = "100%";
-    completeChapter();
     show("screen-end");
+    audio.narrate({ parts: ["Chapitre terminé.", (init.chapterName || "") + "."] });
+    completeChapter();
 }
 
 /* --- Choix de départ (chapitre qui dépend d'un chapitre non joué) --- */
@@ -441,6 +543,10 @@ function renderStartChoice() {
         box.appendChild(btn);
     });
     show("screen-start-choice");
+    audio.narrate({
+        parts: ["Avant de commencer.", sc.question || ""],
+        choices: numbered(sc.options.map((opt) => opt.label)),
+    });
 }
 
 /* --- Câblage --- */
@@ -461,6 +567,7 @@ $("btn-start").addEventListener("click", async () => {
 });
 
 $("btn-enter").addEventListener("click", () => {
+    lastSpeaker = null;
     startScene(game);
     updateHud();
     if (!game.current) return renderDebrief();
@@ -468,6 +575,7 @@ $("btn-enter").addEventListener("click", () => {
 });
 
 $("btn-replay").addEventListener("click", () => {
+    lastSpeaker = null;
     startScene(game);
     renderDialogue();
 });
@@ -478,6 +586,18 @@ $("btn-next").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (e) => {
+    const target = e.target instanceof Element ? e.target : null;
+    // Dans un champ des réglages, les touches servent au champ (sauf Échap,
+    // qui ferme le panneau).
+    const inField = !!(target && target.closest("input, select, textarea"));
+    if (inField && e.key !== "Escape") return;
+    if (audio.handleKey(e)) {
+        e.preventDefault();
+        return;
+    }
+    if (inField) return;
+    // Entrée ou Espace sur un bouton audio : le bouton s'en charge.
+    if (target && target.closest(".audio-ctl") && (e.key === "Enter" || e.key === " ")) return;
     if (!$("screen-start-choice").hidden) {
         const n = parseInt(e.key, 10);
         const btns = document.querySelectorAll("#start-options .choice");
@@ -523,5 +643,14 @@ document.addEventListener("keydown", (e) => {
 });
 
 $("dialogue-text").addEventListener("click", finishTyping);
+
+if (audio.supported) $("keyhint-audio").hidden = false;
+audio.setContent({
+    parts: [
+        "Chapitre " + init.chapterId + ".",
+        (init.chapterName || "") + ".",
+        document.querySelector("#screen-intro .intro-text").textContent,
+    ],
+});
 
 updateHud();

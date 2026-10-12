@@ -11,6 +11,8 @@ from domain.soft_skills import SOFT_SKILL_LABELS, SOFT_SKILLS
 from services.scoring_service import quoted
 
 MAX_PREVIOUS = 3
+# Réponses critiques transmises au LLM, au plus (les premières jouées).
+MAX_CRITICAL = 8
 
 SYSTEM_MESSAGE = (
     "Tu es formateur·rice en communication clinique et en soins palliatifs. "
@@ -24,7 +26,10 @@ SYSTEM_MESSAGE = (
     "- Vouvoie le/la participant·e. Ton bienveillant, direct et concret, sans flatterie.\n"
     "- N'invente AUCUN chiffre : ne cite que les scores fournis, arrondis à l'entier.\n"
     "- Appuie tes remarques sur les moments clés fournis (choix effectué vs réponse "
-    "plus ajustée) : évoque brièvement la situation, sans recopier de longs passages.\n"
+    "plus ajustée) : évoque brièvement la situation, sans recopier de longs passages, "
+    "et appuie-toi sur la justification de la clé quand elle est fournie.\n"
+    "- Si des RÉPONSES CRITIQUES sont fournies, nomme-les clairement et explique pourquoi, "
+    "sans dramatiser ni juger la personne.\n"
     "- Points forts / points faibles : utilise les codes exacts, en priorité ceux "
     "des listes FORCES et FAIBLESSES.\n"
     "- Chapitres à retravailler : choisis uniquement parmi les chapitres fournis (id "
@@ -52,13 +57,18 @@ def _scores_line(scores: Mapping[str, float | None]) -> str:
     return " ; ".join(f"{k} {_fmt(scores.get(k))}" for k in SOFT_SKILLS)
 
 
+def _why(part: Mapping[str, Any]) -> str:
+    return f" [justification de la clé : {part['rationale']}]" if part.get("rationale") else ""
+
+
 def _moment_line(m: Mapping[str, Any]) -> str:
     who = m.get("actor") or "Narration"
     return (
         f"- [Ch. {m['chapter_id']} · « {m.get('scene_title', '')} »] {who} : {quoted(m['prompt'])} "
-        f"→ choix : {quoted(m['choice']['text'])} (total {m['choice']['total']:+d})"
+        f"→ choix : {quoted(m['choice']['text'])} (total {m['choice']['total']:+d}){_why(m['choice'])}"
         + (
             f" ; réponse plus ajustée : {quoted(m['best']['text'])} (total {m['best']['total']:+d})"
+            f"{_why(m['best'])}"
             if m.get("gap", 0) > 0
             else ""
         )
@@ -99,6 +109,8 @@ def format_user_message(
         + (", ".join(str(c) for c in results.get("chapters_to_rework") or []) or "aucun"),
     ]
 
+    if results.get("critical"):
+        lines += ["", "RÉPONSES CRITIQUES CHOISIES :", *map(_moment_line, results["critical"][:MAX_CRITICAL])]
     moments = results.get("moments") or {}
     if moments.get("missed"):
         lines += ["", "MOMENTS CLÉS — OCCASIONS MANQUÉES :", *map(_moment_line, moments["missed"])]

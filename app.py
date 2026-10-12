@@ -29,7 +29,8 @@ from services.auth_service import AuthError, hash_password, register, validate_p
 from services.feedback import FeedbackService
 from services.scoring_service import quoted
 from services.scoring_upgrade import upgrade_scoring
-from views import account_bp, api_bp, auth_bp, pages_bp, session_api_bp
+from services.tts_service import TtsService, build_engine, install_piper_models
+from views import account_bp, api_bp, auth_bp, expert_key_bp, pages_bp, session_api_bp, tts_bp
 from views import guards
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -83,15 +84,28 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         FEEDBACK_BACKEND=None,
         # Scoring v2 : délai minimal entre deux passages notés d'un même chapitre.
         PASSAGE_SPACING_DAYS=int(os.getenv("PASSAGE_SPACING_DAYS", "7")),
+        # Voix de lecture du parcours joueur (services/tts_service.py) :
+        # auto = Azure si une clé est donnée, sinon Piper s'il est installé.
+        TTS_ENGINE=os.getenv("TTS_ENGINE", "auto"),
+        TTS_MODELS_DIR=os.getenv("TTS_MODELS_DIR") or os.path.join(BASE_DIR, "instance", "tts", "models"),
+        TTS_CACHE_DIR=os.getenv("TTS_CACHE_DIR") or os.path.join(BASE_DIR, "instance", "tts", "cache"),
+        TTS_DAILY_CHARS=int(os.getenv("TTS_DAILY_CHARS", "400000")),
+        AZURE_SPEECH_KEY=os.getenv("AZURE_SPEECH_KEY") or None,
+        AZURE_SPEECH_REGION=os.getenv("AZURE_SPEECH_REGION") or None,
     )
     if config:
         app.config.update(config)
+    if app.config.get("TESTING") and not (config or {}).get("TTS_ENGINE"):
+        app.config["TTS_ENGINE"] = "off"  # les tests ne lancent pas de voix sans le demander
     if not app.config["SECRET_KEY"]:
         app.config["SECRET_KEY"] = _load_or_create_secret(app.instance_path)
 
     database.init_app(app)
     app.extensions["eol_chapters"] = ChapterRepository(base_dir=app.config["CHAPTERS_BASE_DIR"])
     app.extensions["eol_feedback"] = FeedbackService(backend=app.config["FEEDBACK_BACKEND"])
+    app.extensions["eol_tts"] = TtsService(
+        build_engine(app.config), app.config["TTS_CACHE_DIR"], daily_chars=app.config["TTS_DAILY_CHARS"]
+    )
     guards.init_app(app)
 
     # Reprise idempotente des parties jouées avant le scoring v2.
@@ -122,7 +136,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     def _weight(value: float | None) -> str:
         return "—" if value is None else "×" + f"{value:.2f}".rstrip("0").rstrip(".").replace(".", ",")
 
-    for bp in (pages_bp, api_bp, auth_bp, account_bp, session_api_bp):
+    for bp in (pages_bp, api_bp, auth_bp, account_bp, session_api_bp, expert_key_bp, tts_bp):
         app.register_blueprint(bp)
 
     @app.cli.command("create-user")
@@ -145,6 +159,13 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
                 click.echo(f"Compte mis à jour : {existing.username} ({role}).")
         except AuthError as e:
             raise click.ClickException(str(e)) from e
+
+    @app.cli.command("tts-install")
+    def tts_install() -> None:
+        """Télécharge les voix françaises de Piper (environ 140 Mo) pour la lecture audio."""
+        written = install_piper_models(app.config["TTS_MODELS_DIR"], echo=click.echo)
+        click.echo(f"{len(written)} fichier(s) téléchargé(s) dans {app.config['TTS_MODELS_DIR']}.")
+        click.echo("Redémarrez l'application : les voix seront proposées dans le jeu.")
 
     return app
 

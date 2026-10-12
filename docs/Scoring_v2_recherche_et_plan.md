@@ -2,9 +2,26 @@
 
 > Statut (06.10.2026) : **étape 1 implémentée** (§ 3.2 à 3.5 : qualité des choix, passage de
 > chapitre, niveau / progression / fiabilité, profil du livre), avec les réglages par défaut
-> du § 6. Restent : la clé d'experts (§ 3.1), les bandes (§ 3.6) et la validation (§ 4).
+> du § 6. **Étape 2 outillée** (§ 3.1) : grille ancrée provisoire, grille d'experts à
+> l'aveugle, import, accord (ICC), synthèse Delphi, champs « critique » et « justification » ;
+> reste à constituer le panel et à appliquer la clé consensuelle. Restent aussi les bandes
+> (§ 3.6) et la validation (§ 4).
 > Mesures faites sur MedStudents Y2 v2 avec des joueur·euse·s simulé·e·s
 > (`scripts/seed_demo.py`, base jetable) ; références vérifiées une à une (§ 7).
+> Mise à jour (10.10.2026) : la clé du livre 2 a été auditée et corrigée (indice de longueur,
+> Compassion sous-mesurée), et le build la contrôle désormais (§ 3.1, point 6).
+> Mise à jour (12.10.2026) : bibliographie refaite. Ne restent que des articles publiés avec
+> comité de lecture **et lisibles gratuitement** : 33 références (§ 7), chacune avec un lien
+> qui ouvre son PDF.
+> **Proposition v3 (12.10.2026), non implémentée :** après lecture intégrale des 33 articles,
+> [Scoring_v3_proposition.md](Scoring_v3_proposition.md) garde l'essentiel de ce plan et en
+> corrige trois points : la progression, les bandes et ce que voit l'étudiant·e.
+> **Clé du livre 2 (12.10.2026) :** plutôt qu'un panel humain (2 017 réponses à coter),
+> Claude a coté chaque réponse : un tour à l'aveugle, un tour de revue des divergences avec
+> l'auteur, puis un tour de calibrage pour le build. Cette clé est appliquée au jeu, mais
+> reste **provisoire** : il faut encore qu'un échantillon ciblé soit relu par des
+> enseignant·e·s. Méthode, accord (ICC du total : 0,90) et limites :
+> [MedStudents_Y2_v2_cle.md](MedStudents_Y2_v2_cle.md).
 
 ## 0. En bref
 
@@ -80,7 +97,10 @@ Une évaluation par le jeu se construit en trois modèles :
 - les **tâches** qui provoquent ces comportements.
 
 Le score n'est pas un compteur de points. C'est un *argument* qui va de l'action observée à la
-compétence (Mislevy, Steinberg & Almond 2003 ; Shute 2011, « évaluation furtive »).
+compétence. C'est le cadre de l'Evidence-Centered Design, que Arieli-Attali et al. (2019) étendent
+aux systèmes qui mêlent apprentissage et évaluation. L'« évaluation furtive » applique ce cadre
+dans le jeu lui-même : dans un jeu vidéo, les estimations tirées des actions des élèves corrèlent
+avec des tests externes de résolution de problèmes (Shute et al. 2016).
 
 → Pour nous : documenter, pour chaque compétence, quels choix la renseignent et pourquoi. La
 grille du § 3.1 sert à ça.
@@ -88,66 +108,68 @@ grille du § 3.1 sert à ça.
 ### 2.2 Nos scènes sont des tests de jugement situationnel
 Un SJT présente une situation et des réponses possibles ; on note la réponse choisie par rapport
 à une **clé**. C'est exactement notre format.
-- **Origine :** le modèle vient de Motowidlo, Dunnette & Carter (1990).
-- **En médecine :** le guide AMEE n° 100 en fait la synthèse (Patterson, Zibarras & Ashworth 2016).
+- **En médecine :** le guide AMEE n° 100 fait la synthèse du format, de son origine (la
+  « simulation basse fidélité ») et de sa validité (Patterson, Zibarras & Ashworth 2016).
 - **Validité prédictive :** une mesure des connaissances sur le comportement interpersonnel chez des
   étudiant·e·s en médecine prédit leur performance en stage 7 ans plus tard, et au travail 9 ans
   plus tard (Lievens & Sackett 2012).
 
 **La manière de noter change la qualité de la mesure :**
-- la fidélité, les écarts entre groupes et la validité dépendent de la méthode de cotation
-  (Bergman et al. 2006 ; de Leng et al. 2017) ;
-- parmi cinq méthodes de cotation par consensus, la plus courante était la moins valide
-  (Weng et al. 2018) ;
-- certains ajustements (standardisation, suppression des options « moyennes » peu
-  discriminantes) améliorent la validité (McDaniel et al. 2011) ;
+- à l'admission en médecine, la fidélité et les écarts entre groupes dépendent de la méthode
+  de cotation (de Leng et al. 2017) ;
+- parmi cinq méthodes de cotation par consensus, l'une des plus courantes (la cote brute) était
+  la moins valide ; les méthodes qui neutralisent les réponses extrêmes donnent une meilleure
+  validité (Weng et al. 2018) ;
 - revue d'ensemble récente : Kepes et al. 2025.
 
 → Pour nous : la clé (les −3…+3) doit être **établie par des experts, puis contrôlée sur les
 données**. Elle ne peut pas rester le jugement d'un seul auteur.
 
 ### 2.3 Une clé d'experts se construit avec une méthode
-- **Consensus :** méthode Delphi ou groupe nominal, avec une description des étapes et des seuils
-  d'accord (Humphrey-Murto et al. 2017).
+- **Consensus :** méthode Delphi, en décrivant les tours, la définition du consensus et le choix
+  des experts. Une revue des études Delphi en soins palliatifs en tire des recommandations
+  (CREDES ; Jünger et al. 2017).
 - **Mesure de l'accord :** coefficient de corrélation intraclasse (ICC). Il est bon à partir de
   0,75 et excellent à partir de 0,90 (Koo & Li 2016).
 - **Ancrage des compétences :**
   - le cadre suisse PROFILES, adapté de CanMEDS (Michaud & Jucker-Kupper 2016) : rôles
     communicateur, collaborateur, professionnel ;
-  - les éléments essentiels de la communication de Kalamazoo (Makoul 2001) ;
-  - le guide Calgary-Cambridge (Kurtz et al. 2003).
+  - les éléments essentiels de la communication de Kalamazoo, dont la grille se cote de façon
+    cohérente par les tuteurs, les patients standardisés et les étudiant·e·s (Joyce et al. 2010) ;
+  - le guide Calgary-Cambridge, utilisable pour évaluer des étudiant·e·s en début de cursus
+    (Simmenroth-Nayda et al. 2014).
 
 ### 2.4 Ramener chaque mesure sur 0–100 de façon interprétable
-- **POMP :** exprimer un score en pourcentage du maximum possible entre le minimum et le maximum
-  d'une échelle (Cohen, Cohen, Aiken & West 1999). C'est ce que fait déjà notre code, mais sur des
-  bornes impossibles à atteindre ensemble.
+- **Pourcentage du maximum possible :** exprimer un score entre le minimum et le maximum d'une
+  échelle. C'est ce que fait déjà notre code, mais sur des bornes impossibles à atteindre
+  ensemble (§ 1).
 - **Correction du hasard :** en QCM, on corrige la part due au hasard (Frary 1988). Même logique
   ici : 50/100 obtenu au hasard ne doit pas ressembler à une compétence moyenne.
 
 ### 2.5 Une performance dépend de la situation : il faut plusieurs situations
-- **Spécificité du cas :** la performance varie d'un cas à l'autre (Eva 2003). Une note fiable
-  demande beaucoup d'occasions de mesure.
-- **Théorie de la généralisabilité :** elle quantifie combien de scènes il faut pour une note
-  fiable (Bloch & Norman 2012).
+- **Spécificité du cas :** la performance varie d'une situation à l'autre. Sur un ECOS de 18
+  stations passé par 278 étudiant·e·s, la station est l'une des principales sources de variance ;
+  la théorie de la généralisabilité, utilisée dans cette étude, quantifie combien de situations
+  il faut pour une note fiable (Trejo-Mejía et al. 2016). Une note fiable demande donc beaucoup
+  d'occasions de mesure.
 - **Évaluation programmatique :** chaque point de mesure sert l'apprentissage ; les décisions
-  importantes se prennent sur l'agrégation de nombreux points (van der Vleuten et al. 2012).
+  importantes se prennent sur l'agrégation de nombreux points (Heeneman et al. 2021).
 
 → Pour nous : afficher l'incertitude, et ne pas publier une note de compétence par chapitre
 quand elle repose sur trop peu de choix.
 
 ### 2.6 Suivre la progression sur plusieurs passages
-- **Courbes d'apprentissage :** elles relient l'effort (les passages) à la performance (Pusic,
-  Boutis, Hatala & Cook 2015).
+- **Courbes d'apprentissage :** elles relient l'effort (les passages) à la performance, et des
+  seuils leur donnent un sens (Howard et al. 2023).
 - **Gain normalisé :** progression rapportée à la progression encore possible,
-  g = (après − avant) / (100 − avant). Il est faible sous 0,3, moyen de 0,3 à 0,7, fort au-dessus
-  (Hake 1998). Marx & Cummings (2007) en donnent une version individuelle qui gère aussi les reculs.
+  g = (après − avant) / (100 − avant). Le « changement normalisé » en est la version individuelle,
+  qui gère aussi les reculs. Les deux favorisent les personnes qui partent haut : ils se lisent
+  avec prudence (Nissen et al. 2018).
 - **Modèles de l'apprenant :** ils estiment le niveau courant en donnant plus de poids aux
-  observations récentes (Corbett & Anderson 1994 ; Pelánek 2016 ; Pelánek 2017). Dans ce domaine,
+  observations récentes (Corbett & Anderson 1995 ; Pelánek 2016 ; Pelánek 2017). Dans ce domaine,
   on juge un modèle à sa capacité à prédire la réponse suivante (Pelánek 2017).
-- **Apprentissage jusqu'à la maîtrise :** on répète jusqu'à atteindre un standard fixé à l'avance
-  (McGaghie et al. 2014).
-- **Oubli :** les compétences cognitives s'érodent sans pratique (Arthur et al. 1998). Une vieille
-  performance représente moins bien le niveau actuel.
+- **Oubli :** même apprises en simulation, des compétences baissent dans les mois qui suivent
+  (Legoux et al. 2021). Une vieille performance représente moins bien le niveau actuel.
 
 ### 2.7 Attention : rejouer le même scénario gonfle le score
 - **Effet de répétition :** à l'admission en médecine en Belgique, les candidat·e·s qui repassent
@@ -164,28 +186,26 @@ quand elle repose sur trop peu de choix.
 espacer les passages comptés ; varier l'ordre des réponses.
 
 ### 2.8 Erreurs critiques : non compensables
-À l'ECOS, certaines actions sont « critiques » pour la sécurité du patient. Payne et al. (2008)
-proposent de les analyser à part pour mieux distinguer les performances, au lieu de les noyer
-dans une somme de points.
+À l'ECOS, beaucoup de facultés ajoutent à la note globale une règle **non compensatoire** : un
+nombre minimal de stations réussies, pour qu'une bonne note ailleurs ne masque pas un échec.
+Homer & Russell (2021) en discutent les raisons et les méthodes.
 
 → Pour nous : violer le secret médical ou ne pas appeler le 144 ne doit pas se compenser par
 dix réponses polies.
 
 ### 2.9 Seuils, validité et feedback
 - **Seuils de réussite :** on les fixe avec des juges et une méthode explicite, par exemple Angoff
-  modifié ou régression sur les cas limites (McKinley & Norcini 2014).
+  modifié, comparé aux méthodes des cas limites (Dwyer et al. 2016).
 - **Validité selon Kane :** on vérifie quatre inférences. La **cotation** (la note reflète-t-elle
   la performance ?), la **généralisation** (à d'autres scènes), l'**extrapolation** (au monde réel)
-  et les **conséquences** (Cook, Brydges, Ginsburg & Hatala 2015).
+  et les **conséquences** (Cook & Hatala 2016).
 - **Contre-exemple :** un jeu sérieux infirmier dont le score ne distinguait pas étudiant·e·s et
   expert·e·s. Les auteurs concluent qu'il ne doit pas servir à noter (Blanié et al. 2020).
-- **Feedback :** il est efficace quand il est spécifique, centré sur la tâche et le processus, et
-  non jugeant (Hattie & Timperley 2007 ; Shute 2008).
+- **Feedback :** il a un effet moyen sur l'apprentissage (d = 0,48 sur 435 études), d'autant plus
+  fort qu'il apporte d'information sur la tâche (Wisniewski, Zierer & Hattie 2020). Il doit être
+  précis et non jugeant (Shute 2008).
 - **Patients virtuels en communication :** ce qui marche, c'est le débriefing, l'étayage et le
   **feedback humain**, pas le feedback automatique seul (Lee et al. 2020).
-- **Fin de vie :** en soins aigus de fin de vie, les récompenses doivent porter sur la qualité du
-  processus (conversation difficile, décision partagée), pas sur le fait de « gagner » contre la
-  mort (Cheng et al. 2026).
 
 ## 3. Le modèle proposé
 
@@ -218,7 +238,16 @@ flowchart LR
    suicide…
 5. **Analyse des réponses après un pilote**, avec l'export Excel déjà en place. On regarde quelle
    réponse est choisie par les meilleur·e·s et par les plus faibles, et on écarte les réponses qui
-   ne discriminent pas (McDaniel 2011).
+   ne discriminent pas.
+
+6. **Aucun indice de forme.** La meilleure réponse ne doit pas se reconnaître à sa forme
+   (longueur, ton), sinon on mesure l'habileté à « lire le test » et non le jugement. Audit du
+   10.10.2026 sur le livre 2, avec des joueur·euse·s simulé·e·s rejoué·e·s par le calcul
+   serveur : choisir toujours la réponse la plus longue donnait **89,5/100** (la meilleure était
+   la plus longue dans 80 % des points de choix) ; après correction, 46,4 (au hasard : 46,7).
+   Le build du livre échoue désormais si une stratégie fondée sur la longueur dépasse 62/100 sur
+   un chapitre, si deux réponses sont ex aequo au meilleur, ou si une compétence est en jeu dans
+   moins de 8 choix sur le parcours le plus court (sinon elle n'est pas notée).
 
 *Outil :* exporter la clé du livre vers Excel, une ligne par réponse avec une colonne par expert,
 puis réimporter la clé de consensus.
@@ -267,7 +296,7 @@ d'apprentissage. Trois indicateurs, affichés ensemble :
 | Indicateur | Calcul | Ce qu'il dit |
 |---|---|---|
 | **Niveau** | Moyenne pondérée des passages, le n-ième pesant 1 + 0,25 × (n − 1) | Où en est l'étudiant·e aujourd'hui |
-| **Progression** | Changement normalisé entre le 1ᵉʳ passage et le niveau (Marx & Cummings) | Combien il ou elle a gagné sur ce qui restait à gagner |
+| **Progression** | Changement normalisé entre le 1ᵉʳ passage et le niveau (Nissen et al. 2018) | Combien il ou elle a gagné sur ce qui restait à gagner |
 | **Fiabilité** | Nombre de passages et de choix, fourchette d'incertitude | Combien la note est solide |
 
 Ces indicateurs répondent à « plus il ou elle fait de sessions, plus son parcours compte » :
@@ -322,7 +351,7 @@ l'inférence « cette note = ce niveau » ne tient plus (Kane).
 
 Ces seuils sont **provisoires**. Ils sont à remplacer par un Angoff modifié : les experts estiment
 chapitre par chapitre ce que ferait un·e étudiant·e « tout juste compétent·e » de 2ᵉ année
-(McKinley & Norcini 2014).
+(Dwyer et al. 2016).
 
 ### 3.7 Niveau 6 — Expliquer chaque note
 - **Pour chaque choix :** la réponse choisie, la meilleure réponse et **la justification des
@@ -376,63 +405,69 @@ Encore ouvertes :
 
 ## 7. Bibliographie
 
+**Critères (revus le 12.10.2026).** Chaque référence remplit deux conditions :
+- c'est un article publié dans une revue scientifique à comité de lecture, ou dans les actes
+  d'une conférence à comité de lecture (CHI) ; son DOI a été vérifié auprès de Crossref,
+  d'OpenAlex et de PubMed (type de publication, revue, pages, absence de rétractation) ;
+- son texte intégral est **gratuit** : le lien « PDF » ouvre l'article, sans abonnement ni
+  paiement. Il mène à une source sûre : l'éditeur en libre accès, PubMed Central, un dépôt
+  d'université, l'archive HAL ou la page universitaire de l'auteur·e. Chaque lien a été ouvert
+  dans un navigateur le 12.10.2026 ; certains sites font d'abord une vérification automatique de
+  quelques secondes.
+
+Une « version acceptée » est le texte accepté après relecture par les pairs, sans la mise en
+page de la revue. Les articles payants sans version gratuite ont été retirés ou remplacés par
+des articles en libre accès (journal de développement, § 2.26). 33 références.
+
 **Concevoir une évaluation par le jeu**
-- Mislevy, R. J., Steinberg, L. S., & Almond, R. G. (2003). On the structure of educational assessments. *Measurement: Interdisciplinary Research and Perspectives*, 1, 3–66. [Introduction (rapport CSE 632)](https://files.eric.ed.gov/fulltext/ED483399.pdf)
-- Shute, V. J. (2011). Stealth assessment in computer-based games to support learning. In *Computer Games and Instruction* (pp. 503–524). [Shute & Sun, Games for Assessment](https://myweb.fsu.edu/vshute/pdf/GBA2017.pdf)
+- Arieli-Attali, M., Ward, S., Thomas, J., Deonovic, B., & von Davier, A. A. (2019). The expanded evidence-centered design (e-ECD) for learning and assessment systems: A framework for incorporating learning goals and processes within assessment design. *Frontiers in Psychology*, 10, 853. *Article méthodologique.* doi:10.3389/fpsyg.2019.00853 · **[PDF](https://www.frontiersin.org/articles/10.3389/fpsyg.2019.00853/pdf)** (version publiée, libre accès, Frontiers)
+- Shute, V. J., Wang, L., Greiff, S., Zhao, W., & Moore, G. (2016). Measuring problem solving skills via stealth assessment in an engaging video game. *Computers in Human Behavior*, 63, 106–117. *Étude empirique.* doi:10.1016/j.chb.2016.05.047 · **[PDF](https://myweb.fsu.edu/vshute/pdf/pvz.pdf)** (version publiée, page de l'autrice, Florida State University)
 
-**Tests de jugement situationnel et cotation**
-- Motowidlo, S. J., Dunnette, M. D., & Carter, G. W. (1990). An alternative selection procedure: The low-fidelity simulation. *Journal of Applied Psychology*, 75(6), 640–647. [doi:10.1037/0021-9010.75.6.640](https://www.semanticscholar.org/paper/An-alternative-selection-procedure:-The-simulation.-Motowidlo-Dunnette/6e21a262bd404ef51532e191cf915d9063f051e3)
-- Bergman, M. E., Drasgow, F., Donovan, M. A., Henning, J. B., & Juraska, S. E. (2006). Scoring situational judgment tests: Once you get the data, your troubles begin. *International Journal of Selection and Assessment*, 14(3), 223–235. [Wiley](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1468-2389.2006.00345.x)
-- McDaniel, M. A., Psotka, J., Legree, P. J., Yost, A. P., & Weekley, J. A. (2011). Toward an understanding of situational judgment item validity and group differences. *Journal of Applied Psychology*, 96(2), 327–336.
-- Patterson, F., Zibarras, L., & Ashworth, V. (2016). Situational judgement tests in medical education and training: Research, theory and practice: AMEE Guide No. 100. *Medical Teacher*, 38(1), 3–17. [Semantic Scholar](https://www.semanticscholar.org/paper/Situational-judgement-tests-in-medical-education-Patterson-Zibarras/ac8bc91346513fae53060b702e6c49df09fdfa09)
-- de Leng, W. E., Stegers-Jager, K. M., Husbands, A., Dowell, J. S., Born, M. P., & Themmen, A. P. N. (2017). Scoring method of a Situational Judgment Test: influence on internal consistency reliability, adverse impact and correlation with personality? *Advances in Health Sciences Education*, 22(2), 243–265. [Dundee](https://discovery.dundee.ac.uk/en/publications/scoring-method-of-a-situational-judgment-test-influence-on-intern/)
-- Weng, Q., Yang, H., Lievens, F., & McDaniel, M. A. (2018). Optimizing the validity of situational judgment tests: The importance of scoring methods. *Journal of Vocational Behavior*, 104, 199–209. [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0001879117301422)
-- Lievens, F., & Sackett, P. R. (2012). The validity of interpersonal skills assessment via situational judgment tests for predicting academic success and job performance. *Journal of Applied Psychology*, 97(2), 460–468. [PDF](https://static1.squarespace.com/static/5dd4c2c45ccc387bd8ffb210/t/5ddc9f0f8ef405035ca275f3/1574739728644/The+validity+of+interpersonal+skills+assessment+via+situational+j.pdf)
-- Kepes, S., Keener, S. K., Lievens, F., & McDaniel, M. A. (2025). An integrative, systematic review of the situational judgment test literature. *Journal of Management*, 51(6), 2278–2319. [SAGE](https://journals.sagepub.com/doi/abs/10.1177/01492063241288545)
+**Nos scènes sont des tests de jugement situationnel (SJT)**
+- Patterson, F., Zibarras, L., & Ashworth, V. (2016). Situational judgement tests in medical education and training: Research, theory and practice: AMEE Guide No. 100. *Medical Teacher*, 38(1), 3–17. *Revue de la littérature (guide AMEE).* doi:10.3109/0142159X.2015.1072619 · **[PDF](https://openaccess.city.ac.uk/id/eprint/12506/1/AMEE%20SJT%20Guide%202015.pdf)** (version acceptée, City Research Online)
+- de Leng, W. E., Stegers-Jager, K. M., Husbands, A., Dowell, J. S., Born, M. P., & Themmen, A. P. N. (2017). Scoring method of a Situational Judgment Test: influence on internal consistency reliability, adverse impact and correlation with personality? *Advances in Health Sciences Education*, 22(2), 243–265. *Étude empirique.* doi:10.1007/s10459-016-9720-7 · **[PDF](https://repub.eur.nl/pub/96435/REPUB_96435-OA.pdf)** (version publiée, libre accès, Université Érasme de Rotterdam)
+- Weng, Q., Yang, H., Lievens, F., & McDaniel, M. A. (2018). Optimizing the validity of situational judgment tests: The importance of scoring methods. *Journal of Vocational Behavior*, 104, 199–209. *Étude empirique.* doi:10.1016/j.jvb.2017.11.005 · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=6772&context=lkcsb_research)** (version acceptée, dépôt de la Singapore Management University)
+- Lievens, F., & Sackett, P. R. (2012). The validity of interpersonal skills assessment via situational judgment tests for predicting academic success and job performance. *Journal of Applied Psychology*, 97(2), 460–468. *Étude empirique longitudinale.* doi:10.1037/a0025741 · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=6617&context=lkcsb_research)** (version acceptée, dépôt de la Singapore Management University)
+- Kepes, S., Keener, S. K., Lievens, F., & McDaniel, M. A. (2025). An integrative, systematic review of the situational judgment test literature. *Journal of Management*, 51(6), 2278–2319. *Revue systématique.* doi:10.1177/01492063241288545 · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=8698&context=lkcsb_research)** (version acceptée, dépôt de la Singapore Management University)
 
-**Répétition, versions alternatives, « jouer avec le système »**
-- Lievens, F., Buyse, T., & Sackett, P. R. (2005). Retest effects in operational selection settings: Development and test of a framework. *Personnel Psychology*. [ResearchGate](https://www.researchgate.net/publication/227626981_Retest_Effects_in_Operational_Selection_Settings)
-- Lievens, F., & Sackett, P. R. (2007). Situational judgment tests in high-stakes settings: Issues and strategies with generating alternate forms. *Journal of Applied Psychology*, 92(4), 1043–1055. [ERIC](https://eric.ed.gov/?id=EJ945879)
-- Hausknecht, J. P., Halpert, J. A., Di Paolo, N. T., & Moriarty Gerrard, M. O. (2007). Retesting in selection: A meta-analysis of coaching and practice effects for tests of cognitive ability. *Journal of Applied Psychology*, 92(2), 373–385.
-- Harenbrock, J., Forthmann, B., & Holling, H. (2023). Retest reliability of situational judgment tests: A meta-analysis. *Journal of Personnel Psychology*, 22(4), 169–184. [Hogrefe](https://econtent.hogrefe.com/doi/10.1027/1866-5888/a000323)
-- Baker, R. S., Corbett, A. T., Koedinger, K. R., & Wagner, A. Z. (2004). Off-task behavior in the cognitive tutor classroom: When students "game the system". *Proceedings of CHI 2004*, 383–390. [ResearchGate](https://www.researchgate.net/publication/2872365_Off-Task_Behavior_in_the_Cognitive_Tutor_Classroom)
+**Répétition : pourquoi un délai avant qu'un chapitre rejoué compte**
+- Lievens, F., Buyse, T., & Sackett, P. R. (2005). Retest effects in operational selection settings: Development and test of a framework. *Personnel Psychology*, 58(4), 981–1007. *Étude empirique.* doi:10.1111/j.1744-6570.2005.00713.x · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=6678&context=lkcsb_research)** (manuscrit de l'auteur, dépôt de la Singapore Management University)
+- Lievens, F., & Sackett, P. R. (2007). Situational judgment tests in high-stakes settings: Issues and strategies with generating alternate forms. *Journal of Applied Psychology*, 92(4), 1043–1055. *Étude empirique.* doi:10.1037/0021-9010.92.4.1043 · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=6674&context=lkcsb_research)** (version acceptée, dépôt de la Singapore Management University)
+- Hausknecht, J. P., Halpert, J. A., Di Paolo, N. T., & Moriarty Gerrard, M. O. (2007). Retesting in selection: A meta-analysis of coaching and practice effects for tests of cognitive ability. *Journal of Applied Psychology*, 92(2), 373–385. *Méta-analyse.* doi:10.1037/0021-9010.92.2.373 · **[PDF](https://ecommons.cornell.edu/server/api/core/bitstreams/4fbba765-0d9c-4940-8492-66fecaca5227/content)** (version acceptée, eCommons, Cornell University)
+- Harenbrock, J., Forthmann, B., & Holling, H. (2023). Retest reliability of situational judgment tests: A meta-analysis. *Journal of Personnel Psychology*, 22(4), 169–184. *Méta-analyse.* doi:10.1027/1866-5888/a000323 · **[PDF](https://econtent.hogrefe.com/doi/pdf/10.1027/1866-5888/a000323)** (version publiée, libre accès, Hogrefe)
+- Baker, R. S., Corbett, A. T., Koedinger, K. R., & Wagner, A. Z. (2004). Off-task behavior in the cognitive tutor classroom: When students “game the system”. *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems (CHI 2004)*, 383–390. *Étude empirique (actes de conférence).* doi:10.1145/985692.985741 · **[PDF](https://hal.science/hal-00190176/document)** (archive ouverte HAL)
 
-**Échelles et correction du hasard**
-- Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units and the circumstance for POMP. *Multivariate Behavioral Research*, 34(3), 315–346. [doi:10.1207/S15327906MBR3403_2](https://www.tandfonline.com/doi/abs/10.1207/S15327906MBR3403_2)
-- Frary, R. B. (1988). Formula scoring of multiple-choice tests (correction for guessing). *Educational Measurement: Issues and Practice*, 7(2), 33–38. [Wiley](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1745-3992.1988.tb00434.x)
+**La note sur 100 et la correction du hasard**
+- Frary, R. B. (1988). Formula scoring of multiple-choice tests (correction for guessing). *Educational Measurement: Issues and Practice*, 7(2), 33–38. *Article méthodologique.* doi:10.1111/j.1745-3992.1988.tb00434.x · **[PDF](https://ncme.org/wp-content/uploads/2025/10/Module-4-Formula-Scoring-of-Multiple-choice-Tests-1.pdf)** (module ITEMS n° 4, site du NCME, éditeur de la revue)
 
-**Fidélité, spécificité du cas, évaluation programmatique**
-- Eva, K. W. (2003). On the generality of specificity. *Medical Education*, 37(7), 587–588. [Wiley](https://asmepublications.onlinelibrary.wiley.com/doi/10.1046/j.1365-2923.2003.01563.x)
-- Bloch, R., & Norman, G. (2012). Generalizability theory for the perplexed: AMEE Guide No. 68. *Medical Teacher*, 34(11), 960–992. [Semantic Scholar](https://www.semanticscholar.org/paper/Generalizability-theory-for-the-perplexed:-A-and-68-Bloch-Norman/08e266c488a69a4d5d34d85fd09d9e8e4e628d87)
-- van der Vleuten, C. P. M., Schuwirth, L. W. T., Driessen, E. W., et al. (2012). A model for programmatic assessment fit for purpose. *Medical Teacher*, 34(3), 205–214. [Maastricht](https://cris.maastrichtuniversity.nl/en/publications/a-model-for-programmatic-assessment-fit-for-purpose/)
+**Fiabilité : il faut plusieurs situations pour bien mesurer**
+- Trejo-Mejía, J. A., Sánchez-Mendiola, M., Méndez-Ramírez, I., & Martínez-González, A. (2016). Reliability analysis of the objective structured clinical examination using generalizability theory. *Medical Education Online*, 21, 31650. *Étude empirique (généralisabilité).* doi:10.3402/meo.v21.31650 · **[PDF](https://pmc.ncbi.nlm.nih.gov/articles/PMC4991996/pdf/MEO-21-31650.pdf)** (version publiée, PubMed Central)
+- Heeneman, S., de Jong, L. H., Dawson, L. J., Wilkinson, T. J., Ryan, A., Tait, G. R., Rice, N., Torre, D., Freeman, A., & van der Vleuten, C. P. M. (2021). Ottawa 2020 consensus statement for programmatic assessment – 1. Agreement on the principles. *Medical Teacher*, 43(10), 1139–1148. *Déclaration de consensus.* doi:10.1080/0142159X.2021.1957088 · **[PDF](https://www.tandfonline.com/doi/pdf/10.1080/0142159X.2021.1957088)** (version publiée, libre accès, Taylor & Francis)
 
-**Progression, modèles de l'apprenant, maîtrise, oubli**
-- Pusic, M. V., Boutis, K., Hatala, R., & Cook, D. A. (2015). Learning curves in health professions education. *Academic Medicine*, 90(8), 1034–1042. [Twelve Tips (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10696298/)
-- Hake, R. R. (1998). Interactive-engagement versus traditional methods: A six-thousand-student survey of mechanics test data for introductory physics courses. *American Journal of Physics*, 66(1), 64–74. [PER Central](https://www.per-central.org/items/detail.cfm?ID=2662)
-- Marx, J. D., & Cummings, K. (2007). Normalized change. *American Journal of Physics*, 75(1), 87–91. [AIP](https://pubs.aip.org/aapt/ajp/article-abstract/75/1/87/1056280/Normalized-change)
-- Corbett, A. T., & Anderson, J. R. (1994). Knowledge tracing: Modeling the acquisition of procedural knowledge. *User Modeling and User-Adapted Interaction*, 4, 253–278. [Springer](https://link.springer.com/article/10.1007/BF01099821)
-- Pelánek, R. (2016). Applications of the Elo rating system in adaptive educational systems. *Computers & Education*, 98, 169–179. [PDF](https://www.fi.muni.cz/~xpelanek/publications/CAE-elo.pdf)
-- Pelánek, R. (2017). Bayesian knowledge tracing, logistic models, and beyond: an overview of learner modeling techniques. *User Modeling and User-Adapted Interaction*, 27, 313–350. [Springer](https://link.springer.com/article/10.1007/s11257-017-9193-2)
-- McGaghie, W. C., Issenberg, S. B., Barsuk, J. H., & Wayne, D. B. (2014). A critical review of simulation-based mastery learning with translational outcomes. *Medical Education*, 48(4), 375–385. [Wiley](https://asmepublications.onlinelibrary.wiley.com/doi/10.1111/medu.12391)
-- Arthur, W., Bennett, W., Stanush, P. L., & McNelly, T. L. (1998). Factors that influence skill decay and retention: A quantitative review and analysis. *Human Performance*, 11(1), 57–101. [PDF](https://gwern.net/doc/psychology/spaced-repetition/1998-arthur.pdf)
+**Suivre la progression sur plusieurs passages**
+- Howard, N., Edwards, R., Boutis, K., Alexander, S., & Pusic, M. (2023). Twelve tips for using learning curves in health professions education research. *MedEdPublish*, 13, 269. *Article méthodologique.* doi:10.12688/mep.19723.1 · **[PDF](https://pmc.ncbi.nlm.nih.gov/articles/PMC10696298/pdf/mep-13-21130.pdf)** (version publiée, PubMed Central)
+- Nissen, J. M., Talbot, R. M., Nasim Thompson, A., & Van Dusen, B. (2018). Comparison of normalized gain and Cohen's d for analyzing gains on concept inventories. *Physical Review Physics Education Research*, 14(1), 010115. *Étude empirique.* doi:10.1103/PhysRevPhysEducRes.14.010115 · **[PDF](https://link.aps.org/pdf/10.1103/PhysRevPhysEducRes.14.010115)** (version publiée, libre accès, American Physical Society)
+- Corbett, A. T., & Anderson, J. R. (1995). Knowledge tracing: Modeling the acquisition of procedural knowledge. *User Modeling and User-Adapted Interaction*, 4(4), 253–278. *Étude empirique.* doi:10.1007/BF01099821 · **[PDF](http://act-r.psy.cmu.edu/wordpress/wp-content/uploads/2012/12/893CorbettAnderson1995.pdf)** (version publiée numérisée, groupe ACT-R, Carnegie Mellon University)
+- Pelánek, R. (2016). Applications of the Elo rating system in adaptive educational systems. *Computers & Education*, 98, 169–179. *Revue de la littérature.* doi:10.1016/j.compedu.2016.03.017 · **[PDF](https://www.fi.muni.cz/~xpelanek/publications/CAE-elo.pdf)** (version acceptée, page de l'auteur, Université Masaryk)
+- Pelánek, R. (2017). Bayesian knowledge tracing, logistic models, and beyond: an overview of learner modeling techniques. *User Modeling and User-Adapted Interaction*, 27(3–5), 313–350. *Revue de la littérature.* doi:10.1007/s11257-017-9193-2 · **[PDF](https://www.fi.muni.cz/~xpelanek/publications/umuai-overview.pdf)** (version acceptée, page de l'auteur, Université Masaryk)
+- Legoux, C., Gerein, R., Boutis, K., Barrowman, N., & Plint, A. (2021). Retention of critical procedural skills after simulation training: A systematic review. *AEM Education and Training*, 5(3), e10536. *Revue systématique.* doi:10.1002/aet2.10536 · **[PDF](https://pmc.ncbi.nlm.nih.gov/articles/PMC8166305/pdf/AET2-5-e10536.pdf)** (version acceptée, PubMed Central)
 
-**Clé d'experts, consensus, accord**
-- Humphrey-Murto, S., Varpio, L., Gonsalves, C., & Wood, T. J. (2017). Using consensus group methods such as Delphi and Nominal Group in medical education research. *Medical Teacher*, 39(1), 14–19. [PubMed](https://pubmed.ncbi.nlm.nih.gov/27841062/)
-- Koo, T. K., & Li, M. Y. (2016). A guideline of selecting and reporting intraclass correlation coefficients for reliability research. *Journal of Chiropractic Medicine*, 15(2), 155–163. [doi:10.1016/j.jcm.2016.02.012](https://www.researchgate.net/publication/299571433_A_Guideline_of_Selecting_and_Reporting_Intraclass_Correlation_Coefficients_for_Reliability_Research)
+**Faire valider les points par un panel d'experts**
+- Jünger, S., Payne, S. A., Brine, J., Radbruch, L., & Brearley, S. G. (2017). Guidance on Conducting and REporting DElphi Studies (CREDES) in palliative care: Recommendations based on a methodological systematic review. *Palliative Medicine*, 31(8), 684–706. *Revue systématique méthodologique.* doi:10.1177/0269216317690685 · **[PDF](https://eprints.lancs.ac.uk/id/eprint/84723/1/Submission_PM_06_12_2016.pdf)** (version acceptée, Lancaster EPrints)
+- Koo, T. K., & Li, M. Y. (2016). A guideline of selecting and reporting intraclass correlation coefficients for reliability research. *Journal of Chiropractic Medicine*, 15(2), 155–163 ; erratum : 16(4), 346 (2017). *Article méthodologique.* doi:10.1016/j.jcm.2016.02.012 · **[PDF](https://pmc.ncbi.nlm.nih.gov/articles/PMC4913118/pdf/main.pdf)** (version publiée, PubMed Central)
 
-**Cadres de compétences (ancrage de la grille)**
-- Michaud, P.-A., & Jucker-Kupper, P. (2016). The "Profiles" document: a modern revision of the objectives of undergraduate medical studies in Switzerland. *Swiss Medical Weekly*, 146, w14270. [PROFILES 2 (SMW)](https://smw.ch/index.php/smw/article/view/4389)
-- Makoul, G. (2001). Essential elements of communication in medical encounters: the Kalamazoo consensus statement. *Academic Medicine*, 76(4), 390–393. [PubMed](https://pubmed.ncbi.nlm.nih.gov/11299158/)
-- Kurtz, S., Silverman, J., Benson, J., & Draper, J. (2003). Marrying content and process in clinical method teaching: enhancing the Calgary-Cambridge guides. *Academic Medicine*, 78(8), 802–809.
+**Les cadres qui définissent les compétences (grille d'évaluation)**
+- Michaud, P.-A., & Jucker-Kupper, P. (2016). The “Profiles” document: a modern revision of the objectives of undergraduate medical studies in Switzerland. *Swiss Medical Weekly*, 146, w14270. *Article de cadre de référence.* doi:10.4414/smw.2016.14270 · **[PDF](https://smw.ch/index.php/smw/article/download/2150/3178)** (version publiée, libre accès, Swiss Medical Weekly)
+- Joyce, B. L., Steenbergh, T., & Scher, E. (2010). Use of the Kalamazoo Essential Elements Communication Checklist (Adapted) in an institutional interpersonal and communication skills curriculum. *Journal of Graduate Medical Education*, 2(2), 165–169. *Étude empirique.* doi:10.4300/JGME-D-10-00024.1 · **[PDF](https://pmc.ncbi.nlm.nih.gov/articles/PMC2941375/pdf/i1949-8357-2-2-165.pdf)** (version publiée, PubMed Central)
+- Simmenroth-Nayda, A., Heinemann, S., Nolte, C., Fischer, T., & Himmel, W. (2014). Psychometric properties of the Calgary Cambridge guides to assess communication skills of undergraduate medical students. *International Journal of Medical Education*, 5, 212–218. *Étude empirique.* doi:10.5116/ijme.5454.c665 · **[PDF](https://www.ijme.net/archive/5/psychometric-properties-of-the-calgary-cambridge-guides.pdf)** (version publiée, libre accès, IJME)
 
-**Erreurs critiques, seuils, validité**
-- Payne, N. J., Bradley, E. B., Heald, E. B., et al. (2008). Sharpening the eye of the OSCE with critical action analysis. *Academic Medicine*, 83(10). [Academic Medicine](https://academic.oup.com/academicmedicine/article-abstract/83/10/900/8354268)
-- McKinley, D. W., & Norcini, J. J. (2014). How to set standards on performance-based examinations: AMEE Guide No. 85. *Medical Teacher*, 36(2), 97–110. doi:10.3109/0142159X.2013.853119
-- Cook, D. A., Brydges, R., Ginsburg, S., & Hatala, R. (2015). A contemporary approach to validity arguments: a practical guide to Kane's framework. *Medical Education*, 49(6), 560–575. [Semantic Scholar](https://www.semanticscholar.org/paper/A-contemporary-approach-to-validity-arguments:-a-to-Cook-Brydges/795c51628080dd22e3945daa14652c5a284affee)
-- Blanié, A., et al. (2020). Assessing validity evidence for a serious game dedicated to patient clinical deterioration and communication. *Advances in Simulation*, 5, 4. [PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC7251894/)
+**Erreurs graves, seuils de réussite et validité de la note**
+- Homer, M., & Russell, J. (2021). Conjunctive standards in OSCEs: The why and the how of number of stations passed criteria. *Medical Teacher*, 43(4), 448–455. *Article méthodologique.* doi:10.1080/0142159X.2020.1856353 · **[PDF](https://eprints.whiterose.ac.uk/id/eprint/168283/3/ConjunctiveStandardsOSCE_ResubUpload.pdf)** (version acceptée, White Rose Research Online)
+- Dwyer, T., Wright, S., Kulasegaram, K. M., Theodoropoulos, J., Chahal, J., Wasserstein, D., Ringsted, C., Hodges, B., & Ogilvie-Harris, D. (2016). How to set the bar in competency-based medical education: standard setting after an Objective Structured Clinical Examination (OSCE). *BMC Medical Education*, 16, 1. *Étude empirique.* doi:10.1186/s12909-015-0506-z · **[PDF](https://link.springer.com/content/pdf/10.1186/s12909-015-0506-z.pdf)** (version publiée, libre accès, BMC)
+- Cook, D. A., & Hatala, R. (2016). Validation of educational assessments: a primer for simulation and beyond. *Advances in Simulation*, 1, 31. *Revue méthodologique.* doi:10.1186/s41077-016-0033-y · **[PDF](https://link.springer.com/content/pdf/10.1186/s41077-016-0033-y.pdf)** (version publiée, libre accès, BMC)
+- Blanié, A., Amorim, M.-A., Meffert, A., Perrot, C., Dondelli, L., & Benhamou, D. (2020). Assessing validity evidence for a serious game dedicated to patient clinical deterioration and communication. *Advances in Simulation*, 5, 4. *Étude empirique de validité.* doi:10.1186/s41077-020-00123-3 · **[PDF](https://link.springer.com/content/pdf/10.1186/s41077-020-00123-3.pdf)** (version publiée, libre accès, BMC)
 
-**Feedback, patients virtuels, fin de vie**
-- Hattie, J., & Timperley, H. (2007). The power of feedback. *Review of Educational Research*, 77(1), 81–112. [ERIC](https://eric.ed.gov/?id=EJ782448)
-- Shute, V. J. (2008). Focus on formative feedback. *Review of Educational Research*, 78(1), 153–189. [PDF](https://myweb.fsu.edu/vshute/pdf/shute%202008_b.pdf)
-- Lee, J., Kim, H., Kim, K. H., Jung, D., Jowsey, T., & Webster, C. S. (2020). Effective virtual patient simulators for medical communication training: A systematic review. *Medical Education*, 54(9), 786–795. [doi:10.1111/medu.14152](https://asmepublications.onlinelibrary.wiley.com/doi/10.1111/medu.14152)
-- Cheng, F., Xu, T., Mao, J., Li, Z., & Wang, Y. (2026). Branching-scenario games in acute end-of-life care education: cultural adaptation and health equity from a public health implementation perspective. *Frontiers in Public Health*, 14, 1889780. [PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC13323315/)
+**Feedback et patients virtuels**
+- Wisniewski, B., Zierer, K., & Hattie, J. (2020). The power of feedback revisited: A meta-analysis of educational feedback research. *Frontiers in Psychology*, 10, 3087. *Méta-analyse.* doi:10.3389/fpsyg.2019.03087 · **[PDF](https://www.frontiersin.org/articles/10.3389/fpsyg.2019.03087/pdf)** (version publiée, libre accès, Frontiers)
+- Shute, V. J. (2008). Focus on formative feedback. *Review of Educational Research*, 78(1), 153–189. *Revue de la littérature.* doi:10.3102/0034654307313795 · **[PDF](https://myweb.fsu.edu/vshute/pdf/shute%202008_b.pdf)** (version publiée, page de l'autrice, Florida State University)
+- Lee, J., Kim, H., Kim, K. H., Jung, D., Jowsey, T., & Webster, C. S. (2020). Effective virtual patient simulators for medical communication training: A systematic review. *Medical Education*, 54(9), 786–795. *Revue systématique.* doi:10.1111/medu.14152 · **[PDF](https://asmepublications.onlinelibrary.wiley.com/doi/pdfdirect/10.1111/medu.14152)** (version publiée, accès libre chez l'éditeur, Wiley)

@@ -289,6 +289,21 @@ details.acc-table-view[open] summary { margin-bottom: 10px; }
 .moment-line .pts { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
 .pts.pos { color: var(--acc-pos); }
 .pts.neg { color: var(--acc-neg); }
+/* Justification de la clé (« Pourquoi ») et réponses critiques. */
+.moment-why { margin: -4px 0 0; font-size: 13.5px; line-height: 1.55; display: grid; grid-template-columns: 150px minmax(0, 1fr) 40px; gap: 10px; color: var(--acc-ink-soft); }
+.moment-why .who { color: var(--acc-ink-faint); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+.moment.is-critical { border-left: 4px solid var(--acc-neg); }
+.crit-card { border-color: var(--acc-neg); }
+.crit-count {
+    display: inline-block; min-width: 26px; margin-left: 6px; padding: 1px 8px; border-radius: 999px;
+    font-size: 14px; text-align: center; vertical-align: middle;
+    color: var(--acc-neg); background: var(--neg-soft);
+}
+.crit-tag {
+    display: inline-block; margin-left: 4px; padding: 1px 8px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; font-style: normal; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--acc-neg); background: var(--neg-soft); border: 1px solid var(--acc-neg);
+}
 
 /* ---------- Espace formateur ---------- */
 
@@ -304,6 +319,12 @@ details.acc-table-view[open] summary { margin-bottom: 10px; }
 .acc-inline-form .acc-check { flex-direction: row; align-items: center; gap: 8px; font-weight: 500; min-height: 46px; }
 .acc-inline-form .acc-check input { width: 18px; height: 18px; margin: 0; padding: 0; accent-color: var(--acc-accent); }
 .acc-export-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.acc-steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.55; color: var(--acc-ink-soft); }
+.acc-steps strong { color: var(--acc-ink); }
+.acc-table tr.is-total td { font-weight: 700; border-top: 2px solid var(--line-strong); }
+.link-btn { font: inherit; font-size: 14px; color: var(--acc-accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.link-btn:hover { color: var(--brand-strong); }
+.acc-inline-form input[type="file"] { padding: 8px; }
 
 @media (max-width: 860px) {
     .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -313,8 +334,9 @@ details.acc-table-view[open] summary { margin-bottom: 10px; }
     .skill-label { grid-column: 1 / -1; }
     .skill-tag { grid-column: 1 / -1; }
     .skill-axis > span:first-child { display: none; }
-    .moment-line { grid-template-columns: minmax(0, 1fr) 40px; }
-    .moment-line .who { grid-column: 1 / -1; }
+    .moment-line, .moment-why { grid-template-columns: minmax(0, 1fr) 40px; }
+    .moment-line .who, .moment-why .who { grid-column: 1 / -1; }
+    .moment-why { margin-top: 0; }
     .userbar { padding: 12px 16px; justify-content: flex-start; }
 }
 /* Profil affiché dans un bloc étroit : l'intitulé passe au-dessus de la barre

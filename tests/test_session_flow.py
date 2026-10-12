@@ -47,12 +47,23 @@ def _scene():
     }
 
 
-@pytest.fixture()
-def app(tmp_path):
+def _keyed_scene():
+    """_scene avec la clé de cotation : justification partout, RD-2 critique."""
+    scene = _scene()
+    why = {(1, 0): "Accueille la question.", (1, 1): "Coupe court à la question.",
+           (2, 0): "Respecte le secret.", (2, 1): "Viole le secret médical."}
+    for ia in scene["Interactions"]:
+        for idx, r in enumerate(ia["Responses"]):
+            r["Rationale"] = why[(ia["Id"], idx)]
+    scene["Interactions"][1]["Responses"][1]["Critical"] = True
+    return scene
+
+
+def _make_app(tmp_path, scene=_scene):
     # Le livre « end_of_life » lit chapter.json : on le remplace par un mini-livre.
     book = {"Chapters": [
-        {"Id": 1, "Name": "Un", "Intro": "", "Scenes": [_scene()]},
-        {"Id": 2, "Name": "Deux", "Intro": "", "Scenes": [_scene()]},
+        {"Id": 1, "Name": "Un", "Intro": "", "Scenes": [scene()]},
+        {"Id": 2, "Name": "Deux", "Intro": "", "Scenes": [scene()]},
     ]}
     (tmp_path / "chapter.json").write_text(json.dumps(book), encoding="utf-8")
     backend = FakeBackend()
@@ -66,6 +77,16 @@ def app(tmp_path):
     })
     app.fake_backend = backend
     return app
+
+
+@pytest.fixture()
+def app(tmp_path):
+    return _make_app(tmp_path)
+
+
+@pytest.fixture()
+def keyed_app(tmp_path):
+    return _make_app(tmp_path, _keyed_scene)
 
 
 def _register(client, username="alice"):
@@ -161,8 +182,52 @@ def test_only_first_attempt_counts(app):
     url = sess["urls"]["attempts"]
     first = c.post(url, json={"chapter_id": 1, "scene_id": 1, "entry_id": 1, "choices": [1]}).get_json()
     again = c.post(url, json={"chapter_id": 1, "scene_id": 1, "entry_id": 1, "choices": [0, 0]}).get_json()
-    assert first == {"counted": True, "attempt_no": 1}
-    assert again == {"counted": False, "attempt_no": 2}
+    # Livre sans clé de cotation : pas de retour de fin de scène.
+    assert first == {"counted": True, "attempt_no": 1, "review": []}
+    assert again == {"counted": False, "attempt_no": 2, "review": []}
+
+
+def test_rationale_and_critical_flag_reach_the_player(keyed_app):
+    c = keyed_app.test_client()
+    _register(c)
+    sess = c.post("/api/play/end_of_life/session").get_json()["session"]
+    # Chapitre 1 : réponse critique au 2ᵉ choix ; chapitre 2 : écart de 3 au 1ᵉʳ.
+    reviews = {}
+    for chapter_id, choices in ((1, [0, 1]), (2, [1])):
+        reviews[chapter_id] = c.post(sess["urls"]["attempts"], json={
+            "chapter_id": chapter_id, "scene_id": 1, "entry_id": 1, "choices": choices,
+        }).get_json()["review"]
+        c.post(sess["urls"]["complete"], json={"chapter_id": chapter_id})
+
+    # Fin de scène : ce qui était attendu, et pourquoi.
+    review = reviews[1]
+    assert len(review) == 1
+    assert review[0]["choice"] == {"text": "vers -1", "critical": True, "rationale": "Viole le secret médical."}
+    assert review[0]["best"]["rationale"] == "Respecte le secret." and not review[0]["is_best"]
+    assert [r["best"]["rationale"] for r in reviews[2]] == ["Accueille la question."]
+
+    # Bilan : la réponse critique est listée avec sa justification, avant les notes.
+    page = c.get(sess["urls"]["report"]).get_data(as_text=True)
+    assert "Réponses critiques" in page and 'class="crit-tag"' in page
+    assert page.index("h-critical") < page.index("Note de la session")
+    assert "Viole le secret médical." in page and "Respecte le secret." in page
+    # Occasion manquée hors critique, avec sa justification.
+    assert "Coupe court à la question." in page and "Accueille la question." in page
+
+    # Le feedback IA reçoit les réponses critiques et les justifications.
+    c.post(f"/api/sessions/{sess['id']}/feedback", json={})
+    prompt = keyed_app.fake_backend.prompts[-1]
+    assert "RÉPONSES CRITIQUES CHOISIES" in prompt and "Viole le secret médical." in prompt
+
+    # Export formateur : la justification accompagne la colonne « critique ».
+    with keyed_app.app_context():
+        from repositories.database import db_session
+        UserRepository(db_session()).create("trainer", "Formatrice", hash_password("motdepasse1"), ROLE_TRAINER)
+    t = keyed_app.test_client()
+    t.post("/login", data={"username": "trainer", "password": "motdepasse1"})
+    choix = json.loads(t.get("/trainer/export?format=json").data)["tables"]["choix"]
+    assert [(c["critique"], c["justification"]) for c in choix] == [
+        (False, "Accueille la question."), (True, "Viole le secret médical."), (False, "Coupe court à la question.")]
 
 
 def test_server_rejects_impossible_paths(app):

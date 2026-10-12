@@ -89,6 +89,10 @@ class R:
     scores: str = ""
     sets: tuple[str, ...] | list[str] = ()
     clears: tuple[str, ...] | list[str] = ()
+    # Clé de cotation : réponse dangereuse ou contraire à la loi (non compensable),
+    # et justification d'une phrase montrée dans le feedback (validées par le panel).
+    critical: bool = False
+    rationale: str = ""
 
     def soft(self) -> dict[str, int]:
         return parse_scores(self.scores)
@@ -110,6 +114,10 @@ class R:
             d["SetFlags"] = list(self.sets)
         if self.clears:
             d["ClearFlags"] = list(self.clears)
+        if self.critical:
+            d["Critical"] = True
+        if self.rationale:
+            d["Rationale"] = self.rationale
         return d
 
 

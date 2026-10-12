@@ -12,17 +12,23 @@ Le script :
   2. le valide : liens, points d'entrée, scènes atteignables et terminables,
      cohérence des états narratifs, une scène jouée par emplacement (zéro ou
      une pour une histoire annexe), issues obligatoires, éventail des choix ;
-  3. écrit le JSON, le rapport de répartition des soft skills et la liste des
-     images à produire.
+     et la clé de notation elle-même : une seule meilleure réponse par point de
+     choix, aucun indice de longueur exploitable (BLIND_MAX), chaque compétence
+     en jeu dans assez de choix pour être notée (MIN_SKILL_EVIDENCE) ;
+  3. écrit le JSON, le rapport de répartition des soft skills (avec l'audit du
+     score : joueur·euse·s simulé·e·s rejoué·e·s par le vrai calcul serveur) et
+     la liste des images à produire.
 
 Usage : .venv/bin/python scripts/build_medstudents_y2_v2.py [--check]
         (--check : valide sans rien écrire)
 """
 from __future__ import annotations
 
+import heapq
 import itertools
 import json
 import os
+import random
 import sys
 from collections import Counter, defaultdict
 from typing import Any
@@ -36,6 +42,13 @@ from domain.soft_skills import SOFT_SKILLS, SOFT_SKILL_LABELS  # noqa: E402
 from medstudents_y2_v2.book import CHAPTERS, MUTEX, OUTCOMES  # noqa: E402
 from medstudents_y2_v2.cast import CAST_KEYS  # noqa: E402
 from medstudents_y2_v2.dsl import CODE_OF_SKILL, C, S  # noqa: E402
+from services.scoring_service import (  # noqa: E402
+    MIN_SKILL_EVIDENCE,
+    choice_quality,
+    replay_scene,
+    response_scores,
+)
+from services.scoring_service import total as score_total  # noqa: E402
 from services.validation_service import (  # noqa: E402
     validate_entry_points,
     validate_next_interaction_ids,
@@ -57,6 +70,16 @@ CATEGORIES = [
 SHORT = {"RespectAndDignity": "RD", "Empathy": "EM", "Compassion": "CO",
          "EmotionalRegulation": "ER", "CommunicationClarity": "CC",
          "ProfessionalBoundaries": "PB", "InterprofessionalCollaboration": "IC"}
+
+# Audit du score. Une stratégie « à l'aveugle » choisit d'après la longueur des
+# réponses sans lire les scores ; au hasard, on obtient environ 47/100. Au-delà de
+# BLIND_MAX, la forme des réponses trahirait la bonne (le livre v1 : 89,5 en
+# choisissant toujours la plus longue).
+BLIND_MAX = 62
+BLIND = [("la plus longue", 0), ("la 2ᵉ plus longue", 1), ("la 3ᵉ plus longue", 2),
+         ("la plus courte", -1)]
+RANDOM_GAMES = 100   # parties « au hasard » simulées pour le rapport
+RANDOM_SEED = 2026   # graine fixe : le rapport généré est reproductible
 
 
 def category(total: int) -> str:
@@ -138,6 +161,7 @@ def validate(chapters: list[C]) -> tuple[list[str], list[str]]:
             warnings.append(f"État « {flag} » posé (ch. {sorted(chs)}) mais pas encore lu")
 
     errors += _validate_slots(chapters)
+    errors += _validate_scoring(chapters)
     return errors, warnings
 
 
@@ -255,6 +279,275 @@ def _validate_slots(chapters: list[C]) -> list[str]:
                     errors.append(f"Ch. {ch.id} : ordre de jeu {played} incohérent "
                                   f"avec les états {sorted(flags)}")
     return errors
+
+
+# ---------------------------------------------------------------------------
+# Audit du score : la clé de notation mesure-t-elle le jugement ?
+# ---------------------------------------------------------------------------
+
+def _choice_points(ch: C):
+    for sc in ch.scenes:
+        for n in sc.nodes:
+            if len(n.responses) > 1:
+                yield sc, n
+
+
+def blind_quality(ch: C) -> dict[str, int]:
+    """Qualité (0 = toujours la pire, 100 = toujours la meilleure) de stratégies qui
+    ne regardent que la longueur des réponses, sur tous les points de choix du
+    chapitre, chacun compté une fois."""
+    gain = {name: 0 for name, _ in BLIND}
+    span = 0
+    for _, n in _choice_points(ch):
+        totals = [r.total() for r in n.responses]
+        by_length = sorted(range(len(totals)), key=lambda i: -len(n.responses[i].text))
+        low = min(totals)
+        span += max(totals) - low
+        for name, rank in BLIND:
+            gain[name] += totals[by_length[rank]] - low
+    return {name: round(100 * g / span) if span else 0 for name, g in gain.items()}
+
+
+def best_length_ranks(chapters: list[C]) -> dict[int, int]:
+    """Rang de longueur de la meilleure réponse (1 = la plus longue) : nombre de
+    points de choix par rang. Un rang qui écrase les autres est un indice."""
+    ranks: Counter[int] = Counter()
+    for ch in chapters:
+        for _, n in _choice_points(ch):
+            totals = [r.total() for r in n.responses]
+            lengths = sorted((len(r.text) for r in n.responses), reverse=True)
+            ranks[lengths.index(len(n.responses[totals.index(max(totals))].text)) + 1] += 1
+    return dict(sorted(ranks.items()))
+
+
+def _in_play(node) -> dict[str, int]:
+    """1 pour chaque compétence que ce point de choix met en jeu (les réponses ne la
+    notent pas toutes pareil), comme le compte `evidence` de `choice_quality`."""
+    if len(node.responses) < 2:
+        return {k: 0 for k in SOFT_SKILLS}
+    soft = [r.soft() for r in node.responses]
+    return {k: int(max(s[k] for s in soft) > min(s[k] for s in soft)) for k in SOFT_SKILLS}
+
+
+def _scene_min_evidence(sc: S, start: int) -> dict[str, int]:
+    """Pour chaque compétence, le plus petit nombre de choix qui la mettent en jeu sur
+    un parcours complet de la scène depuis `start` (plus court chemin : repasser par
+    une boucle n'ajoute jamais que des choix)."""
+    by_id = {n.id: n for n in sc.nodes}
+    weight = {n.id: _in_play(n) for n in sc.nodes}
+    out: dict[str, int] = {}
+    for k in SOFT_SKILLS:
+        dist = {start: weight[start][k]}
+        heap = [(dist[start], start)]
+        best_end: int | None = None
+        while heap:
+            d, nid = heapq.heappop(heap)
+            if d > dist.get(nid, d):
+                continue
+            node = by_id[nid]
+            if not node.responses or any(r.next == -1 for r in node.responses):
+                best_end = d if best_end is None else min(best_end, d)
+            for r in node.responses:
+                if r.next in by_id:
+                    nd = d + weight[r.next][k]
+                    if nd < dist.get(r.next, nd + 1):
+                        dist[r.next] = nd
+                        heapq.heappush(heap, (nd, r.next))
+        out[k] = best_end or 0
+    return out
+
+
+def min_evidence(ch: C) -> dict[str, int]:
+    """Borne basse prudente : pour chaque compétence, le nombre minimal de choix qui
+    la mettent en jeu sur un parcours complet du chapitre (scènes obligatoires
+    seulement ; pour chaque emplacement, la pire variante et le pire point d'entrée)."""
+    slots: dict[str, list[S]] = defaultdict(list)
+    for sc in ch.scenes:
+        if not sc.annex:
+            slots[sc.slot_key].append(sc)
+    total = {k: 0 for k in SOFT_SKILLS}
+    for scenes in slots.values():
+        mins = [_scene_min_evidence(sc, start) for sc in scenes
+                for start in [sc.nodes[0].id] + [e.interaction for e in sc.entries]]
+        for k in SOFT_SKILLS:
+            total[k] += min(m[k] for m in mins)
+    return total
+
+
+def _validate_scoring(chapters: list[C]) -> list[str]:
+    errors: list[str] = []
+    for ch in chapters:
+        for sc, n in _choice_points(ch):
+            totals = [r.total() for r in n.responses]
+            if totals.count(max(totals)) > 1:
+                errors.append(f"[{sc.title}] I{n.id} : meilleure réponse ex aequo {totals}")
+        for name, q in blind_quality(ch).items():
+            if q > BLIND_MAX:
+                errors.append(f"Ch. {ch.id} : choisir toujours {name} rapporte {q}/100 "
+                              f"(maximum {BLIND_MAX}) : la longueur trahit la bonne réponse")
+        for k, n_ev in min_evidence(ch).items():
+            if n_ev < MIN_SKILL_EVIDENCE:
+                errors.append(f"Ch. {ch.id} : {SHORT[k]} n'est en jeu que dans {n_ev} choix sur le "
+                              f"parcours le plus court (il en faut {MIN_SKILL_EVIDENCE} pour la noter)")
+    return errors
+
+
+def _pick(strategy: str, responses: list[Any], rng: random.Random, tried: set[int]) -> int:
+    """Choix d'un·e joueur·euse simulé·e. Au second passage par un même point (boucle
+    « on recommence »), il ou elle essaie une autre réponse."""
+    allowed = [i for i in range(len(responses)) if i not in tried] or list(range(len(responses)))
+    if strategy == "random":
+        return rng.choice(allowed)
+    totals = {i: score_total(response_scores(responses[i])) for i in allowed}
+    lengths = {i: len(responses[i].Text) for i in allowed}
+    if strategy == "best":
+        return max(allowed, key=lambda i: (totals[i], -i))
+    if strategy == "worst":
+        return min(allowed, key=lambda i: (totals[i], i))
+    if strategy == "longest":
+        return max(allowed, key=lambda i: (lengths[i], -i))
+    if strategy == "shortest":
+        return min(allowed, key=lambda i: (lengths[i], i))
+    raise ValueError(strategy)
+
+
+def play_book(chapters: list[Chapter], strategy: str,
+              rng: random.Random) -> list[tuple[int, list[dict[str, Any]]]]:
+    """Joue tout le livre comme le parcours joueur (scènes conditionnelles, points
+    d'entrée, états posés puis effacés) et renvoie, par chapitre, la trace du vrai
+    rejeu serveur (`replay_scene`)."""
+    flags: set[str] = set()
+    played: list[tuple[int, list[dict[str, Any]]]] = []
+    for ch in chapters:
+        start = ch._extra.get("StartChoice")
+        if start and not any(f in flags for f in start.get("UnlessAny", [])):
+            flags |= set(rng.choice(start["Options"])["Flags"])
+        steps: list[dict[str, Any]] = []
+        for sc in ch.Scenes:
+            if not _eval(sc._extra.get("Condition"), flags):
+                continue
+            entry = next((ep["InteractionId"] for ep in sc._extra.get("EntryPoints") or []
+                          if _eval(ep.get("Condition"), flags)), sc.Interactions[0].Id)
+            by_id = {ia.Id: ia for ia in sc.Interactions}
+            current = by_id.get(entry)
+            choices: list[int] = []
+            tried: dict[int, set[int]] = defaultdict(set)
+            while current is not None and current.Responses:
+                idx = 0 if len(current.Responses) == 1 else _pick(
+                    strategy, current.Responses, rng, tried[current.Id])
+                tried[current.Id].add(idx)
+                chosen = current.Responses[idx]
+                choices.append(idx)
+                flags -= set(chosen._extra.get("ClearFlags") or [])
+                flags |= set(chosen._extra.get("SetFlags") or [])
+                nxt = chosen.NextInteractionID
+                current = by_id.get(nxt) if nxt not in (None, -1) else None
+            steps += replay_scene(sc, entry, choices).trace
+        played.append((ch.Id, steps))
+    return played
+
+
+def scoring_audit(chapters: list[C]) -> dict[str, Any]:
+    """Joueur·euse·s simulé·e·s (vrai rejeu serveur) et indices de forme."""
+    typed = [Chapter.from_dict(c.to_dict()) for c in chapters]
+    sim: dict[str, dict[str, float]] = {}
+    for strategy in ("best", "worst", "longest", "shortest"):
+        played = play_book(typed, strategy, random.Random(RANDOM_SEED))
+        sim[strategy] = {str(cid): round(choice_quality(steps)["global"], 1) for cid, steps in played}
+        sim[strategy]["book"] = round(choice_quality([st for _, s in played for st in s])["global"], 1)
+    rng = random.Random(RANDOM_SEED)
+    per_ch: dict[str, list[float]] = defaultdict(list)
+    book: list[float] = []
+    seen_min = {str(ch.id): {k: 10 ** 9 for k in SOFT_SKILLS} for ch in chapters}
+    unscored = 0
+    for _ in range(RANDOM_GAMES):
+        played = play_book(typed, "random", rng)
+        for cid, steps in played:
+            q = choice_quality(steps)
+            per_ch[str(cid)].append(q["global"])
+            unscored += sum(v is None for v in q["scores"].values())
+            for k in SOFT_SKILLS:
+                seen_min[str(cid)][k] = min(seen_min[str(cid)][k], q["evidence"][k])
+        book.append(choice_quality([st for _, s in played for st in s])["global"])
+    sim["random"] = {cid: round(sum(v) / len(v), 1) for cid, v in per_ch.items()}
+    sim["random"]["book"] = round(sum(book) / len(book), 1)
+    return {
+        "simulated": sim,
+        "random_games": RANDOM_GAMES,
+        "random_unscored_skills": unscored,
+        "random_min_evidence": seen_min,
+        "blind_static": {str(ch.id): blind_quality(ch) for ch in chapters},
+        "best_is_longest": {str(ch.id): [sum(
+            len(n.responses[[r.total() for r in n.responses].index(max(r.total() for r in n.responses))].text)
+            == max(len(r.text) for r in n.responses) for _, n in _choice_points(ch)),
+            sum(1 for _ in _choice_points(ch))] for ch in chapters},
+        "best_length_ranks": {str(k): v for k, v in best_length_ranks(chapters).items()},
+        "min_evidence": {str(ch.id): min_evidence(ch) for ch in chapters},
+    }
+
+
+def _audit_lines(chapters: list[C], audit: dict[str, Any]) -> list[str]:
+    sim = audit["simulated"]
+    names = {str(ch.id): f"{ch.id}. {ch.name}" for ch in chapters}
+    lines = [
+        "## Audit du score",
+        "",
+        "Ce que vaut chaque façon de jouer, recalculée à chaque build. **Le build échoue** si",
+        "un point de choix a deux meilleures réponses, si une stratégie fondée sur la longueur",
+        f"des réponses dépasse {BLIND_MAX}/100 sur un chapitre, ou si une compétence est en jeu",
+        f"dans moins de {MIN_SKILL_EVIDENCE} choix sur le parcours le plus court d'un chapitre",
+        f"(`MIN_SKILL_EVIDENCE` : en dessous, le serveur ne note pas la compétence).",
+        "",
+        "### Joueur·euse·s simulé·e·s (vrai rejeu serveur)",
+        "",
+        "Tout le livre est joué avec ses états narratifs, puis chaque parcours est rejoué par",
+        "`replay_scene` et noté par `choice_quality`, comme une vraie partie : 0 = toujours la",
+        f"pire réponse, 100 = toujours la meilleure. « Au hasard » : moyenne de {audit['random_games']}",
+        "parties.",
+        "",
+        "| Chapitre | Meilleure | Pire | Au hasard | Toujours la plus longue | Toujours la plus courte |",
+        "|---|---:|---:|---:|---:|---:|",
+    ]
+    for cid in list(names) + ["book"]:
+        label = names.get(cid, "**Livre**")
+        lines.append(f"| {label} | {sim['best'][cid]:g} | {sim['worst'][cid]:g} | {sim['random'][cid]:g} | "
+                     f"{sim['longest'][cid]:g} | {sim['shortest'][cid]:g} |")
+    lines += [
+        "",
+        f"Compétences non notées faute de preuves, sur les {audit['random_games']} parties au "
+        f"hasard : **{audit['random_unscored_skills']}**.",
+        "",
+        "### Indices de forme (tous les points de choix, chacun compté une fois)",
+        "",
+        "| Chapitre | Points de choix | Meilleure = la plus longue | "
+        + " | ".join(f"Toujours {name}" for name, _ in BLIND) + " |",
+        "|---|---:|---:|" + "---:|" * len(BLIND),
+    ]
+    for cid, label in names.items():
+        longest, n_points = audit["best_is_longest"][cid]
+        blind = audit["blind_static"][cid]
+        lines.append(f"| {label} | {n_points} | {longest} ({round(100 * longest / n_points)} %) | "
+                     + " | ".join(str(blind[name]) for name, _ in BLIND) + " |")
+    ranks = audit["best_length_ranks"]
+    lines += [
+        "",
+        "Rang de longueur de la meilleure réponse (1 = la plus longue) : "
+        + " · ".join(f"{r} : {n}" for r, n in ranks.items()) + ".",
+        "",
+        "### Preuves par compétence",
+        "",
+        "Nombre de choix qui mettent chaque compétence en jeu : minimum sur un parcours complet",
+        "(borne basse : pire variante de chaque scène) et, entre parenthèses, minimum observé sur",
+        "les parties au hasard.",
+        "",
+        "| Chapitre | " + " | ".join(SHORT[k] for k in SOFT_SKILLS) + " |",
+        "|---|" + "---:|" * len(SOFT_SKILLS),
+    ]
+    for cid, label in names.items():
+        lines.append(f"| {label} | " + " | ".join(
+            f"{audit['min_evidence'][cid][k]} ({audit['random_min_evidence'][cid][k]})"
+            for k in SOFT_SKILLS) + " |")
+    return lines + [""]
 
 
 # ---------------------------------------------------------------------------
@@ -397,6 +690,7 @@ def build_report(chapters: list[C]) -> tuple[str, dict[str, Any]]:
     book_total = sum(book_pos.values()) or 1
     book_share = {k: round(100 * book_pos[k] / book_total) for k in SOFT_SKILLS}
     data["book_share_percent"] = book_share
+    data["scoring_audit"] = scoring_audit(chapters)
     summary = [
         "## Vue d'ensemble du livre",
         "",
@@ -405,6 +699,7 @@ def build_report(chapters: list[C]) -> tuple[str, dict[str, Any]]:
         *overview,
         "| **Livre** | | " + " | ".join(f"**{book_share[k]}**" for k in SOFT_SKILLS) + " | | |",
         "",
+        *_audit_lines(chapters, data["scoring_audit"]),
     ]
     idx = lines.index("IC Collaboration interprofessionnelle.") + 2
     lines[idx:idx] = summary

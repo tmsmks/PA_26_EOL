@@ -132,8 +132,8 @@ def test_a_scene_replayed_in_a_passage_is_not_scored_twice(alice):
     body = {"chapter_id": 1, "scene_id": 1, "entry_id": 1, "passage_id": passage["id"]}
     first = alice.post(sess["urls"]["attempts"], json={**body, "choices": [1]}).get_json()
     again = alice.post(sess["urls"]["attempts"], json={**body, "choices": [0, 0]}).get_json()
-    assert first == {"counted": True, "attempt_no": 1}
-    assert again == {"counted": False, "attempt_no": 2}
+    assert (first["counted"], first["attempt_no"]) == (True, 1)
+    assert (again["counted"], again["attempt_no"]) == (False, 2)
     done = alice.post(sess["urls"]["complete"], json={"chapter_id": 1}).get_json()
     assert done["passage"]["global"] == 0.0  # la 1ʳᵉ tentative fait foi
     # Reprendre le chapitre ouvre le même passage tant qu'il n'est pas clos.

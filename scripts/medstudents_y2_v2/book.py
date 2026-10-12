@@ -6,9 +6,11 @@ from .ch2 import CH2
 from .ch3 import CH3
 from .ch4 import CH4
 from .ch5 import CH5
-from .ch6 import CH6
+from .key import apply_key
 
-CHAPTERS = [CH1, CH2, CH3, CH4, CH5, CH6]
+# Les scores des chapitres sont la clé de l'auteur ; la clé en vigueur
+# (data/keys/MedStudents_Y2_v2_cle.json) les remplace aux points de choix.
+CHAPTERS = apply_key([CH1, CH2, CH3, CH4, CH5])
 
 # États mutuellement exclusifs : une combinaison qui en contient deux d'un même
 # groupe ne peut pas se produire (utilisé pour valider les emplacements de scènes).
@@ -17,9 +19,11 @@ MUTEX: list[tuple[str, ...]] = [
     ("erreur_homonyme", "bon_pittet", "appel_rattrape"),
     ("aveu_homonyme", "esquive_homonyme"),
     ("papa_144", "papa_rassure"),
+    ("papa_minuit", "papa_rassure"),
     ("bernard_rapide", "bernard_retard"),
     ("mensonge_portfolio", "verite_portfolio"),
     ("noah_aide", "noah_seul"),
+    ("noah_tard", "noah_seul"),
     ("famille_apaisee", "famille_dechiree"),
     ("oceane_orientee", "oceane_trahie", "oceane_seule"),
     ("examen_quitte", "examen_fini"),
@@ -29,13 +33,13 @@ MUTEX: list[tuple[str, ...]] = [
 # état de chaque groupe. Clé : titre de la scène.
 OUTCOMES: dict[str, list[tuple[str, ...]]] = {
     "1.2 La story": [("photo_virale", "photo_supprimee")],
-    "2.2 Le téléphone": [("erreur_homonyme", "bon_pittet", "appel_rattrape")],
-    "2.4 Le Café de la Gare": [("aveu_homonyme", "esquive_homonyme")],
-    "3.2 Le repas de Noël": [("papa_144", "papa_rassure")],
-    "4.2 Hors script": [("bernard_rapide", "bernard_retard")],
-    "4.3 Le portfolio": [("mensonge_portfolio", "verite_portfolio")],
-    "4.4 1 h 07": [("noah_aide", "noah_seul")],
-    "5.2 La table de la cuisine": [("famille_apaisee", "famille_dechiree")],
-    "5.3 La grange": [("oceane_orientee", "oceane_trahie", "oceane_seule")],
-    "6.1 L'examen": [("examen_quitte", "examen_fini")],
+    "2.1 Le jour des vaccins": [("erreur_homonyme", "bon_pittet", "appel_rattrape")],
+    "2.3 Le Café de la Gare": [("aveu_homonyme", "esquive_homonyme")],
+    "3.1 Le repas de Noël": [("papa_144", "papa_rassure")],
+    "4.1 Hors script": [("bernard_rapide", "bernard_retard")],
+    "4.2 Le portfolio": [("mensonge_portfolio", "verite_portfolio")],
+    "4.3 1 h 07": [("noah_aide", "noah_seul")],
+    "5.1 La table de la cuisine": [("famille_apaisee", "famille_dechiree")],
+    "5.2 La grange": [("oceane_orientee", "oceane_trahie", "oceane_seule")],
+    "5.3 La dernière visite": [("examen_quitte", "examen_fini")],
 }

@@ -10,6 +10,10 @@ sqlalchemy>=2.0
 psycopg[binary]>=3.1
 # Export des données de jeu au format Excel (.xlsx)
 openpyxl>=3.1
+# Lecture audio : voix neuronales locales (Piper, GPL-3.0, lancé dans un
+# processus séparé) et encodage MP3. Modèles : flask --app app tts-install
+piper-tts>=1.3
+soundfile>=0.13
 
 # Tests (dev)
 pytest>=7.0

@@ -107,6 +107,28 @@ flask --app app create-user <identifiant> --role trainer
 
 Les participant·e·s créent leur compte eux-mêmes sur `/register`.
 
+### Lecture audio (voix naturelles)
+
+Le parcours joueur peut lire les textes à voix haute (bouton « Écouter »). Par
+défaut, il utilise des **voix neuronales locales** (Piper), gratuites et hors
+ligne : le texte ne quitte pas le serveur. Pour les installer (environ 140 Mo,
+dans `instance/tts/models`) :
+
+```bash
+flask --app app tts-install
+```
+
+Pour des voix encore plus naturelles, dont le **français de Suisse** (Ariane,
+Fabrice), définir `AZURE_SPEECH_KEY` et `AZURE_SPEECH_REGION` (Azure AI Speech,
+niveau gratuit de 500 000 caractères par mois) : le texte des écrans est alors
+envoyé à Microsoft. Sans voix serveur, le jeu utilise les voix du navigateur.
+Chaque extrait lu est gardé en cache (`instance/tts/cache`) : un même texte
+n'est synthétisé qu'une fois.
+
+Piper est sous licence GPL-3.0 : il tourne dans un processus séparé
+(`scripts/tts_piper_worker.py`, lui aussi sous GPL-3.0). Voix : *siwis*
+(CC BY 4.0) et *upmc* (Pierre, Jessica ; CC BY-SA 4.0).
+
 ## Routes
 
 | Méthode | URL | Description |
@@ -120,6 +142,7 @@ Les participant·e·s créent leur compte eux-mêmes sur `/register`.
 | `GET` | `/sessions/<id>` | Bilan d'une session (graphiques + feedback) |
 | `GET` | `/trainer/` · `/trainer/participants/<id>` | Suivi formateur·rice |
 | `GET` | `/trainer/export?format=xlsx\|csv\|json` | Données brutes (filtres `book`, `user`, `pseudo=1`) (formateur) |
+| `GET` · `POST` | `/trainer/cle/` | Validation de la clé de cotation : grille d'experts, import, accord (ICC), synthèse (formateur) |
 | `GET` | `/books/<slug>/` | Liste des chapitres d'un livre (formateur) |
 | `GET` | `/books/<slug>/chapters/<id>` | Éditeur graphique d'un chapitre (formateur) |
 | `POST` | `/api/save` | Sauvegarde atomique d'un chapitre (formateur) |
@@ -130,6 +153,9 @@ Les participant·e·s créent leur compte eux-mêmes sur `/register`.
 | `POST` | `/api/sessions/<id>/complete-chapter` | Clôture un chapitre (et le livre) |
 | `POST` | `/api/sessions/<id>/feedback` | Feedback général (généré au 1er appel) |
 | `GET` | `/api/data/images/<filename>` | Images des personnages |
+| `GET` | `/api/tts/voices` | Voix naturelles disponibles (connecté) |
+| `POST` | `/api/tts/speak` | Fait lire un texte d'écran, renvoie l'adresse du MP3 (connecté) |
+| `GET` | `/api/tts/audio/<voix>/<clé>.mp3` | Extrait audio en cache (connecté) |
 
 ## Fonctionnalités
 
@@ -166,6 +192,12 @@ Le calcul des notes suit le scoring v2 (`docs/Scoring_v2_recherche_et_plan.md`,
   (mesuré sur le livre Y2). La note globale porte sur le total des 7
   compétences ; le profil, sur chacune, notée seulement si au moins 8 choix la
   mettent en jeu.
+- **Contrôle de la clé (livre 2)** : `scripts/build_medstudents_y2_v2.py`
+  échoue si un point de choix a deux meilleures réponses, si choisir toujours
+  la réponse la plus longue (ou la plus courte) dépasse 62/100 sur un chapitre,
+  ou si une compétence est en jeu dans moins de 8 choix sur le parcours le plus
+  court. L'audit (joueur·euse·s simulé·e·s rejoué·e·s par le serveur) est dans
+  `docs/MedStudents_Y2_v2_soft_skills.md`.
 - **Niveau d'un chapitre** : moyenne de ses passages notés, le n-ième pesant
   1 + 0,25 × (n − 1) ; avec la **progression** (changement normalisé depuis le
   1ᵉʳ passage, Marx & Cummings 2007) et une **marge** d'incertitude à 95 %
@@ -206,6 +238,37 @@ Dans l'espace formateur (`/trainer/`, et sur la page de chaque participant),
 - Les sessions en cours ont des bilans **provisoires**, calculés sur les
   passages déjà joués ; les sessions terminées reprennent l'instantané figé.
 
+## Validation de la clé de cotation
+
+Les points des réponses (−3 à +3 sur 7 compétences) ont été écrits par l'auteur
+seul : ils restent **provisoires** tant qu'un panel d'experts ne les a pas
+validés (plan de scoring v2, § 3.1). La page `/trainer/cle/` outille cette
+validation :
+
+1. **Grille Excel pour les experts**, par livre, par chapitre ou sur un
+   échantillon de points de choix tirés au hasard (le même pour tous). Elle
+   contient les consignes, la grille ancrée (`domain/expert_rubric.py`,
+   brouillon à valider) et une ligne par réponse, **sans les points de
+   l'auteur** (cotation à l'aveugle). Saisie contrôlée de −3 à +3, colonnes
+   « critique » et « justification ».
+2. **Import des grilles remplies** : le nom de l'expert et le tour sont lus dans
+   la grille ; réimporter remplace ses cotes de ce tour.
+3. **Accord entre experts** par compétence et sur le total : ICC(2,1) et
+   ICC(2,k), deux facteurs, effets aléatoires, accord absolu, avec les seuils de
+   Koo & Li (2016). Liste des réponses à revoir (experts écartés de 3 points ou
+   plus, ou médiane écartée de l'auteur de 2 points ou plus) et réponses jugées
+   critiques par la majorité.
+4. **Synthèse Excel** d'un tour, pour le tour suivant (méthode Delphi).
+
+La clé consensuelle n'est pas encore appliquée au livre. Les champs `Critical`
+et `Rationale` d'une réponse sont lus par le jeu : la trace de chaque choix
+garde le marqueur critique et la justification de la réponse choisie et de la
+meilleure. Le joueur les voit à la fin de chaque scène (« Ce qui était
+attendu ») et dans le bilan de session (réponses critiques, puis moments
+clés) ; l'export les reprend (colonnes `critique`, `critique_provisoire` — à
+−7 ou moins au total — et `justification`). Aucun plafond de note n'est
+appliqué en cas de réponse critique.
+
 ## Base de données
 
 Les livres restent des fichiers JSON (`data/chapters/`). Les comptes, sessions
@@ -225,6 +288,7 @@ Le dossier `instance/` (base SQLite + clé `secret_key`) est ignoré par git.
 | `scene_attempts` | Une scène jouée : choix effectués, scores, bornes des réponses proposées à chaque choix, tentative notée ou non |
 | `chapter_passages` | Un passage de chapitre : noté ou d'entraînement, dates, états narratifs de départ, résultats figés |
 | `passage_attempts` | Les scènes jouées pendant chaque passage |
+| `expert_ratings` | Cotes des experts : réponse, expert, tour, points par compétence, critique, justification |
 
 ### Opérations courantes (SQLite)
 
@@ -302,6 +366,10 @@ migrations (Alembic), idéalement mis en place avant la mise en production.
 | `REGISTRATION_CODE` | — | Si défini, code exigé à l'inscription |
 | `APP_TIMEZONE` | `Europe/Zurich` | Fuseau d'affichage des dates |
 | `PASSAGE_SPACING_DAYS` | `7` | Délai minimal entre deux passages notés d'un même chapitre |
+| `TTS_ENGINE` | `auto` | Voix de lecture : `auto` (Azure si clé, sinon Piper s'il est installé), `piper`, `azure` ou `off` |
+| `AZURE_SPEECH_KEY` · `AZURE_SPEECH_REGION` | — | Voix neuronales Azure (ex. région `switzerlandnorth`) |
+| `TTS_MODELS_DIR` · `TTS_CACHE_DIR` | `instance/tts/models` · `instance/tts/cache` | Modèles Piper et extraits audio en cache |
+| `TTS_DAILY_CHARS` | `400000` | Plafond de caractères synthétisés par jour (coût, abus) |
 
 ## Tests
 
@@ -309,7 +377,7 @@ migrations (Alembic), idéalement mis en place avant la mise en production.
 pytest
 ```
 
-Couverture actuelle : domain models (round-trip), repository (atomicité), graph service, validation EG-7, filtrage doublons, normalisation des requêtes IA, scoring (rejeu, bornes, pondération), feedback (validation IA, repli), parcours complet comptes → sessions → bilan → droits, export des données (Excel, CSV, JSON, filtres, pseudonymisation), scoring v2 (qualité des choix, passages, règle d'espacement, chapitre rejoué seul, niveaux, reprise des données v1).
+Couverture actuelle : domain models (round-trip), repository (atomicité), graph service, validation EG-7, filtrage doublons, normalisation des requêtes IA, scoring (rejeu, bornes, pondération), feedback (validation IA, repli), parcours complet comptes → sessions → bilan → droits, export des données (Excel, CSV, JSON, filtres, pseudonymisation), scoring v2 (qualité des choix, passages, règle d'espacement, chapitre rejoué seul, niveaux, reprise des données v1), validation de la clé (ICC vérifié sur l'exemple de Shrout & Fleiss, grille à l'aveugle, import, synthèse), lecture audio (préparation du texte, testée avec Node ; voix serveur : cache, limites, API, Azure simulé, Piper réel s'il est installé).
 
 ## Export Mermaid
 
