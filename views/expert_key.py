@@ -18,11 +18,14 @@ from flask import (
 from books import BOOKS, get_book
 from domain.expert_rubric import RUBRIC, RUBRIC_STATUS
 from domain.soft_skills import SOFT_SKILL_LABELS, SOFT_SKILLS
+from exporters.angoff import angoff_workbook
 from exporters.expert_key import grid_workbook, synthesis_meta, synthesis_tables
 from exporters.tables import to_xlsx
 from repositories.database import db_session
+from repositories.angoff_ratings import AngoffRatingRepository
 from repositories.expert_ratings import ExpertRatingRepository
-from services.expert_key_service import analyse, key_items, parse_grid
+from services.angoff_service import MIN_JUDGES, angoff_points, cut_scores, parse_angoff_grid
+from services.expert_key_service import analyse, key_items, parse_grid, targeted_review
 from views.guards import trainer_required
 
 expert_key_bp = Blueprint("expert_key", __name__, url_prefix="/trainer/cle")
@@ -60,6 +63,12 @@ def _rating_dicts(ratings) -> list[dict]:
     ]
 
 
+def _keys_dir() -> str:
+    import os
+
+    return os.path.join(current_app.root_path, "data", "keys")
+
+
 def _int_arg(name: str, default: int, allowed: tuple[int, ...] | None = None) -> int:
     value = request.args.get(name, type=int)
     if value is None:
@@ -94,6 +103,9 @@ def index():
             for ch in chapters
         ],
         n_items=len(items),
+        targeted=targeted_review(book["slug"], _keys_dir()),
+        angoff=_angoff_summary(book["slug"], chapters),
+        min_judges=MIN_JUDGES,
         samples=SAMPLES,
         summary=summary,
         rounds=rounds,
@@ -117,12 +129,24 @@ def grid(book_slug: str):
         abort(404)
     sample = _int_arg("sample", 0, SAMPLES)
     round_ = _int_arg("round", 1, (1, 2, 3))
-    items = key_items(chapters, [chapter] if chapter else None, sample or None)
-    scope = (f"Chapitre {chapter}" if chapter else "Tous les chapitres") + (
-        f" · échantillon de {sample} points de choix par chapitre" if sample else ""
-    )
-    name = f"grille_experts_{book['slug']}_{'ch' + str(chapter) if chapter else 'tout'}"
-    name += f"_ech{sample}" if sample else ""
+    targeted = targeted_review(book["slug"], _keys_dir()) if request.args.get("cible") else None
+    if request.args.get("cible") and targeted is None:
+        abort(404)
+    if targeted:
+        # Relecture ciblée : réponses où les clés divergent, et réponses critiques.
+        items = key_items(chapters, refs=targeted["refs"])
+        scope = (
+            f"Relecture ciblée · {targeted['n_points_changed']} points de choix où la meilleure réponse "
+            f"a changé (2 réponses chacun) et {targeted['n_critical']} réponses critiques"
+        )
+        name = f"grille_relecture_ciblee_{book['slug']}"
+    else:
+        items = key_items(chapters, [chapter] if chapter else None, sample or None)
+        scope = (f"Chapitre {chapter}" if chapter else "Tous les chapitres") + (
+            f" · échantillon de {sample} points de choix par chapitre" if sample else ""
+        )
+        name = f"grille_experts_{book['slug']}_{'ch' + str(chapter) if chapter else 'tout'}"
+        name += f"_ech{sample}" if sample else ""
     response = send_file(
         io.BytesIO(grid_workbook(book["title"], items, round_, scope)),
         mimetype=XLSX,
@@ -190,3 +214,77 @@ def synthesis(book_slug: str):
     )
     response.headers["Cache-Control"] = "no-store"
     return response
+
+
+# --- Seuils de niveau (Angoff modifié) ----------------------------------------
+
+def _angoff_summary(book_slug: str, chapters) -> dict:
+    repo = AngoffRatingRepository(db_session())
+    ratings = repo.for_book(book_slug)
+    picks = [{"judge": r.judge, "point": r.point, "response_no": r.response_no} for r in ratings]
+    return {
+        "judges": repo.summary(book_slug),
+        "cuts": cut_scores(angoff_points(chapters), picks) if picks else [],
+    }
+
+
+@expert_key_bp.route("/<book_slug>/angoff/grille")
+@trainer_required
+def angoff_grid(book_slug: str):
+    """Grille Excel des seuils : la réponse la plus probable d'un·e étudiant·e tout juste compétent·e."""
+    book = _book(book_slug)
+    chapters = _chapters(book)
+    chapter = request.args.get("chapter", type=int)
+    if chapter is not None and chapter not in {ch.Id for ch in chapters}:
+        abort(404)
+    sample = _int_arg("sample", 0, SAMPLES)
+    points = angoff_points(chapters, [chapter] if chapter else None, sample or None)
+    scope = (f"Chapitre {chapter}" if chapter else "Tous les chapitres") + (
+        f" · échantillon de {sample} points de choix par chapitre" if sample else ""
+    )
+    year = book.get("audience") or "l'année visée par le livre"
+    name = f"grille_seuils_{book['slug']}_{'ch' + str(chapter) if chapter else 'tout'}"
+    name += f"_ech{sample}" if sample else ""
+    response = send_file(
+        io.BytesIO(angoff_workbook(book["title"], points, scope, year)),
+        mimetype=XLSX,
+        as_attachment=True,
+        download_name=f"{name}.xlsx",
+    )
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@expert_key_bp.route("/<book_slug>/angoff/import", methods=["POST"])
+@trainer_required
+def angoff_upload(book_slug: str):
+    """Importe des grilles de seuils remplies (réimporter remplace les choix du ou de la juge)."""
+    book = _book(book_slug)
+    points = {p.ref: p for p in angoff_points(_chapters(book))}
+    files = [f for f in request.files.getlist("grids") if f and f.filename][:MAX_UPLOAD_FILES]
+    if not files:
+        flash("Choisissez au moins une grille de seuils remplie (.xlsx).", "error")
+    repo = AngoffRatingRepository(db_session())
+    for f in files:
+        parsed = parse_angoff_grid(f.read(), f.filename, points)
+        for err in parsed.errors[:5]:
+            flash(err, "error")
+        if parsed.errors or not parsed.judge:
+            flash(f"{f.filename} : grille non importée, corrigez-la puis réimportez-la.", "error")
+            continue
+        n = repo.replace(book["slug"], parsed.judge, parsed.picks)
+        note = f" ({parsed.unknown} ligne(s) d'une autre version du livre ignorée(s))" if parsed.unknown else ""
+        flash(f"{parsed.judge} : {n} point(s) de choix jugé(s) importé(s){note}.", "ok")
+    return redirect(url_for("expert_key.index", book=book["slug"]) + "#h-angoff")
+
+
+@expert_key_bp.route("/<book_slug>/angoff/supprimer", methods=["POST"])
+@trainer_required
+def angoff_remove(book_slug: str):
+    book = _book(book_slug)
+    judge = request.form.get("judge", "")
+    if not judge:
+        abort(400)
+    AngoffRatingRepository(db_session()).delete(book["slug"], judge)
+    flash(f"Choix de {judge} supprimés.", "ok")
+    return redirect(url_for("expert_key.index", book=book["slug"]) + "#h-angoff")

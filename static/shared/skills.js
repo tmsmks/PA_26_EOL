@@ -21,6 +21,17 @@ export const SKILL_LABELS_FR = {
     InterprofessionalCollaboration: "Collab. interpro.",
 };
 
+/** Noms complets (bilans, tendance par compétence). */
+export const SKILL_NAMES_FR = {
+    RespectAndDignity: "respect et dignité",
+    Empathy: "empathie",
+    Compassion: "compassion",
+    EmotionalRegulation: "régulation émotionnelle",
+    CommunicationClarity: "clarté de la communication",
+    ProfessionalBoundaries: "frontières professionnelles",
+    InterprofessionalCollaboration: "collaboration interprofessionnelle",
+};
+
 export function emptyScores() {
     const obj = {};
     for (const sk of SCORE_SKILLS) obj[sk] = 0;

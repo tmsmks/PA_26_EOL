@@ -70,7 +70,7 @@
             <p class="session-note is-info">Passage d'entraînement : ce chapitre a été noté le {{ outlook.last_counted_at | date_fr }}. Un nouveau passage comptera à partir du {{ outlook.next_counted_at | date_fr }}.
             {%- endif %}
             {%- if session_info %} Session {{ session_info.number }} en cours · {{ session_info.completed_chapters | length }} chapitre{{ 's' if session_info.completed_chapters | length > 1 }} sur {{ chapter_count }} terminé{{ 's' if session_info.completed_chapters | length > 1 }}.
-            {%- else %} Ce chapitre ouvrira votre session {{ next_number }} de ce livre.{% endif %}</p>
+            {%- else %} Ce chapitre ouvrira votre session {{ next_number }} de ce livre.{% endif %} <a href="{{ url_for('pages.scoring_explained') }}" target="_blank" rel="noopener">Comment est-ce noté ?</a></p>
             <button class="primary-btn" id="btn-start">Commencer</button>
             <p class="save-status" id="start-status" hidden></p>
             {%- if teacher_intro %}
@@ -122,7 +122,10 @@
                 <ul class="moments" id="review-list"></ul>
                 <p class="review-hint" id="review-critical-note" hidden>Réponse critique : elle met en danger le patient ou un tiers, ou enfreint la loi ou une règle déontologique essentielle.</p>
             </section>
-            <div class="bars" id="debrief-bars"></div>
+            <details class="points-details">
+                <summary>Voir les points de ce scénario</summary>
+                <div class="bars" id="debrief-bars"></div>
+            </details>
             <p class="save-status" id="save-status" hidden></p>
             <div class="debrief-actions">
                 <button class="ghost-btn" id="btn-replay">Refaire ce scénario</button>
@@ -135,9 +138,21 @@
         <div class="intro-box">
             <p class="eyebrow">Chapitre terminé</p>
             <h1 id="end-title"></h1>
+            {#- Feedback d'abord : ce qu'il faut retenir, puis la bande et la tendance ; la note à la demande. #}
+            <section class="review" id="end-review" aria-labelledby="end-review-title" aria-live="polite" hidden>
+                <h3 class="review-title" id="end-review-title">Ce qu'il faut retenir de ce chapitre</h3>
+                <p class="review-hint">Les choix les plus décisifs du chapitre, avec la justification de la clé de cotation (provisoire).</p>
+                <ul class="moments" id="end-review-list"></ul>
+                <p class="review-hint" id="end-review-critical-note" hidden>Réponse critique : elle met en danger le patient ou un tiers, ou enfreint la loi ou une règle déontologique essentielle. Elle ne se compense pas par de bonnes réponses ailleurs.</p>
+            </section>
             <p class="end-score" id="end-score" hidden></p>
-            <p class="session-note">Clé de cotation provisoire, en attente de validation par un panel d'experts.</p>
-            <div class="bars" id="end-bars"></div>
+            <p class="end-trend" id="end-trend" hidden></p>
+            <details class="points-details" id="end-details" hidden>
+                <summary>Voir la note</summary>
+                <p class="end-note" id="end-note"></p>
+                <div class="bars" id="end-bars"></div>
+            </details>
+            <p class="session-note">Clé de cotation provisoire, en attente de validation par des enseignant·e·s. <a href="{{ url_for('pages.scoring_explained') }}" target="_blank" rel="noopener">Comment est-ce noté ?</a></p>
             <p class="save-status" id="end-status" hidden></p>
             <div class="debrief-actions">
                 <a class="ghost-btn" href="{{ url_for('pages.play_book', book_slug=book.slug) }}">Retour au sommaire</a>

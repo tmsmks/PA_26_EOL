@@ -26,10 +26,10 @@ from domain.models import Chapter
 from domain.soft_skills import SOFT_SKILL_LABELS, SOFT_SKILLS
 from exporters.tables import Table
 from repositories.orm import BookSession, ChapterPassage, User
-from services.history_service import chapter_progress
+from services.history_service import chapter_progress, cohort_first_sds
 from services.expert_key_service import CRITICAL_PROVISIONAL_TOTAL
 from services.scoring_service import MIN_SKILL_EVIDENCE, TEXT_MAX, choice_quality
-from services.session_service import as_utc, results_from_passages
+from services.session_service import as_utc, passage_attempt_dicts, results_from_passages
 
 
 def _slug(label: str) -> str:
@@ -81,10 +81,22 @@ LEVEL_COLUMNS = [
     BOOK,
     CHAPTER_ID,
     CHAPTER,
-    ("niveau", "Moyenne pondérée des passages comptés : le n-ième pèse 1 + 0,25 × (n − 1)."),
+    ("niveau", "Moyenne pondérée des passages comptés : un passage pèse 2^(−âge en jours / 90), "
+               "1 aujourd'hui, 0,5 à 90 jours (depuis le 13.10.2026 ; avant : selon le rang)."),
     ("fourchette", "Demi-largeur de l'intervalle de confiance à 95 % du niveau, en points."),
-    ("progression", "Changement normalisé entre le 1ᵉʳ passage et le niveau, en % de ce qui restait "
-                    "à gagner (Nissen et al. 2018) ; vide avec un seul passage."),
+    ("bande", "Bande de niveau (seuils provisoires 60, 75, 90, ou seuils Angoff du chapitre), donnée avec sa marge : « entre A et B » "
+              "si l'intervalle déborde d'une bande ; jamais au-dessus de « À consolider » si le "
+              "dernier passage compté contient une réponse critique."),
+    ("plafond_critique", "1 si le dernier passage compté contient une réponse critique (bande plafonnée)."),
+    ("gain_points", "Progression : moyenne pondérée des passages suivants − 1ᵉʳ passage, en points ; "
+                    "vide avec un seul passage."),
+    ("marge_gain", "Marge à 95 % du gain, en points."),
+    ("progres", "progrès net (gain au-delà de sa marge et d'un tiers d'écart-type de la cohorte), "
+                "progrès probable, pas encore démontré, baisse nette, ou pas de changement démontré."),
+    ("a_rafraichir", "1 si le dernier passage compté a plus de 90 jours."),
+    ("progression", "Ancien indicateur, gardé une version : changement normalisé en % de ce qui "
+                    "restait à gagner. Il favorise ceux qui partent haut (Nissen et al. 2018) ; "
+                    "remplacé par gain_points."),
     ("premier_passage", "Qualité des choix au 1ᵉʳ passage compté (« score à froid »)."),
     ("dernier_passage", "Qualité des choix au dernier passage compté."),
     ("passages_notes", "Passages comptés."),
@@ -102,12 +114,20 @@ PASSAGE_COLUMNS = [
     SESSION_NO,
     ("passage_no", "Rang du passage pour ce participant et ce chapitre (1, 2, 3…)."),
     ("compte", "1 si le passage compte dans le niveau (1ᵉʳ passage, ou assez espacé du précédent "
-               "passage compté : voir le délai dans lisez-moi), 0 = entraînement."),
+               "passage compté : voir le délai dans lisez-moi ; et pas joué trop vite), 0 = entraînement."),
+    ("trop_rapide", "1 si plus d'un quart des choix chronométrés ont été faits en moins de 2 secondes "
+                    "(seuil provisoire) : le passage ne compte pas."),
+    ("choix_chronometres", "Choix dont le navigateur a envoyé le temps de réponse."),
+    ("choix_rapides", "Choix faits en moins de 2 secondes."),
+    ("temps_median_s", "Temps de réponse médian, en secondes."),
+    ("reponses_critiques", "Réponses critiques choisies pendant le passage."),
     ("statut", "termine ou en_cours."),
     ("debut", "Début du passage."),
     ("fin", "Fin du passage (vide s'il est en cours)."),
     QUALITY,
     CHANCE,
+    ("taux_meilleure_reponse", "Part des choix où la meilleure réponse a été choisie, en % "
+                               "(cotation dichotomique, calculée à côté de la qualité ; environ 20 % au hasard)."),
     ("scenes", "Scènes notées (1ʳᵉ tentative de chaque scène dans le passage)."),
     ("choix", "Choix notés."),
     *_skills(SKILL_100),
@@ -194,6 +214,7 @@ CHOICE_COLUMNS = ATTEMPT_COLUMNS + [
     ("critique", "1 si la réponse choisie est marquée critique dans la clé du livre (champ Critical)."),
     ("critique_provisoire", "1 si elle est critique dans la clé, ou vaut −7 ou moins au total "
                             "(repère provisoire en attendant le panel d'experts)."),
+    ("temps_s", "Temps de réponse en secondes, depuis l'affichage des réponses (vide avant le 13.10.2026)."),
     ("justification", "Justification de la réponse choisie dans la clé du livre (champ Rationale) ; "
                       "vide si la clé n'en donne pas, ou pour un choix enregistré avant le 13.10.2026."),
 ]
@@ -261,6 +282,7 @@ def build_export(
     pseudonymize: bool = False,
     spacing_days: int = 7,
     now: datetime | None = None,
+    thresholds: dict[str, dict[int, Any]] | None = None,
 ) -> tuple[list[Table], dict[str, Any]]:
     """Tables et métadonnées de l'export.
 
@@ -300,6 +322,7 @@ def build_export(
     passage_rows: list[dict[str, Any]] = []
     level_rows: list[dict[str, Any]] = []
     passage_of: dict[int, ChapterPassage] = {}
+    cohorts: dict[str, dict[int, float | None]] = {}
     groups: dict[tuple[int, str, int], list[ChapterPassage]] = {}
     for p in passages:
         groups.setdefault((p.user_id, p.book_slug, p.chapter_id), []).append(p)
@@ -321,17 +344,30 @@ def build_export(
                 "session_no": session_no.get(p.session_id),
                 "passage_no": rank,
                 "compte": p.counted,
+                "trop_rapide": bool((res.get("timing") or {}).get("too_fast")),
+                "choix_chronometres": (res.get("timing") or {}).get("n_timed"),
+                "choix_rapides": (res.get("timing") or {}).get("n_fast"),
+                "temps_median_s": round((res.get("timing") or {})["median_ms"] / 1000, 1)
+                if (res.get("timing") or {}).get("median_ms") is not None else None,
+                "reponses_critiques": res.get("n_critical"),
                 "statut": "termine" if p.is_completed else "en_cours",
                 "debut": _local(p.started_at),
                 "fin": _local(p.completed_at),
                 "qualite": res.get("global"),
                 "qualite_corrigee_hasard": res.get("chance_corrected"),
+                "taux_meilleure_reponse": res.get("best_rate")
+                if "best_rate" in res
+                else choice_quality([st for a in passage_attempt_dicts(p) for st in a["trace"] or []])["best_rate"],
                 "scenes": res.get("n_scenes"),
                 "choix": res.get("n_choices"),
                 **_skill_values(res.get("scores")),
                 "etats_depart": ", ".join(p.flags_in or []),
             })
-        level = chapter_progress(group)
+        level = chapter_progress(
+            group,
+            cohorts.setdefault(slug, cohort_first_sds(passages, slug)).get(chapter_id),
+            thresholds=((thresholds or {}).get(slug) or {}).get(chapter_id),
+        )
         if level:
             level_rows.append({
                 "participant": code[user_id],
@@ -340,6 +376,12 @@ def build_export(
                 "chapitre": names.get((slug, chapter_id)),
                 "niveau": level["level"],
                 "fourchette": level["margin"],
+                "bande": (level.get("band") or {}).get("label"),
+                "plafond_critique": level.get("critical_capped"),
+                "gain_points": level.get("gain"),
+                "marge_gain": level.get("gain_margin"),
+                "progres": (level.get("progress") or {}).get("label"),
+                "a_rafraichir": level.get("refresh"),
                 "progression": level["progression"],
                 "premier_passage": level["first"],
                 "dernier_passage": level["last"],
@@ -448,6 +490,7 @@ def build_export(
                     "critique": bool(choice.get("critical")),
                     "critique_provisoire": bool(choice.get("critical"))
                     or choice["total"] <= CRITICAL_PROVISIONAL_TOTAL,
+                    "temps_s": round(st["time_ms"] / 1000, 1) if isinstance(st.get("time_ms"), (int, float)) else None,
                     "justification": choice.get("rationale") or "",
                 })
 

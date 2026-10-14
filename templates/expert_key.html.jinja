@@ -47,6 +47,12 @@
 
     <section class="acc-card" aria-labelledby="h-grid">
         <h2 id="h-grid">1. Grille pour les experts</h2>
+        {%- if targeted %}
+        <div class="acc-targeted">
+            <p><strong>Relecture ciblée (recommandée) : {{ targeted.n_items }} réponses.</strong> Plutôt que tout le livre, faites relire en priorité les réponses où la clé est la plus discutable : aux {{ targeted.n_points_changed }} points de choix où la meilleure réponse de la clé actuelle n'est pas celle de l'auteur, les deux réponses en concurrence ; et les {{ targeted.n_critical }} réponses marquées critiques. Avec 2 ou 3 enseignant·e·s, c'est faisable en une séance.</p>
+            <a class="primary-btn small" href="{{ url_for('expert_key.grid', book_slug=book.slug, cible=1, round=1) }}">Télécharger la grille ciblée</a>
+        </div>
+        {%- endif %}
         <form class="acc-inline-form" method="get" action="{{ url_for('expert_key.grid', book_slug=book.slug) }}">
             <label>Chapitre
                 <select name="chapter">
@@ -184,6 +190,75 @@
         <a class="primary-btn small" style="align-self:flex-start" href="{{ url_for('expert_key.synthesis', book_slug=book.slug, round=round) }}">Télécharger la synthèse du tour {{ round }} (.xlsx)</a>
     </section>
     {%- endif %}
+    <section class="acc-card" aria-labelledby="h-angoff">
+        <h2 id="h-angoff">Seuils de niveau (méthode d'Angoff)</h2>
+        <p class="acc-hint">Les bandes (Insuffisant, À consolider, Compétent, Avancé) utilisent des seuils provisoires : 60, 75, 90. Des enseignant·e·s peuvent les fixer chapitre par chapitre (Dwyer et al. 2016). Chaque juge indique, pour chaque point de choix, la réponse que choisirait le plus probablement un·e étudiant·e « tout juste compétent·e » de l'année visée. La note de ces réponses donne le seuil « Compétent » du chapitre ; « À consolider » et « Avancé » restent à 15 points en dessous et au-dessus. La médiane des juges s'applique à partir de {{ min_judges }} juges.</p>
+        <form class="acc-inline-form" method="get" action="{{ url_for('expert_key.angoff_grid', book_slug=book.slug) }}">
+            <label>Chapitre
+                <select name="chapter">
+                    <option value="">Tous</option>
+                    {%- for ch in chapters %}
+                    <option value="{{ ch.id }}">{{ ch.id }}. {{ ch.name | e }} ({{ ch.n_points }} points de choix)</option>
+                    {%- endfor %}
+                </select>
+            </label>
+            <label>Points de choix
+                <select name="sample">
+                    <option value="0">Tous</option>
+                    {%- for n in samples if n %}<option value="{{ n }}">{{ n }} par chapitre, tirés au hasard</option>{% endfor %}
+                </select>
+            </label>
+            <button class="primary-btn small" type="submit">Télécharger la grille des seuils</button>
+        </form>
+        <form class="acc-inline-form" method="post" enctype="multipart/form-data" action="{{ url_for('expert_key.angoff_upload', book_slug=book.slug) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>Grilles de seuils remplies (.xlsx)
+                <input type="file" name="grids" accept=".xlsx" multiple required>
+            </label>
+            <button class="primary-btn small" type="submit">Importer</button>
+        </form>
+        {%- if angoff.judges %}
+        <div class="acc-table-wrap">
+        <table class="acc-table">
+            <thead><tr><th>Juge</th><th class="num">Points jugés</th><th>Importée le</th><th></th></tr></thead>
+            <tbody>
+            {%- for j in angoff.judges %}
+            <tr>
+                <td>{{ j.judge | e }}</td>
+                <td class="num">{{ j.n }}</td>
+                <td class="muted nowrap">{{ j.uploaded_at | date_fr(true) }}</td>
+                <td class="num">
+                    <form method="post" action="{{ url_for('expert_key.angoff_remove', book_slug=book.slug) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="judge" value="{{ j.judge | e }}">
+                        <button type="submit" class="link-btn">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        </div>
+        <div class="acc-table-wrap">
+        <table class="acc-table">
+            <thead><tr><th>Chapitre</th><th class="num">Juges</th><th class="num">Seuil « Compétent » (médiane)</th><th class="num">Écart entre juges</th><th>Seuils appliqués</th></tr></thead>
+            <tbody>
+            {%- for c in angoff.cuts %}
+            <tr>
+                <td>{{ c.chapter_id }}. {{ c.chapter | e }}</td>
+                <td class="num">{{ c.n_judges }}</td>
+                <td class="num">{{ c.median | note(1) if c.median is not none else '—' }}</td>
+                <td class="num">{% if c.min is not none %}{{ c.min | note(1) }} – {{ c.max | note(1) }}{% else %}—{% endif %}</td>
+                <td>{% if c.applied %}<strong>{{ c.thresholds[0] | note(1) }} · {{ c.thresholds[1] | note(1) }} · {{ c.thresholds[2] | note(1) }}</strong>{% else %}<span class="muted">provisoires (60 · 75 · 90) : il faut {{ min_judges }} juges</span>{% endif %}</td>
+            </tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        </div>
+        {%- else %}
+        <p class="acc-empty">Aucune grille de seuils importée : les seuils provisoires s'appliquent.</p>
+        {%- endif %}
+    </section>
 </main>
 </body>
 </html>

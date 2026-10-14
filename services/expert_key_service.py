@@ -65,16 +65,62 @@ class KeyItem:
         return self.critical or self.author_total <= CRITICAL_PROVISIONAL_TOTAL
 
 
+# Clés de cotation appliquées au build (scripts/medstudents_y2_v2/key.py) : elles
+# gardent, pour chaque réponse, la cote de l'auteur à côté de la cote en vigueur.
+KEY_FILES = {"medstudents_y2": "MedStudents_Y2_v2_cle.json"}
+
+
+def targeted_review(book_slug: str, keys_dir: str | Path) -> dict[str, Any] | None:
+    """Réponses à faire relire en priorité par des enseignant·e·s.
+
+    - aux points de choix où la meilleure réponse de la clé en vigueur n'est pas
+      celle de l'auteur : ces deux réponses ;
+    - toutes les réponses marquées critiques.
+    None si le livre n'a pas de fichier de clé.
+    """
+    name = KEY_FILES.get(book_slug)
+    path = Path(keys_dir) / name if name else None
+    if path is None or not path.exists():
+        return None
+    import json
+
+    items = json.loads(path.read_text(encoding="utf-8"))["reponses"]
+
+    def total(spec: str) -> int:
+        return sum(int(tok[2:]) for tok in spec.split())
+
+    points: dict[str, list[str]] = {}
+    for ref in items:
+        points.setdefault(ref.rsplit("-r", 1)[0], []).append(ref)
+    changed: set[str] = set()
+    n_changed = 0
+    for refs in points.values():
+        best = max(refs, key=lambda r: total(items[r]["cotes"]))
+        author = max(refs, key=lambda r: total(items[r]["auteur"]))
+        if best != author:
+            n_changed += 1
+            changed |= {best, author}
+    critical = {ref for ref, v in items.items() if v.get("critique")}
+    return {
+        "refs": changed | critical,
+        "n_points_changed": n_changed,
+        "n_critical": len(critical),
+        "n_items": len(changed | critical),
+    }
+
+
 def key_items(
     chapters: list[Chapter],
     chapter_ids: Iterable[int] | None = None,
     sample: int | None = None,
     seed: int = DEFAULT_SEED,
+    refs: set[str] | None = None,
 ) -> list[KeyItem]:
     """Réponses des points de choix, dans l'ordre du livre.
 
     `sample` : nombre de points de choix tirés au hasard par chapitre (graine
     fixe : le même tirage d'un export à l'autre, pour tous les experts).
+    `refs` : ne garder que ces réponses (relecture ciblée).
     """
     wanted = set(chapter_ids) if chapter_ids is not None else None
     items: list[KeyItem] = []
@@ -101,6 +147,8 @@ def key_items(
                     author={k: int(r.score(k) or 0) for k in SOFT_SKILLS},
                     critical=bool(r._extra.get("Critical")),
                 ))
+    if refs is not None:
+        items = [it for it in items if it.ref in refs]
     return items
 
 

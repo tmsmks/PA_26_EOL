@@ -1,13 +1,13 @@
 // Historique : profil de compétences du livre et courbe de chaque chapitre rejoué.
 
-import { skillBars, trendLine } from "./charts.js";
+import { skillRose, trendLine } from "./charts.js";
 
 const H = window.PA_HISTORY || { books: [] };
 
 H.books.forEach((book) => {
     const profile = document.querySelector('[data-chart="profile"][data-book="' + book.slug + '"]');
     if (profile && book.profile && book.profile.global !== null) {
-        skillBars(profile, {
+        skillRose(profile, {
             skills: H.skills,
             labels: H.labels,
             current: book.profile.scores,

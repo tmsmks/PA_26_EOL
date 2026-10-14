@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comment est-ce noté ? — End of Life</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='shared/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='play.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
+</head>
+<body class="play-menu">
+{% include "_userbar.html.jinja" %}
+<main class="acc-wrap acc-explain">
+    <nav class="acc-crumbs"><a href="{{ url_for('pages.landing') }}">← Tous les livres</a></nav>
+    <header class="acc-header">
+        <p class="eyebrow">Avant de jouer</p>
+        <h1>Comment est-ce noté ?</h1>
+        <p class="acc-sub">La note sert à apprendre, pas à classer : elle n'est comparée à celle de personne, et elle vous dit ce qui était attendu, et pourquoi.</p>
+    </header>
+
+    <section class="acc-card">
+        <h2>1. Chaque réponse a des points</h2>
+        <p>Chaque réponse proposée vaut de −3 à +3 sur sept compétences : respect et dignité, empathie, compassion, régulation émotionnelle, clarté de la communication, frontières professionnelles, collaboration interprofessionnelle. Une réponse <strong>critique</strong> met en danger le patient ou un tiers, ou enfreint la loi ou une règle déontologique essentielle (secret médical, appel au 144…).</p>
+        <p class="acc-hint">Ces points forment la « clé de cotation ». Elle est provisoire : elle doit encore être relue par des enseignant·e·s.</p>
+    </section>
+
+    <section class="acc-card">
+        <h2>2. La note d'un choix</h2>
+        <p>Votre réponse est comparée aux autres réponses proposées au même moment : la meilleure vaut 100, la pire vaut 0. Répondre au hasard donne environ 50.</p>
+        <div class="explain-ex">
+            <p>Exemple : les réponses valent +6, +3, +2 et −5. Vous choisissez +3.</p>
+            <p class="explain-calc">(3 + 5) / (6 + 5) = 73 sur 100</p>
+            <p class="explain-formula">note du choix = (votre réponse − la pire) / (la meilleure − la pire) × 100</p>
+        </div>
+    </section>
+
+    <section class="acc-card">
+        <h2>3. Le chapitre, unité de note</h2>
+        <p>Un chapitre joué en entier est un <strong>passage</strong>. Sa note additionne tous ses choix : un choix décisif pèse plus qu'un choix anodin. Une compétence n'est notée que si au moins {{ min_evidence }} choix la mettent en jeu ; sinon, « non évalué ».</p>
+        <p class="explain-formula">note du chapitre = somme des (votre réponse − la pire) / somme des (la meilleure − la pire) × 100</p>
+    </section>
+
+    <section class="acc-card">
+        <h2>4. Rejouer : quels passages comptent</h2>
+        <ul class="acc-steps">
+            <li>Votre <strong>premier passage</strong> d'un chapitre compte toujours.</li>
+            <li>Un nouveau passage compte s'il commence au moins <strong>{{ spacing_days }} jours</strong> après le dernier passage noté. Rejouer tout de suite apprend les réponses par cœur ; c'est alors un entraînement, utile mais non noté.</li>
+            <li>Un passage joué <strong>trop vite</strong> (plus de {{ fast_share }} % des choix en moins de {{ fast_s }} secondes) ne compte pas : il reste un entraînement.</li>
+            <li>L'ordre des réponses change à chaque passage.</li>
+        </ul>
+    </section>
+
+    <section class="acc-card">
+        <h2>5. Votre niveau et votre progression</h2>
+        <p>Votre <strong>niveau</strong> dans un chapitre est la moyenne de vos passages notés. Un passage pèse moins en vieillissant : moitié moins après {{ half_life }} jours. Après {{ refresh_days }} jours sans passage noté, le chapitre est marqué « à rafraîchir ».</p>
+        <div class="explain-ex">
+            <p>Exemple : 60 il y a {{ half_life }} jours (poids 0,5), puis 80 aujourd'hui (poids 1).</p>
+            <p class="explain-calc">Niveau = (60 × 0,5 + 80 × 1) / 1,5 = 73</p>
+            <p class="explain-formula">niveau = somme des (note × poids) / somme des poids, poids = 2^(−âge en jours / {{ half_life }})</p>
+            <p class="explain-calc">Progression = 80 − 60 = +20 points</p>
+            <p class="explain-formula">progression = moyenne des passages suivants − premier passage</p>
+        </div>
+        <p>Chaque note a une <strong>marge d'erreur</strong> (± quelques points) : elle se resserre à chaque passage noté. On ne parle de « progrès net » que si le gain dépasse cette marge.</p>
+    </section>
+
+    <section class="acc-card">
+        <h2>6. Les bandes</h2>
+        <p>Votre niveau est aussi donné en bande : <strong>{{ bands[0] }}</strong> (moins de {{ thresholds[0] }}), <strong>{{ bands[1] }}</strong> ({{ thresholds[0] }} à {{ thresholds[1] - 1 }}), <strong>{{ bands[2] }}</strong> ({{ thresholds[1] }} à {{ thresholds[2] - 1 }}), <strong>{{ bands[3] }}</strong> ({{ thresholds[2] }} et plus). Si la marge d'erreur déborde sur deux bandes, on écrit « entre {{ bands[1] }} et {{ bands[2] }} ».</p>
+        <p>Une <strong>réponse critique</strong> ne se compense pas par de bonnes réponses ailleurs : la bande du chapitre reste « {{ bands[1] }} » au plus, jusqu'à votre prochain passage noté sans réponse critique. Votre formateur·rice pourra en parler avec vous.</p>
+        <p class="acc-hint">Ces seuils sont provisoires : ils seront fixés avec des enseignant·e·s.</p>
+    </section>
+
+    <section class="acc-card">
+        <h2>7. Ce que vous voyez</h2>
+        <p>À la fin de chaque scène et de chaque chapitre, vous voyez d'abord <strong>ce qui était attendu, et pourquoi</strong>, puis votre bande et vos points forts. La note sur 100 s'affiche si vous la demandez. Elle n'est jamais comparée à celle des autres.</p>
+    </section>
+</main>
+</body>
+</html>

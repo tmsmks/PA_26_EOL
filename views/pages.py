@@ -9,8 +9,9 @@ from repositories.database import db_session
 from repositories.passages import PassageRepository
 from repositories.sessions import SessionRepository
 from services.graph_service import build_all_scenes, chapter_meta, chapter_outline
-from services.history_service import book_progress
+from services.history_service import book_progress, cohorts_for
 from views.guards import current_user, login_required, trainer_required
+from views.scoring_context import book_thresholds
 from views.session_api import play_service, session_payload
 
 pages_bp = Blueprint("pages", __name__)
@@ -18,6 +19,25 @@ pages_bp = Blueprint("pages", __name__)
 
 def _repo() -> ChapterRepository:
     return current_app.extensions["eol_chapters"]
+
+
+@pages_bp.route("/notation")
+def scoring_explained():
+    """Comment le jeu note : dire aux participants comment le test est noté
+    (Frary 1988), et que la note sert à apprendre (Heeneman et al. 2021)."""
+    from services import scoring_service as sc
+
+    return render_template(
+        "scoring_explained.html.jinja",
+        spacing_days=current_app.config["PASSAGE_SPACING_DAYS"],
+        half_life=sc.LEVEL_HALF_LIFE_DAYS,
+        refresh_days=sc.REFRESH_AFTER_DAYS,
+        thresholds=sc.BAND_THRESHOLDS,
+        bands=sc.BANDS,
+        min_evidence=sc.MIN_SKILL_EVIDENCE,
+        fast_s=sc.FAST_CHOICE_MS // 1000,
+        fast_share=round(sc.FAST_SHARE * 100),
+    )
 
 
 # Les intros de chapitre mêlent la mise en situation (pour le joueur) et les
@@ -103,7 +123,13 @@ def play_book(book_slug: str):
     sessions = SessionRepository(db_session()).list_for_user(user.id, book["slug"])
     current = next((s for s in reversed(sessions) if not s.is_completed), None)
     last_completed = next((s for s in reversed(sessions) if s.is_completed), None)
-    progress = book_progress(chapters, PassageRepository(db_session()).list_for_user(user.id, book["slug"]))
+    repo = PassageRepository(db_session())
+    progress = book_progress(
+        chapters,
+        repo.list_for_user(user.id, book["slug"]),
+        cohorts_for(repo.list_all(book_slug=book["slug"]), [book["slug"]])[book["slug"]],
+        thresholds=book_thresholds(book["slug"], chapters),
+    )
     return render_template(
         "play_book.html.jinja",
         book=book,

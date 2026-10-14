@@ -220,6 +220,8 @@ def _response_payload(r: Response) -> dict[str, Any]:
         "InterprofessionalCollaboration": r.score("InterprofessionalCollaboration"),
         "set_flags": _str_list(r._extra.get("SetFlags")),
         "clear_flags": _str_list(r._extra.get("ClearFlags")),
+        # Réponse critique (clé de cotation) : le bilan de fin de scène en tient compte.
+        "critical": bool(r._extra.get("Critical")),
     }
 
 

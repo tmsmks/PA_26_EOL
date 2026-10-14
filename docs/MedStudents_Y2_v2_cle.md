@@ -188,9 +188,10 @@ parcours le plus court. Sous ce seuil, le serveur ne la note pas.
    encore que la note prédise le comportement d'un·e étudiant·e en stage.
 
 **Recommandation.** Faire relire par 2 ou 3 enseignant·e·s un échantillon ciblé plutôt que
-les 2 017 réponses (environ 150 réponses) :
-- les **36 points** où la meilleure réponse finale diffère de celle de l'auteur ;
+les 2 017 réponses, soit **186 réponses** :
+- aux **36 points** où la meilleure réponse finale diffère de celle de l'auteur, les deux
+  réponses en concurrence (72 réponses) ;
 - les **114 réponses critiques**.
 
-L'outil `/trainer/cle/` sait produire une grille à l'aveugle par tirage de points de choix.
-Tant que cette relecture n'est pas faite, la clé reste **provisoire**.
+Depuis le 13.10.2026, l'outil `/trainer/cle/` produit cette grille à l'aveugle (« Télécharger
+la grille ciblée »). Tant que cette relecture n'est pas faite, la clé reste **provisoire**.

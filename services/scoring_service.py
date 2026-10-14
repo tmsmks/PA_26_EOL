@@ -15,20 +15,42 @@ Scoring v2 (docs/Scoring_v2_recherche_et_plan.md, § 3) :
    Une compétence n'est notée que si au moins `MIN_SKILL_EVIDENCE` choix
    la mettent en jeu (spécificité du cas : trop peu de choix = note fragile).
 4. **Passage** = une partie complète d'un chapitre, l'unité de note.
-   `chapter_level` combine les passages comptés d'un chapitre : le n-ième
-   pèse 1 + 0,25 × (n − 1) ; progression = changement normalisé (Marx &
-   Cummings 2007) ; fiabilité = demi-largeur de l'intervalle à 95 %.
+   `chapter_level` combine les passages comptés d'un chapitre ; fiabilité =
+   demi-largeur de l'intervalle à 95 %.
 5. `book_profile` : la note du livre est la moyenne des niveaux des
    chapitres évalués (poids égaux) ; le profil par compétence est pondéré
    par le nombre de choix qui mettent chaque compétence en jeu.
 6. Feedback : chaque pas de la trace garde la justification de la clé
    (`rationale`) de la réponse choisie et de la meilleure, et le drapeau
    « critique ». `scene_review` en tire le retour de fin de scène ; le bilan
-   liste les réponses critiques (`critical_choices`). Pas de plafond de note.
+   liste les réponses critiques (`critical_choices`).
+
+Scoring v3, étape A (docs/Scoring_v3_proposition.md, § 2.3 à 2.6 et § 5) :
+
+7. **Poids selon l'âge** : un passage pèse 2^(−âge / 90 jours), au lieu de
+   son rang ; « à rafraîchir » si le dernier passage compté a plus de 90 jours.
+8. **Progression en points** : gain = moyenne pondérée des passages suivants −
+   1ᵉʳ passage, avec sa marge ; « progrès net » seulement au-delà de la marge
+   et d'un tiers d'écart-type de la cohorte. Le changement normalisé reste
+   calculé une version, pour l'export.
+9. **Bandes** (Insuffisant, À consolider, Compétent, Avancé ; seuils
+   provisoires 60, 75, 90), données avec leur marge : « entre A et B » si
+   l'intervalle déborde d'une bande.
+10. **Erreur critique non compensable** : si le dernier passage compté d'un
+    chapitre contient une réponse critique, sa bande ne dépasse pas « À
+    consolider », quelle que soit la note ; un passage suivant sans réponse
+    critique lève le plafond. Au livre, « Compétent » ou plus demande aussi
+    qu'aucun chapitre ne soit « Insuffisant » (règle conjonctive provisoire).
+11. **Temps de réponse** : un passage où plus d'un quart des choix sont faits
+    en moins de 2 secondes est « trop rapide » et ne compte pas.
+Les valeurs chiffrées sont des valeurs de départ, à calibrer sur un pilote.
 """
 from __future__ import annotations
 
+import statistics
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from math import sqrt
 from typing import Any, Iterable, Mapping
 
 from domain.models import Chapter, Response, Scene
@@ -45,6 +67,18 @@ Z_95 = 1.96
 # Seuils pour les « moments clés » transmis au feedback.
 MISSED_MIN_GAP = 3
 GOOD_MIN_TOTAL = 4
+
+# Scoring v3, étape A : valeurs de départ, provisoires, à calibrer sur le pilote.
+LEVEL_HALF_LIFE_DAYS = 90  # poids d'un passage = 2^(−âge / 90 j) (oubli : Legoux et al. 2021)
+REFRESH_AFTER_DAYS = 90  # « à rafraîchir » au-delà
+BANDS = ("Insuffisant", "À consolider", "Compétent", "Avancé")
+BAND_THRESHOLDS = (60, 75, 90)  # en attendant un Angoff modifié (Dwyer et al. 2016)
+CRITICAL_CAP_BAND = 1  # « À consolider » : bande maximale avec une erreur critique non résolue
+FAST_CHOICE_MS = 2000  # choix fait en moins de 2 s
+FAST_SHARE = 0.25  # passage trop rapide : plus d'un quart de choix trop rapides (Baker et al. 2004)
+FAST_MIN_TIMED = 8  # pas de jugement sur moins de 8 choix chronométrés
+NET_GAIN_SD_FRACTION = 1 / 3  # gain dû à la seule répétition (Lievens et al. 2005)
+COHORT_MIN = 10  # écart-type de la cohorte utilisé à partir de 10 personnes
 
 Scores = dict[str, int]
 
@@ -257,6 +291,7 @@ def choice_quality(steps: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
     - `global` : sur le total des 7 compétences, de 0 à 100 ;
     - `chance_corrected` : (gain − gain au hasard) / (écart − gain au hasard),
       0 = hasard, 100 = meilleur choix, négatif = pire que le hasard ;
+    - `best_rate` : part des choix où la meilleure réponse a été choisie (%) ;
     - `scores` : par compétence, None si moins de MIN_SKILL_EVIDENCE choix la
       mettent en jeu ; `raw_scores` : sans ce seuil (pour agréger plus haut) ;
     - `steps` : [gain, écart] du total pour chaque choix (fiabilité).
@@ -265,6 +300,7 @@ def choice_quality(steps: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
     span = {k: 0 for k in SOFT_SKILLS}
     evidence = {k: 0 for k in SOFT_SKILLS}
     t_gain = t_span = t_chance = 0.0
+    n_best = 0
     pairs: list[list[float]] = []
     for st in steps:
         bounds = st.get("bounds")
@@ -283,11 +319,15 @@ def choice_quality(steps: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
             t_gain += g
             t_span += hi - lo
             t_chance += float(st.get("chance") or 0)
+            n_best += st["choice"]["total"] >= hi
             pairs.append([g, hi - lo])
     raw_scores = {k: _pct(gain[k], span[k]) for k in SOFT_SKILLS}
     return {
         "global": _pct(t_gain, t_span),
         "chance_corrected": _pct(t_gain - t_chance, t_span - t_chance),
+        # Taux de meilleure réponse (cotation dichotomique), calculé à côté de la qualité
+        # pour le pilote : au hasard, environ 20 % sur le livre 2 (Weng et al. 2018).
+        "best_rate": _pct(n_best, len(pairs)),
         "scores": {k: v if evidence[k] >= MIN_SKILL_EVIDENCE else None for k, v in raw_scores.items()},
         "raw_scores": raw_scores,
         "evidence": evidence,
@@ -408,6 +448,7 @@ def scene_review(trace: Iterable[Mapping[str, Any]], limit: int = 3) -> list[dic
         picked = [max(steps, key=span)]
     return [
         {
+            "scene_title": st.get("scene_title") or "",
             "actor": st.get("actor") or "",
             "prompt": st.get("prompt") or "",
             "is_best": gap(st) <= 0,
@@ -420,6 +461,17 @@ def scene_review(trace: Iterable[Mapping[str, Any]], limit: int = 3) -> list[dic
         }
         for st in picked
     ]
+
+
+def chapter_review(attempts: Iterable[Mapping[str, Any]], limit: int = 3) -> list[dict[str, Any]]:
+    """Retour de fin de chapitre : les choix les plus décisifs de tout le passage,
+    avec leur scène (mêmes règles que `scene_review`)."""
+    steps = [
+        {**st, "scene_title": a.get("scene_title", "")}
+        for a in attempts
+        for st in a.get("trace") or []
+    ]
+    return scene_review(steps, limit)
 
 
 def session_results(
@@ -451,6 +503,7 @@ def session_results(
         "detail": q["detail"],
         "global": q["global"],
         "chance_corrected": q["chance_corrected"],
+        "best_rate": q["best_rate"],
         "n_choices": q["n_choices"],
         "chapters": chapter_rows,
         "strengths": strengths,
@@ -470,6 +523,7 @@ def passage_results(attempts: list[Mapping[str, Any]]) -> dict[str, Any]:
         "version": 2,
         "global": q["global"],
         "chance_corrected": q["chance_corrected"],
+        "best_rate": q["best_rate"],
         "scores": q["scores"],
         "raw_scores": q["raw_scores"],
         "evidence": q["evidence"],
@@ -479,10 +533,122 @@ def passage_results(attempts: list[Mapping[str, Any]]) -> dict[str, Any]:
         "strengths": strengths,
         "weaknesses": weaknesses,
         "moments": key_moments(attempts, n_missed=2, n_good=1),
+        "n_critical": len(critical_choices(attempts)),
+        "timing": passage_timing(attempts),
+    }
+
+
+def passage_timing(attempts: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    """Temps de réponse des choix d'un passage, et drapeau « trop rapide ».
+
+    Seuls comptent les vrais choix (au moins deux réponses) dont le navigateur a
+    envoyé le temps (`time_ms`). Trop rapide : au moins `FAST_MIN_TIMED` choix
+    chronométrés, dont plus de `FAST_SHARE` en moins de `FAST_CHOICE_MS`.
+    """
+    times = [
+        float(st["time_ms"])
+        for a in attempts
+        for st in a.get("trace") or []
+        if (st.get("n_options") or 0) > 1 and isinstance(st.get("time_ms"), (int, float))
+    ]
+    n_fast = sum(1 for t in times if t < FAST_CHOICE_MS)
+    return {
+        "n_timed": len(times),
+        "n_fast": n_fast,
+        "median_ms": round(statistics.median(times)) if times else None,
+        "threshold_ms": FAST_CHOICE_MS,
+        "too_fast": len(times) >= FAST_MIN_TIMED and n_fast > FAST_SHARE * len(times),
     }
 
 
 # --- Niveau d'un chapitre sur plusieurs passages ---------------------------
+
+def as_datetime(value: Any) -> datetime | None:
+    """Date d'un passage (datetime ou texte ISO) ; sans fuseau = UTC (SQLite)."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        try:
+            value = datetime.fromisoformat(value)
+        except ValueError:
+            return None
+    if not isinstance(value, datetime):
+        return None
+    return value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+
+
+def age_weight(completed_at: Any, now: datetime) -> float:
+    """Poids d'un passage selon son âge : 1 aujourd'hui, 0,5 à 90 jours, 0,25 à 180."""
+    done = as_datetime(completed_at)
+    if done is None:
+        return 1.0
+    age_days = max(0.0, (now - done).total_seconds() / 86400)
+    return 2 ** (-age_days / LEVEL_HALF_LIFE_DAYS)
+
+
+def band_index(value: float, thresholds: Iterable[float] = BAND_THRESHOLDS) -> int:
+    return sum(1 for t in thresholds if value >= t)
+
+
+def band(
+    level: float | None,
+    margin: float | None,
+    capped: bool = False,
+    thresholds: Iterable[float] | None = None,
+) -> dict[str, Any] | None:
+    """Bande d'un niveau, donnée avec sa marge.
+
+    Si l'intervalle niveau ± marge tient dans une bande, on la donne ; sinon
+    « entre A et B ». `capped` (erreur critique non résolue) : jamais au-dessus
+    de « À consolider ». `thresholds` : seuils fixés par des juges (Angoff) pour
+    ce chapitre, sinon les seuils provisoires.
+    """
+    if level is None:
+        return None
+    th = tuple(thresholds) if thresholds else BAND_THRESHOLDS
+    m = margin or 0.0
+    lo = band_index(max(0.0, level - m), th)
+    hi = band_index(min(100.0, level + m), th)
+    limited = capped and hi > CRITICAL_CAP_BAND
+    if capped:
+        lo, hi = min(lo, CRITICAL_CAP_BAND), min(hi, CRITICAL_CAP_BAND)
+    return {
+        "low": BANDS[lo],
+        "high": BANDS[hi],
+        "label": BANDS[lo] if lo == hi else f"entre {BANDS[lo]} et {BANDS[hi]}",
+        "settled": lo == hi,
+        "capped": limited,
+        "thresholds": list(th),
+        "angoff": bool(thresholds),
+    }
+
+
+PROGRESS_LABELS = {
+    "net_gain": "progrès net",
+    "possible_gain": "progrès probable, pas encore démontré",
+    "net_loss": "baisse nette",
+    "stable": "pas de changement démontré",
+}
+
+
+def progress_status(gain: float, gain_margin: float | None, cohort_sd: float | None = None) -> dict[str, Any]:
+    """Un gain n'est « net » que s'il dépasse sa marge et le tiers d'un écart-type
+    de la cohorte (ce que rapporte la simple répétition). Sans cohorte assez
+    grande, seule la marge s'applique."""
+    sd_min = NET_GAIN_SD_FRACTION * cohort_sd if cohort_sd else None
+    clear = gain_margin is not None and abs(gain) > gain_margin and (sd_min is None or abs(gain) > sd_min)
+    if gain > 0:
+        status = "net_gain" if clear else "possible_gain"
+    elif gain < 0 and clear:
+        status = "net_loss"
+    else:
+        status = "stable"
+    return {
+        "status": status,
+        "label": PROGRESS_LABELS[status],
+        "sd_min": round(sd_min, 1) if sd_min else None,
+    }
+
 
 def normalized_change(pre: float | None, post: float | None) -> float | None:
     """Changement normalisé (Marx & Cummings 2007), en % de ce qui restait.
@@ -523,16 +689,23 @@ def level_margin(passages: list[Mapping[str, Any]], weights: list[float]) -> flo
     return round(100 * Z_95 * (var / n_eff) ** 0.5, 1)
 
 
-def chapter_level(passages: list[Mapping[str, Any]]) -> dict[str, Any] | None:
+def chapter_level(
+    passages: list[Mapping[str, Any]],
+    now: datetime | None = None,
+    cohort_sd: float | None = None,
+    thresholds: Iterable[float] | None = None,
+) -> dict[str, Any] | None:
     """Niveau d'un chapitre à partir des résultats de ses passages comptés.
 
-    `passages` : du plus ancien au plus récent. Le n-ième pèse
-    1 + 0,25 × (n − 1). None si aucun passage n'a de note.
+    `passages` : du plus ancien au plus récent, avec `completed_at` et
+    `n_critical`. Chaque passage pèse 2^(−âge / 90 j). None si aucun passage
+    n'a de note. `cohort_sd` : écart-type des 1ᵉʳˢ passages de la cohorte.
     """
     rated = [p for p in passages if p.get("global") is not None]
     if not rated:
         return None
-    weights = [session_weight(i) for i in range(1, len(rated) + 1)]
+    now = now or datetime.now(timezone.utc)
+    weights = [age_weight(p.get("completed_at"), now) for p in rated]
     level = round(sum(w * p["global"] for w, p in zip(weights, rated)) / sum(weights), 1)
 
     raw_scores: dict[str, float | None] = {}
@@ -546,6 +719,22 @@ def chapter_level(passages: list[Mapping[str, Any]]) -> dict[str, Any] | None:
                 den += w
         raw_scores[k] = round(num / den, 1) if den else None
         evidence[k] = sum((p.get("evidence") or {}).get(k, 0) for p in rated) / len(rated)
+    margin = level_margin(rated, weights)
+
+    gain = gain_margin = progress = None
+    if len(rated) > 1:
+        rest, w_rest = rated[1:], weights[1:]
+        after = sum(w * p["global"] for w, p in zip(w_rest, rest)) / sum(w_rest)
+        gain = round(after - rated[0]["global"], 1)
+        m_first = level_margin(rated[:1], [1.0])
+        m_rest = level_margin(rest, w_rest)
+        if m_first is not None and m_rest is not None:
+            gain_margin = round(sqrt(m_first ** 2 + m_rest ** 2), 1)
+        progress = progress_status(gain, gain_margin, cohort_sd)
+
+    last = rated[-1]
+    n_critical_open = int(last.get("n_critical") or 0)
+    last_at = as_datetime(last.get("completed_at"))
     return {
         "level": level,
         "scores": {
@@ -554,12 +743,21 @@ def chapter_level(passages: list[Mapping[str, Any]]) -> dict[str, Any] | None:
         "raw_scores": raw_scores,
         "evidence": evidence,
         "first": rated[0]["global"],
-        "last": rated[-1]["global"],
+        "last": last["global"],
+        "gain": gain,
+        "gain_margin": gain_margin,
+        "progress": progress,
+        # Ancien indicateur (changement normalisé), gardé une version pour l'export.
         "progression": normalized_change(rated[0]["global"], level) if len(rated) > 1 else None,
-        "margin": level_margin(rated, weights),
+        "margin": margin,
+        "band": band(level, margin, capped=n_critical_open > 0, thresholds=thresholds),
+        "n_critical_open": n_critical_open,
+        "critical_capped": n_critical_open > 0,
+        "refresh": bool(last_at and (now - last_at).days > REFRESH_AFTER_DAYS),
+        "last_at": last_at.isoformat() if last_at else None,
         "n_passages": len(rated),
         "n_choices": sum(p.get("n_choices") or 0 for p in rated),
-        "weights": weights,
+        "weights": [round(w, 3) for w in weights],
         "points": [{"number": i, "global": p["global"]} for i, p in enumerate(rated, start=1)],
     }
 
@@ -568,7 +766,10 @@ def book_profile(levels: Mapping[int, Mapping[str, Any] | None], n_chapters: int
     """Profil du livre à partir des niveaux de ses chapitres.
 
     Note = moyenne des niveaux des chapitres évalués (poids égaux) ; profil
-    par compétence pondéré par le nombre de choix qui la mettent en jeu.
+    par compétence pondéré par le nombre de choix qui la mettent en jeu ;
+    marge = √(Σ marges²) / nombre de chapitres. Bande du livre : règle
+    conjonctive, pas au-dessus de « À consolider » si un chapitre est
+    « Insuffisant » ou garde une erreur critique non résolue.
     """
     rated = {cid: lv for cid, lv in levels.items() if lv}
     scores: dict[str, float | None] = {}
@@ -580,18 +781,79 @@ def book_profile(levels: Mapping[int, Mapping[str, Any] | None], n_chapters: int
                 num += ev * v
                 den += ev
         scores[k] = round(num / den, 1) if den >= MIN_SKILL_EVIDENCE else None
-    progressions = [lv["progression"] for lv in rated.values() if lv["progression"] is not None]
     strengths, weaknesses = rank_skills(scores)
+    n = len(rated)
+    global_ = round(sum(lv["level"] for lv in rated.values()) / n, 1) if n else None
+
+    margins = [lv.get("margin") for lv in rated.values()]
+    margin = round(sqrt(sum(m * m for m in margins)) / n, 1) if n and all(m is not None for m in margins) else None
+    insufficient = sorted(cid for cid, lv in rated.items() if (lv.get("band") or {}).get("high") == BANDS[0])
+    open_critical = sorted(cid for cid, lv in rated.items() if lv.get("critical_capped"))
+    # Seuils du livre : moyenne des seuils de ses chapitres (Angoff ou provisoires).
+    chapter_th = [(lv.get("band") or {}).get("thresholds") for lv in rated.values()]
+    custom = any((lv.get("band") or {}).get("angoff") for lv in rated.values())
+    book_th = (
+        [round(sum(t[i] for t in chapter_th) / len(chapter_th), 1) for i in range(len(BAND_THRESHOLDS))]
+        if custom and all(chapter_th) else None
+    )
+    book_band = band(global_, margin, capped=bool(insufficient or open_critical), thresholds=book_th)
+
+    gains = [lv for lv in rated.values() if lv.get("gain") is not None]
+    progress = None
+    if gains:
+        gain = round(sum(lv["gain"] for lv in gains) / len(gains), 1)
+        gm = [lv.get("gain_margin") for lv in gains]
+        gain_margin = round(sqrt(sum(m * m for m in gm)) / len(gains), 1) if all(m is not None for m in gm) else None
+        sds = [(lv.get("progress") or {}).get("sd_min") for lv in gains]
+        sd = 3 * sum(sds) / len(sds) if all(sds) else None
+        progress = {"gain": gain, "gain_margin": gain_margin, "n_chapters": len(gains),
+                    **progress_status(gain, gain_margin, sd)}
+    progressions = [lv["progression"] for lv in rated.values() if lv.get("progression") is not None]
     return {
-        "global": round(sum(lv["level"] for lv in rated.values()) / len(rated), 1) if rated else None,
+        "global": global_,
+        "margin": margin,
+        "band": book_band,
+        "insufficient_chapters": insufficient,
+        "critical_chapters": open_critical,
         "scores": scores,
         "strengths": strengths,
         "weaknesses": weaknesses,
-        "n_evaluated": len(rated),
+        "n_evaluated": n,
         "n_chapters": n_chapters,
-        "complete": bool(rated) and len(rated) >= n_chapters,
+        "complete": bool(rated) and n >= n_chapters,
         "n_passages": sum(lv["n_passages"] for lv in rated.values()),
+        "progress": progress,
+        # Ancien indicateur (moyenne des changements normalisés), gardé une version.
         "progression": round(sum(progressions) / len(progressions), 1) if progressions else None,
+    }
+
+
+def group_change(pairs: list[tuple[float, float]]) -> dict[str, Any] | None:
+    """Progrès d'un groupe entre le 1ᵉʳ et le dernier passage compté d'un chapitre.
+
+    *d* de Cohen = (moyenne du dernier − moyenne du 1ᵉʳ) / écart-type moyen
+    √((s₁² + s₂²) / 2), avec la corrélation entre les deux passages, comme le
+    recommandent Nissen et al. (2018) plutôt que le gain normalisé. None si
+    moins de 2 personnes ont deux passages comptés.
+    """
+    if len(pairs) < 2:
+        return None
+    first = [a for a, _ in pairs]
+    last = [b for _, b in pairs]
+    s1, s2 = statistics.stdev(first), statistics.stdev(last)
+    pooled = sqrt((s1 * s1 + s2 * s2) / 2)
+    m1, m2 = statistics.fmean(first), statistics.fmean(last)
+    r = None
+    if len(pairs) >= 3 and s1 > 0 and s2 > 0:
+        r = round(statistics.correlation(first, last), 2)
+    return {
+        "n": len(pairs),
+        "mean_first": round(m1, 1),
+        "mean_last": round(m2, 1),
+        "sd_first": round(s1, 1),
+        "sd_last": round(s2, 1),
+        "r": r,
+        "d": round((m2 - m1) / pooled, 2) if pooled > 0 else None,
     }
 
 

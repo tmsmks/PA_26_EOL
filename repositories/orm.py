@@ -189,3 +189,24 @@ class ExpertRating(Base):
     comment: Mapped[str] = mapped_column(Text, default="")
     uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
+
+
+class AngoffRating(Base):
+    """Choix d'un·e juge pour un point de choix (seuils de niveau, Angoff modifié).
+
+    Le ou la juge indique la réponse que choisirait le plus probablement un·e
+    étudiant·e « tout juste compétent·e » de l'année visée. `point` :
+    « c{chapitre}-s{scène}-i{interaction} ».
+    """
+
+    __tablename__ = "angoff_ratings"
+    __table_args__ = (UniqueConstraint("book_slug", "point", "judge"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    book_slug: Mapped[str] = mapped_column(String(80), index=True)
+    point: Mapped[str] = mapped_column(String(40))
+    chapter_id: Mapped[int] = mapped_column(Integer)
+    judge: Mapped[str] = mapped_column(String(80))
+    response_no: Mapped[int] = mapped_column(Integer)
+    comment: Mapped[str] = mapped_column(Text, default="")
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

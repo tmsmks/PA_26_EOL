@@ -10,10 +10,11 @@ from repositories.database import db_session
 from repositories.orm import BookSession, ChapterPassage
 from repositories.passages import PassageRepository
 from repositories.sessions import SessionRepository
-from services.history_service import chapter_progress, completed_with_results
-from services.scoring_service import InvalidPathError, scene_review, weighted_profile
-from services.session_service import PlaySessionService, SessionError
+from services.history_service import chapter_progress, cohort_first_sds, completed_with_results
+from services.scoring_service import InvalidPathError, chapter_review, scene_review, weighted_profile
+from services.session_service import PlaySessionService, SessionError, passage_attempt_dicts
 from views.guards import current_user, login_required
+from views.scoring_context import book_thresholds
 
 session_api_bp = Blueprint("session_api", __name__, url_prefix="/api")
 
@@ -46,6 +47,7 @@ def session_payload(bs: BookSession) -> dict[str, Any]:
 
 def passage_payload(p: ChapterPassage) -> dict[str, Any]:
     results = p.results or {}
+    timing = results.get("timing") or {}
     return {
         "id": p.id,
         "chapter_id": p.chapter_id,
@@ -54,6 +56,9 @@ def passage_payload(p: ChapterPassage) -> dict[str, Any]:
         "flags": list(p.flags_in or []),
         "global": results.get("global"),
         "n_choices": results.get("n_choices"),
+        "n_critical": results.get("n_critical"),
+        "too_fast": bool(timing.get("too_fast")),
+        "timing": timing or None,
     }
 
 
@@ -124,6 +129,7 @@ def record_attempt(session_id: int):
         choices=choices,
         flags=payload.get("flags"),
         passage_id=passage_id,
+        times=payload.get("times"),
     )
     return jsonify({
         "counted": attempt.counted,
@@ -140,14 +146,27 @@ def complete_chapter(session_id: int):
     bs = _load(session_id)
     chapter_id = _int(payload, "chapter_id")
     book_done, passage = play_service().complete_chapter(bs, chapter_id, payload.get("flags"))
-    passages = PassageRepository(db_session()).list_for_user(
-        bs.user_id, bs.book_slug, chapter_id, completed_only=True
-    )
+    repo = PassageRepository(db_session())
+    passages = repo.list_for_user(bs.user_id, bs.book_slug, chapter_id, completed_only=True)
+    cohort = cohort_first_sds(repo.list_all(book_slug=bs.book_slug), bs.book_slug)
     return jsonify({
         "book_completed": book_done,
         "session": session_payload(bs),
         "passage": passage_payload(passage),
-        "progress": chapter_progress(passages),
+        "progress": chapter_progress(
+            passages,
+            cohort.get(chapter_id),
+            thresholds=book_thresholds(
+                bs.book_slug, current_app.extensions["eol_chapters"].load_chapters(bs.book_slug)
+            ).get(chapter_id),
+        ),
+        # Feedback d'abord (proposition v3, § 2.7) : ce qu'il faut retenir du
+        # chapitre, puis la tendance par compétence ; la note se lit à la demande.
+        "review": chapter_review(passage_attempt_dicts(passage)),
+        "trend": {
+            "strengths": (passage.results or {}).get("strengths") or [],
+            "weaknesses": (passage.results or {}).get("weaknesses") or [],
+        },
     })
 
 

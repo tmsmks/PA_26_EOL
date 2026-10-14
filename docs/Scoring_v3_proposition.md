@@ -1,15 +1,21 @@
-# Scoring v3 — proposition fondée sur les 33 articles
+# Scoring v3 — proposition fondée sur la bibliographie du scoring
 
-> Proposition du 12.10.2026, **non implémentée**. Elle part du scoring v2 déjà en place
+> Proposition du 12.10.2026. **Étape A implémentée le 13.10.2026** (journal § 2.33 et § 2.34),
+> ainsi que les **outils des étapes B et C** : grille de relecture ciblée, seuils par la méthode
+> d'Angoff (`/trainer/cle/`), protocole du pilote ([Pilote_protocole.md](Pilote_protocole.md)).
+> Restent ce qui demande des personnes (juges, pilote) et l'étape D. Elle part du scoring v2 déjà en place
 > ([Scoring_v2_recherche_et_plan.md](Scoring_v2_recherche_et_plan.md), étape 1 faite le
-> 06.10.2026) et des 33 articles de sa bibliographie (§ 7 du plan, PDF
+> 06.10.2026) et des articles de sa bibliographie (§ 7 du plan, PDF
 > [Scoring_v2_bibliographie.pdf](Scoring_v2_bibliographie.pdf)), lus en texte intégral.
+> Le 13.10.2026, la bibliographie est réduite de 33 à 27 articles : seuls restent ceux qui
+> servent au scoring. Les passages qui s'appuyaient sur les 6 articles retirés sont supprimés
+> ou reformulés.
 > Les chiffres « simulés » viennent de joueur·euse·s simulé·e·s sur le livre 2 v2, rejoué·e·s
 > par le vrai calcul serveur, sur une base jetable (aucune donnée réelle).
 
 ## 0. En bref
 
-Le scoring v2 tient debout : la recherche confirme ses choix principaux. Les 33 articles
+Le scoring v2 tient debout : la recherche confirme ses choix principaux. Les articles
 demandent pourtant de corriger trois points, d'en préciser quatre et d'ajouter de quoi le
 valider.
 
@@ -35,19 +41,15 @@ valider.
    les commentaires (Shute 2008). Le feedback riche en information est l'élément le plus efficace
    (*d* = 0,99 ; Wisniewski et al. 2020).
 
-## 1. Ce que disent les 33 articles : dix constats
+## 1. Ce que disent les articles : dix constats
 
 Chaque constat résume ce que les articles montrent, puis ce que cela implique pour nous.
 
 ### Constat 1 — La note mesure un *jugement*, pas un comportement
-- Un test de jugement situationnel (SJT) en vidéo, passé à l'admission en médecine, prédit la
-  performance en stage 7 ans plus tard et au travail 9 ans plus tard. Le lien passe par le
-  comportement en stage. Le test mesure une **connaissance procédurale** du comportement
-  interpersonnel : savoir ce qu'il faut faire. Le panel avait fixé une seule bonne réponse
-  par question (1 point) ; la corrélation corrigée est d'environ 0,2 (Lievens & Sackett 2012).
+- Un SJT mesure surtout une **connaissance procédurale** : savoir ce qu'il faut faire.
 - Les consignes « que faut-il faire ? » mesurent plutôt la connaissance ; les consignes « que
   feriez-vous ? » plutôt la personnalité. En situation d'examen, les candidat·e·s répondent de
-  toute façon comme à la première (Kepes et al. 2025 ; Patterson et al. 2016).
+  toute façon comme à la première (Patterson et al. 2016).
 
 **Pour nous :** la note dit ce que l'étudiant·e *sait qu'il faut faire* face à un patient en
 fin de vie. Elle ne dit pas ce qu'il ou elle fera. Il faut l'écrire partout où la note
@@ -56,8 +58,6 @@ apparaît, et ne jamais promettre davantage.
 ### Constat 2 — La clé vaut ce que vaut le panel
 - Les réponses sont cotées par un **panel de concordance**, distinct des auteurs des scènes,
   puis la clé est pilotée et analysée (Patterson et al. 2016).
-- Une clé établie par des experts prédit la performance mieux que des clés établies par des
-  étudiant·e·s (étude citée par Kepes et al. 2025).
 - Delphi : en général 2 ou 3 tours ; consensus défini *à l'avance*, le plus souvent par 75 à
   80 % d'accord et/ou par la médiane ; retour aux experts entre les tours (Jünger et al. 2017,
   CREDES).
@@ -88,10 +88,6 @@ consensus, et comparer sur le pilote notre cotation graduée à une cotation dic
   la variance, les étudiant·e·s 4,8 %. La fiabilité relative (G = 0,93) est plus haute que la
   fiabilité absolue (Φ = 0,83), qui est celle qui compte pour un seuil de réussite
   (Trejo-Mejía et al. 2016).
-- La fidélité test-retest moyenne des SJT est de 0,70 (k = 37 ; Harenbrock et al. 2023), et de
-  0,76 dans une autre synthèse (Kepes et al. 2025).
-- Le coefficient alpha ne convient pas aux SJT, qui mesurent plusieurs choses à la fois
-  (de Leng et al. 2017 ; Kepes et al. 2025).
 
 ### Constat 5 — Rejouer fait monter la note, surtout le même test
 - Repasser un test fait gagner en moyenne 0,26 écart-type la 2ᵉ fois, et encore 0,2 la 3ᵉ.
@@ -113,8 +109,6 @@ consensus, et comparer sur le pilote notre cotation graduée à une cotation dic
 - La moyenne mobile exponentielle, qui donne moins de poids aux observations anciennes,
   prédit bien. Mieux vaut un modèle simple, sauf raison claire, et on le juge à sa capacité à
   prédire la suite (Pelánek 2017).
-- Le système Elo convient à la pratique à faible enjeu, mais il lui faut au moins
-  100 étudiant·e·s pour estimer la difficulté des items (Pelánek 2016).
 - Le *knowledge tracing* estime la probabilité qu'une compétence soit acquise et fixe la
   maîtrise à 0,95 (Corbett & Anderson 1995).
 - Une courbe d'apprentissage demande au moins 3 points. On y trace un seuil de compétence et
@@ -156,8 +150,6 @@ corrélation entre avant et après (Nissen et al. 2018).
     seuls font beaucoup progresser, une note avec des commentaires ne fait pas progresser.
 - Avec des patients virtuels en communication, ce qui marche, ce sont la préparation, le
   débriefing et le feedback **humain**, pas le feedback automatique seul (Lee et al. 2020).
-- Quand l'apprenant·e a reçu de l'aide, ses réponses suivantes renseignent sur
-  l'apprentissage plutôt que sur le niveau de départ (Arieli-Attali et al. 2019).
 
 ### Constat 10 — Valider, c'est construire un argument
 - Valider demande huit étapes et les quatre inférences de Kane : cotation, généralisation,
@@ -166,8 +158,6 @@ corrélation entre avant et après (Nissen et al. 2018).
 - Exemple réel : la note d'un jeu sérieux infirmier ne distinguait pas étudiant·e·s,
   jeunes diplômé·e·s et expert·e·s. Il reste un bon outil pédagogique, pas un outil de
   notation (Blanié et al. 2020).
-- L'évaluation furtive d'un jeu vidéo corrélait à 0,40 et 0,41 avec deux tests externes,
-  sur 47 élèves seulement, avec un risque de surajustement (Shute et al. 2016).
 
 ## 2. Le modèle proposé, niveau par niveau
 
@@ -238,8 +228,7 @@ atteignable.
    Au hasard, on obtient **20,6 %** sur le livre 2 (simulation, 5 réponses par choix le plus
    souvent). Il est calculé à côté de la qualité, pour l'export et pour le pilote seulement.
    *Pourquoi :* la cotation dichotomique, au mode, résiste mieux aux réponses sans consensus
-   (Weng et al. 2018). Le SJT de Lievens & Sackett (2012) était coté ainsi et restait
-   prédictif. Aucune méthode n'est la meilleure partout (de Leng et al. 2017) : on gardera
+   (Weng et al. 2018). Aucune méthode n'est la meilleure partout (de Leng et al. 2017) : on gardera
    celle qui a les meilleures preuves de validité sur nos données.
 2. **Le temps de réponse** : le navigateur envoie, avec chaque choix, le temps écoulé depuis
    l'affichage des réponses. *Pourquoi :* il permet de repérer le « jeu avec le système »
@@ -265,7 +254,6 @@ c'est la logique de la correction du hasard en QCM (Frary 1988). Frary ajoute qu
    sans note par compétence et sans décision par compétence. *Pourquoi :*
    - les 7 éléments de Kalamazoo forment un seul facteur, celui de la communication en
      général (Joyce et al. 2010) ;
-   - les facettes d'une évaluation furtive sont corrélées entre elles (Shute et al. 2016) ;
    - nos 7 compétences ne sont donc probablement pas mesurées séparément.
 3. **Erreurs critiques.** Elles sont listées. Un passage qui en contient ne peut pas dépasser
    « À consolider », quelle que soit sa note, et un **débriefing est proposé au formateur**.
@@ -281,9 +269,8 @@ c'est la logique de la correction du hasard en QCM (Frary 1988). Frary ajoute qu
    5ᵉ centile des temps de réponse). *Pourquoi :* Baker et al. (2004) ; aucun article ne fixe
    de seuil, donc il se mesure.
 5. **Le premier passage d'un chapitre** se joue sans aide : on ne voit les meilleures réponses
-   qu'à la fin de chaque scène. *Pourquoi :* une réponse donnée après une aide renseigne sur
-   l'apprentissage, pas sur le niveau de départ (Arieli-Attali et al. 2019). Il faut donner
-   le feedback après l'essai (Shute 2008).
+   qu'à la fin de chaque scène. *Pourquoi :* le feedback se donne après l'essai (Shute 2008) ;
+   une réponse donnée après une aide ne dit plus le niveau de départ.
 
 ### 2.4 Niveau 3 — Le chapitre dans le temps
 
@@ -404,8 +391,8 @@ décision absolue, qui dépend de la fiabilité absolue Φ, plus basse que la fi
 
 **Ce qui reste à mesurer.** Une simulation sur le livre 2 donne une fidélité moitié-moitié
 de 0,85 par chapitre. C'est un **plafond** : les joueur·euse·s simulé·e·s n'ont qu'une seule
-capacité, sans spécificité du cas. Les SJT réels ont une fidélité test-retest de 0,70
-(Harenbrock et al. 2023). Seul le pilote dira la vraie valeur.
+capacité, sans spécificité du cas. Seul le pilote dira la vraie valeur, par une mesure
+test-retest.
 
 ### 2.7 Niveau 6 — Ce que voit l'étudiant·e, ce que voit le formateur
 
@@ -496,8 +483,7 @@ chapitre.
 Cook & Hatala (2016) proposent huit étapes ; voici ce que chacune demande pour nous.
 
 1. **Construit et interprétation.** « Jugement situationnel en communication et
-   professionnalisme face à la fin de vie, en 2ᵉ année ». Ce n'est pas un comportement réel
-   (Lievens & Sackett 2012).
+   professionnalisme face à la fin de vie, en 2ᵉ année ». Ce n'est pas un comportement réel.
 2. **Décisions visées.** Aujourd'hui, formatives seulement. Plus tard peut-être une
    attestation, décidée par un·e formateur·rice sur l'ensemble des données (Heeneman et
    al. 2021).
@@ -517,8 +503,8 @@ Cook & Hatala (2016) proposent huit étapes ; voici ce que chacune demande pour 
 | Cotation | Équité | Écarts entre groupes examinés scène par scène | de Leng et al. 2017 ; Patterson et al. 2016 |
 | Cotation | Méthode de cotation | Graduée contre dichotomique : garder la plus valide | Weng et al. 2018 ; de Leng et al. 2017 |
 | Généralisation | Étude G : étudiant·e × scène × choix | Φ par chapitre, et nombre de chapitres ou de passages nécessaire (étude D) | Trejo-Mejía et al. 2016 |
-| Généralisation | Fidélité test-retest à 7 jours ou plus | ≈ 0,70 attendu | Harenbrock et al. 2023 |
-| Extrapolation | Corrélation avec l'ECOS de communication ou l'avis des tuteurs | Modeste mais positive (0,2 à 0,4 dans la littérature) | Lievens & Sackett 2012 ; Shute et al. 2016 |
+| Généralisation | Fidélité test-retest à 7 jours ou plus | À mesurer, en tenant compte du gain de répétition | Hausknecht et al. 2007 |
+| Extrapolation | Corrélation avec l'ECOS de communication ou l'avis des tuteurs | Positive, sans doute modeste | Cook & Hatala 2016 |
 | Extrapolation | Groupes contrastés (2ᵉ année, 6ᵉ année, médecins assistant·e·s) | Différences attendues, mais ce n'est pas l'argument principal | Blanié et al. 2020 ; Cook & Hatala 2016 |
 | Conséquences | Progrès dans des chapitres jamais rejoués | Positif | Lievens & Sackett 2007 |
 | Conséquences | Passages trop rapides, anxiété, avis des étudiant·e·s | Faibles | Baker et al. 2004 ; Heeneman et al. 2021 |
@@ -532,7 +518,7 @@ Cook & Hatala (2016) proposent huit étapes ; voici ce que chacune demande pour 
 
 ## 5. Ce qu'il faudrait changer dans l'application
 
-**Étape A — sans données, possible tout de suite.**
+**Étape A — sans données, possible tout de suite.** Faite le 13.10.2026 (seuil de temps provisoire : 2 secondes).
 1. Enregistrer le temps de chaque choix dans la trace (navigateur, puis serveur), et
    signaler les passages trop rapides : drapeau et non-comptage.
 2. Remplacer, dans `chapter_level`, le changement normalisé par le gain en points, sa marge
@@ -562,8 +548,6 @@ marqueurs « critique » ; médiane ; ICC avec intervalle ; Angoff modifié par 
 - Vérifier les seuils Angoff par la régression sur les cas limites.
 
 **Étape D — plus tard, et seulement si le pilote le justifie.**
-- Elo, pour estimer la difficulté des scènes : au moins 100 étudiant·e·s, faible enjeu
-  (Pelánek 2016).
 - *Knowledge tracing* par compétence (Corbett & Anderson 1995).
 - Selon Pelánek (2017), un modèle plus complexe ne se justifie que par un gain de
   prédiction mesuré.
@@ -598,21 +582,16 @@ marqueurs « critique » ; médiane ; ICC avec intervalle ; Angoff modifié par 
 - **Les chiffres de simulation** (35 à 46 choix, marges, 0,85) décrivent le livre, pas les
   étudiant·e·s.
 
-## 8. Les 33 articles : où chacun sert, et pourquoi
+## 8. Les 27 articles : où chacun sert, et pourquoi
 
 | Article | Où il sert | Pourquoi |
 |---|---|---|
-| Arieli-Attali et al. 2019 | § 2.3, point 5 | Séparer les preuves sur le niveau des preuves sur l'apprentissage |
-| Shute et al. 2016 | § 2.3 ; § 4 | Facettes corrélées ; validité modeste et sur un petit échantillon |
 | Patterson et al. 2016 | § 2.1 ; § 2.2 | Panel de concordance distinct ; cotation rationnelle ; équité |
 | de Leng et al. 2017 | § 2.1 ; § 2.2 ; § 4 | La méthode de cotation change la mesure ; écarts entre groupes |
 | Weng et al. 2018 | § 2.1 ; § 2.2 | Médiane ou mode ; items sans consensus ; dichotomique |
-| Lievens & Sackett 2012 | Constat 1 ; § 4 | Ce que mesure la note ; ampleur réaliste de la validité |
-| Kepes et al. 2025 | Constats 1 à 4 | Clé d'experts ; consignes ; test-retest de 0,76 ; alpha inadapté |
 | Lievens et al. 2005 | § 2.4 | Gain de répétition d'un tiers d'écart-type ; validité du 2ᵉ essai |
 | Lievens & Sackett 2007 | § 2.4 ; § 4 | Changer de contexte change la mesure : le progrès se juge aussi hors des chapitres rejoués |
 | Hausknecht et al. 2007 | § 2.4 ; § 6 | Gain plus fort quand le test est identique ; l'intervalle compte |
-| Harenbrock et al. 2023 | § 2.6 ; § 4 | Fidélité test-retest de référence : 0,70 |
 | Baker et al. 2004 | § 2.2 ; § 2.3 ; § 4 | Repérer le jeu avec le système |
 | Frary 1988 | § 2.2 ; § 2.7 | Correction du hasard ; dire comment le test est noté |
 | Trejo-Mejía et al. 2016 | § 2.6 ; § 4 | Spécificité des stations ; Φ pour les seuils ; étude D |
@@ -620,7 +599,6 @@ marqueurs « critique » ; médiane ; ICC avec intervalle ; Angoff modifié par 
 | Howard et al. 2023 | § 2.4 | Courbes à partir de 3 points ; seuils de compétence et de remédiation |
 | Nissen et al. 2018 | § 2.4 | Abandonner le gain normalisé ; *d* de Cohen pour les groupes |
 | Corbett & Anderson 1995 | § 2.4 ; § 5, étape D | Maîtrise sur preuves répétées ; modèle possible plus tard |
-| Pelánek 2016 | § 5, étape D | Elo : faible enjeu, au moins 100 étudiant·e·s |
 | Pelánek 2017 | § 2.2 ; § 2.4 | Moyenne mobile exponentielle ; juger par la prédiction ; rester simple |
 | Legoux et al. 2021 | § 2.4 | Oubli dès 3 mois : demi-vie et signal « à rafraîchir » |
 | Jünger et al. 2017 | § 2.1 | Delphi : tours, consensus défini à l'avance, seuil de 75 % |

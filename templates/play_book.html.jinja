@@ -35,7 +35,7 @@
     {%- elif last_completed %}
         <div>
             <p class="session-banner-title">Session {{ last_completed.number }} terminée · note {{ (last_completed.results or {}).get('global') | note }}/100</p>
-            <p class="session-banner-sub">Rejouez les chapitres que vous voulez améliorer : chacun garde son propre niveau{% if profile.global is not none %} (note du livre {{ profile.global | note }}/100, {{ profile.n_evaluated }}/{{ profile.n_chapters }} chapitres évalués){% endif %}.</p>
+            <p class="session-banner-sub">Rejouez les chapitres que vous voulez améliorer : chacun garde son propre niveau{% if profile.global is not none %} (note du livre {{ profile.global | note }}/100, {{ profile.n_evaluated }}/{{ profile.n_chapters }} chapitres évalués){% endif %}. <a href="{{ url_for('pages.scoring_explained') }}">Comment est-ce noté ?</a></p>
         </div>
         <a class="primary-btn small" href="{{ url_for('account.session_report', session_id=last_completed.id) }}">Voir le bilan</a>
     {%- else %}
@@ -63,7 +63,7 @@
                         {%- endif %}
                         {%- set lv = levels[ch.id] %}
                         {%- if lv %}
-                        <span class="chapter-progress">· niveau {{ lv.level | note }}/100 ({{ lv.n_passages }} passage{{ 's' if lv.n_passages > 1 }} noté{{ 's' if lv.n_passages > 1 }})</span>
+                        <span class="chapter-progress">· niveau {{ lv.level | note }}/100{% if lv.band %} · {{ lv.band.label }}{% endif %} ({{ lv.n_passages }} passage{{ 's' if lv.n_passages > 1 }} noté{{ 's' if lv.n_passages > 1 }}){% if lv.critical_capped %} · réponse critique à revoir{% endif %}{% if lv.refresh %} · à rafraîchir{% endif %}</span>
                         {%- endif %}
                     </span>
                 </span>

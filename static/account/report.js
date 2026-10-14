@@ -1,14 +1,14 @@
 // Bilan d'une session : graphiques + feedback général (généré au 1er affichage).
 
 import { postJSON } from "../shared/http.js";
-import { esc, heatmap, skillBars, trendLine } from "./charts.js";
+import { esc, heatmap, skillRose, trendLine } from "./charts.js";
 
 const R = window.PA_REPORT || {};
 const results = R.results || {};
 const labels = R.labels || {};
 const $ = (id) => document.getElementById(id);
 
-skillBars($("skills-chart"), {
+skillRose($("skills-chart"), {
     skills: R.skills,
     labels: labels,
     current: results.scores || {},

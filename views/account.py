@@ -27,7 +27,9 @@ from repositories.sessions import SessionRepository
 from repositories.users import UserRepository
 from services.auth_service import AuthError, hash_password, validate_password
 from services.export_service import build_export, participant_code
-from services.history_service import book_progress, completed_with_results, user_history
+from services.history_service import book_progress, cohorts_for, completed_with_results, user_history
+from services.scoring_service import group_change
+from views.scoring_context import book_thresholds, thresholds_for
 from services.scoring_service import MIN_SKILL_EVIDENCE
 from views.guards import current_user, login_required, trainer_required
 from views.session_api import play_service
@@ -51,7 +53,8 @@ def _history_page(user: User, trainer_view: bool):
     sessions = SessionRepository(db_session()).list_for_user(user.id)
     passages = PassageRepository(db_session()).list_for_user(user.id)
     chapters = _book_chapters({s.book_slug for s in sessions})
-    blocks = user_history(sessions, passages, chapters)
+    cohorts = cohorts_for(PassageRepository(db_session()).list_all(), chapters)
+    blocks = user_history(sessions, passages, chapters, cohorts, thresholds_for(chapters))
     return render_template(
         "account_history.html.jinja",
         subject=user,
@@ -94,9 +97,13 @@ def _report_data(bs: BookSession) -> dict[str, Any]:
     else:
         # Session en cours : résultats provisoires, sans feedback.
         results = play_service().compute_results(bs)
+    repo = PassageRepository(db_session())
+    book_chapters = _book_chapters({bs.book_slug})[bs.book_slug]
     progress = book_progress(
-        _book_chapters({bs.book_slug})[bs.book_slug],
-        PassageRepository(db_session()).list_for_user(bs.user_id, bs.book_slug),
+        book_chapters,
+        repo.list_for_user(bs.user_id, bs.book_slug),
+        cohorts_for(repo.list_all(book_slug=bs.book_slug), [bs.book_slug])[bs.book_slug],
+        thresholds=book_thresholds(bs.book_slug, book_chapters),
     )
     user = current_user()
     feedback = bs.feedback
@@ -159,9 +166,13 @@ def trainer_dashboard():
     for s in SessionRepository(db_session()).list_all():
         by_user.setdefault(s.user_id, []).append(s)
     passages_by_user: dict[int, list] = {}
-    for p in PassageRepository(db_session()).list_all():
+    all_passages = PassageRepository(db_session()).list_all()
+    for p in all_passages:
         passages_by_user.setdefault(p.user_id, []).append(p)
     chapters = _book_chapters({b["slug"] for b in BOOKS})
+    cohorts = cohorts_for(all_passages, chapters)
+    thresholds = thresholds_for(chapters)
+    titles = {b["slug"]: b["title"] for b in BOOKS}
 
     # Livre détaillé chapitre par chapitre : celui demandé, sinon le premier joué.
     played = [b["slug"] for b in BOOKS if any(p.book_slug == b["slug"] for ps in passages_by_user.values() for p in ps)]
@@ -172,13 +183,34 @@ def trainer_dashboard():
         abort(404)
 
     rows = []
+    # À débriefer (erreurs critiques non résolues) et passages trop rapides :
+    # le débriefing humain est ce qui rend les patients virtuels efficaces.
+    debriefs: list[dict] = []
+    fast: list[dict] = []
     for u in users:
         sessions = by_user.get(u.id, [])
         passages = passages_by_user.get(u.id, [])
         progress = {
-            b["slug"]: book_progress(chapters[b["slug"]], [p for p in passages if p.book_slug == b["slug"]])
+            b["slug"]: book_progress(
+                chapters[b["slug"]], [p for p in passages if p.book_slug == b["slug"]], cohorts.get(b["slug"]),
+                thresholds=thresholds.get(b["slug"]),
+            )
             for b in BOOKS
         }
+        for slug, pr in progress.items():
+            for c in pr["chapters"]:
+                if c["critical"]:
+                    debriefs.append({
+                        "user": u, "book": titles[slug], "chapter": f"{c['id']}. {c['name']}",
+                        "answers": c["critical"], "at": c["level"]["last_at"],
+                    })
+        for p in passages:
+            timing = (p.results or {}).get("timing") or {}
+            if timing.get("too_fast"):
+                fast.append({
+                    "user": u, "book": titles.get(p.book_slug, p.book_slug), "chapter_id": p.chapter_id,
+                    "at": p.completed_at, "n_fast": timing.get("n_fast"), "n_timed": timing.get("n_timed"),
+                })
         activity = max(
             [s.updated_at for s in sessions] + [p.completed_at for p in passages if p.completed_at],
             default=u.last_login_at,
@@ -192,9 +224,22 @@ def trainer_dashboard():
             "profiles": {slug: pr["profile"] for slug, pr in progress.items()},
             "detail": progress[detail_book["slug"]]["chapters"],
         })
+    # Progrès du groupe, chapitre par chapitre : 1ᵉʳ et dernier passage compté.
+    group = []
+    for ch in chapters[detail_book["slug"]]:
+        pairs = [
+            (c["level"]["first"], c["level"]["last"])
+            for r in rows
+            for c in r["detail"]
+            if c["id"] == ch.Id and c["level"] and c["level"]["n_passages"] >= 2
+        ]
+        group.append({"id": ch.Id, "name": ch.Name, "change": group_change(pairs)})
     return render_template(
         "trainer_dashboard.html.jinja",
         rows=rows,
+        group=group,
+        debriefs=debriefs,
+        fast=sorted(fast, key=lambda f: f["at"] or 0, reverse=True)[:20],
         books=BOOKS,
         detail_book=detail_book,
         detail_chapters=chapters[detail_book["slug"]],
@@ -263,11 +308,13 @@ def trainer_export():
     users = [participant] if participant else UserRepository(db_session()).list_all()
     user_id = participant.id if participant else None
     sessions = SessionRepository(db_session()).list_for_export(user_id=user_id, book_slug=book_slug)
+    export_chapters = _book_chapters({s.book_slug for s in sessions})
     tables, meta = build_export(
         users,
         sessions,
         PassageRepository(db_session()).list_all(user_id=user_id, book_slug=book_slug),
-        _book_chapters({s.book_slug for s in sessions}),
+        export_chapters,
+        thresholds=thresholds_for(export_chapters),
         book_slug=book_slug,
         participant=participant,
         pseudonymize=pseudonymize,

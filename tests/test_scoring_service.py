@@ -1,17 +1,23 @@
 """Tests du scoring : rejeu, qualité des choix, niveaux, profil, pondération."""
+from datetime import datetime, timedelta, timezone
+
 import pytest
 
 from domain.models import Actor, Chapter, Interaction, Response, Scene
 from services.scoring_service import (
     MIN_SKILL_EVIDENCE,
     InvalidPathError,
+    band,
     book_profile,
     chapter_level,
     choice_quality,
     enrich_trace,
     normalized_change,
     option_stats,
+    group_change,
     passage_results,
+    passage_timing,
+    progress_status,
     quoted,
     rank_skills,
     replay_scene,
@@ -156,16 +162,101 @@ def _passage(globals_):
             "n_choices": 20, "steps": [[g, 10] for g in ([3, 8, 5, 10, 0] * 4)]}
 
 
-def test_chapter_level_weights_recent_passages_and_tracks_progress():
-    level = chapter_level([_passage(40), _passage(60), _passage(75)])
-    # (40·1 + 60·1,25 + 75·1,5) / 3,75 = 60,67, comme la note pondérée v1
-    assert level["level"] == 60.7
-    assert level["weights"] == [1.0, 1.25, 1.5]
-    assert level["progression"] == normalized_change(40, 60.7)
+NOW = datetime(2026, 10, 13, 12, tzinfo=timezone.utc)
+
+
+def _dated(globals_, days_ago, n_critical=0):
+    return {**_passage(globals_), "completed_at": NOW - timedelta(days=days_ago), "n_critical": n_critical}
+
+
+def _flat(globals_, days_ago=0, n_critical=0):
+    """Passage dont tous les choix ont la même qualité : marge nulle."""
+    return {**_dated(globals_, days_ago, n_critical), "steps": [[globals_, 100]] * 20}
+
+
+def test_chapter_level_weights_passages_by_age():
+    level = chapter_level([_dated(40, 180), _dated(60, 90), _dated(75, 0)], now=NOW)
+    # Un passage pèse 2^(−âge / 90 j) : 0,25 à 180 jours, 0,5 à 90, 1 aujourd'hui.
+    assert level["weights"] == [0.25, 0.5, 1.0]
+    assert level["level"] == round((40 * 0.25 + 60 * 0.5 + 75) / 1.75, 1)
+    assert level["scores"]["Empathy"] == level["level"]
     assert level["n_passages"] == 3 and level["first"] == 40 and level["last"] == 75
-    assert level["scores"]["Empathy"] == 60.7
+    # Deux passages du même jour pèsent autant l'un que l'autre.
+    assert chapter_level([_dated(40, 0), _dated(80, 0)], now=NOW)["level"] == 60.0
     assert chapter_level([]) is None
-    assert chapter_level([_passage(50)])["progression"] is None
+
+
+def test_progression_is_a_gain_in_points_with_its_margin():
+    level = chapter_level([_dated(40, 180), _dated(60, 90), _dated(75, 0)], now=NOW)
+    assert level["gain"] == round((60 * 0.5 + 75) / 1.5 - 40, 1)
+    assert level["gain_margin"] > 0 and level["progress"]["status"] == "net_gain"
+    # L'ancien indicateur reste calculé une version, pour l'export.
+    assert level["progression"] == normalized_change(40, level["level"])
+    single = chapter_level([_dated(50, 3)], now=NOW)
+    assert single["gain"] is None and single["progress"] is None and single["progression"] is None
+
+
+def test_progress_is_net_only_beyond_its_margin_and_a_third_of_the_cohort_sd():
+    assert progress_status(10, 8)["status"] == "net_gain"
+    assert progress_status(10, 12)["status"] == "possible_gain"
+    assert progress_status(10, 8, cohort_sd=36)["status"] == "possible_gain"  # 10 < 36 / 3
+    assert progress_status(13, 8, cohort_sd=36)["status"] == "net_gain"
+    assert progress_status(-15, 8)["status"] == "net_loss"
+    assert progress_status(-5, 8)["status"] == "stable"
+    assert progress_status(10, None)["status"] == "possible_gain"
+
+
+def test_a_band_is_given_with_its_margin():
+    assert band(80, 3)["label"] == "Compétent"
+    assert band(72, 8)["label"] == "entre À consolider et Compétent"
+    assert band(95, 10)["label"] == "entre Compétent et Avancé"
+    assert band(55, None)["label"] == "Insuffisant"
+    assert band(None, 5) is None
+
+
+def test_a_critical_answer_caps_the_band_until_a_clean_passage():
+    capped = chapter_level([_flat(95, 1, n_critical=1)], now=NOW)
+    assert capped["level"] == 95  # la note ne change pas
+    assert capped["critical_capped"] and capped["n_critical_open"] == 1
+    assert {k: capped["band"][k] for k in ("low", "high", "label", "settled", "capped")} == {
+        "low": "À consolider", "high": "À consolider", "label": "À consolider", "settled": True, "capped": True}
+    lifted = chapter_level([_flat(95, 10, n_critical=1), _flat(95, 0)], now=NOW)
+    assert not lifted["critical_capped"] and lifted["band"]["label"] == "Avancé"
+
+
+def test_the_book_band_follows_the_conjunctive_rule():
+    strong = {i: chapter_level([_flat(95)], now=NOW) for i in (1, 2, 3)}
+    assert book_profile({**strong, 4: chapter_level([_flat(80)], now=NOW)}, 4)["band"]["label"] == "Avancé"
+    # Moyenne de 81 (« Compétent ») mais un chapitre insuffisant : pas au-dessus d'« À consolider ».
+    weak = book_profile({**strong, 4: chapter_level([_flat(40)], now=NOW)}, 4)
+    assert weak["global"] == 81.2 and weak["insufficient_chapters"] == [4]
+    assert weak["band"]["label"] == "À consolider" and weak["band"]["capped"]
+    critical = book_profile({**strong, 4: chapter_level([_flat(95, n_critical=2)], now=NOW)}, 4)
+    assert critical["critical_chapters"] == [4] and critical["band"]["label"] == "À consolider"
+
+
+def test_book_progress_averages_chapter_gains():
+    a = chapter_level([_dated(40, 30), _dated(80, 0)], now=NOW)
+    b = chapter_level([_dated(60, 0)], now=NOW)
+    profile = book_profile({1: a, 2: b}, 2)
+    assert profile["progress"]["gain"] == a["gain"] and profile["progress"]["n_chapters"] == 1
+
+
+def test_a_chapter_is_to_refresh_after_90_days():
+    assert chapter_level([_dated(70, 91)], now=NOW)["refresh"] is True
+    assert chapter_level([_dated(70, 89)], now=NOW)["refresh"] is False
+
+
+def test_passage_timing_flags_a_passage_played_too_fast():
+    def attempts(times, n_options=4):
+        return [{"trace": [{"n_options": n_options, "time_ms": t} for t in times]}]
+
+    fast = passage_timing(attempts([500] * 3 + [5000] * 5))  # 3/8 en moins de 2 s
+    assert fast["too_fast"] and fast["n_fast"] == 3 and fast["n_timed"] == 8
+    assert not passage_timing(attempts([500] * 2 + [5000] * 6))["too_fast"]  # 2/8 : pas plus d'un quart
+    assert not passage_timing(attempts([500] * 3))["too_fast"]  # trop peu de choix chronométrés
+    assert passage_timing(attempts([100] * 9, n_options=1))["n_timed"] == 0  # « Continuer » : ignoré
+    assert passage_timing([{"trace": [{"n_options": 3}]}])["median_ms"] is None
 
 
 def test_margin_narrows_with_more_passages():
@@ -332,3 +423,28 @@ def test_quoted_does_not_wrap_a_gesture_that_carries_its_own_speech():
     gesture = "Poser la main sur son téléphone. « Range-le. »"
     assert quoted(gesture) == gesture
     assert quoted("Poser la main. « Range-le, et…") == "Poser la main. « Range-le, et… »"
+
+
+
+def test_bands_use_the_chapter_thresholds_set_by_judges():
+    assert band(70, 0)["label"] == "À consolider"
+    angoff = band(70, 0, thresholds=(50, 65, 80))
+    assert angoff["label"] == "Compétent" and angoff["angoff"] and angoff["thresholds"] == [50, 65, 80]
+    a = chapter_level([_flat(70)], now=NOW, thresholds=(50, 65, 80))
+    b = chapter_level([_flat(70)], now=NOW, thresholds=(40, 55, 70))
+    profile = book_profile({1: a, 2: b}, 2)
+    assert profile["band"]["thresholds"] == [45.0, 60.0, 75.0] and profile["band"]["label"] == "Compétent"
+
+
+def test_best_answer_rate_is_computed_beside_the_quality():
+    run = replay_scene(_scene(), 1, [0, 1])  # meilleure réponse, puis la pire
+    res = passage_results([{"chapter_id": 1, "scene_id": 1, "scene_title": "T", "trace": run.trace}])
+    assert res["best_rate"] == 50.0
+
+
+def test_group_change_reports_cohen_d_and_correlation():
+    g = group_change([(50, 60), (60, 75), (70, 72)])
+    assert g["n"] == 3 and g["mean_first"] == 60.0 and g["mean_last"] == 69.0
+    assert g["d"] == 1.0 and g["r"] == 0.76
+    assert group_change([(50, 60)]) is None
+    assert group_change([(50, 60), (70, 80)])["r"] is None  # corrélation à partir de 3 personnes

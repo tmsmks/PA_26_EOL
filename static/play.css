@@ -269,6 +269,16 @@ body {
 
 /* Fin de scène : ce qui était attendu, et pourquoi (cartes .moment d'account.css). */
 .review { display: flex; flex-direction: column; gap: 10px; text-align: left; margin-top: 4px; }
+.moment-scene { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-faint); }
+.points-details { text-align: left; margin-top: 4px; }
+.points-details[hidden] { display: none; }
+.points-details > summary {
+    cursor: pointer; font-size: 14px; font-weight: 600; color: var(--brand); padding: 6px 0; list-style-position: inside;
+}
+.points-details > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+.end-trend { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-soft); text-align: left; }
+.end-trend[hidden] { display: none; }
+.end-note { margin: 4px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink); }
 .review[hidden] { display: none; }
 .review-title { margin: 0; font-size: 19px; font-weight: 700; color: var(--navy); }
 .review-hint { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-faint); }

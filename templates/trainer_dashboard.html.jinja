@@ -19,6 +19,31 @@
         <p class="acc-sub">{{ rows | length }} compte{{ 's' if rows | length > 1 }} · note du livre = moyenne des niveaux des chapitres évalués, nombre de chapitres évalués entre parenthèses.</p>
     </header>
 
+    {%- if debriefs or fast %}
+    <section class="acc-card acc-critical" aria-labelledby="h-debrief">
+        <h2 id="h-debrief">À débriefer</h2>
+        {%- if debriefs %}
+        <p class="acc-hint">Réponses critiques dans le dernier passage noté d'un chapitre. Elles ne se compensent pas : un échange avec la personne est recommandé (le débriefing humain est ce qui rend les patients virtuels efficaces).</p>
+        <ul class="critical-list">
+            {%- for d in debriefs %}
+            <li><a href="{{ url_for('account.trainer_participant', user_id=d.user.id) }}">{{ d.user.display_name | e }}</a> · {{ d.book | e }} · chapitre {{ d.chapter | e }} · {{ d.answers | length }} réponse{{ 's' if d.answers | length > 1 }} critique{{ 's' if d.answers | length > 1 }}
+                <ul>{% for it in d.answers %}<li><span class="muted">{{ it.scene_title | e }}</span> — {{ it.text | e }}</li>{% endfor %}</ul>
+            </li>
+            {%- endfor %}
+        </ul>
+        {%- endif %}
+        {%- if fast %}
+        <h3>Passages trop rapides</h3>
+        <p class="acc-hint">Plus d'un quart des choix faits en moins de 2 secondes : le passage ne compte pas dans le niveau (seuil provisoire, à calibrer sur le pilote).</p>
+        <ul class="critical-list">
+            {%- for f in fast %}
+            <li><a href="{{ url_for('account.trainer_participant', user_id=f.user.id) }}">{{ f.user.display_name | e }}</a> · {{ f.book | e }} · chapitre {{ f.chapter_id }} · {{ f.n_fast }}/{{ f.n_timed }} choix rapides · {{ f.at | date_fr }}</li>
+            {%- endfor %}
+        </ul>
+        {%- endif %}
+    </section>
+    {%- endif %}
+
     <section class="acc-card">
         <div class="acc-toolbar">
             <h2>Suivi</h2>
@@ -70,7 +95,7 @@
                 <noscript><button class="ghost-btn small" type="submit">Afficher</button></noscript>
             </form>
         </div>
-        <p class="acc-hint">Niveau de chaque chapitre (moyenne pondérée des passages notés) et, entre parenthèses, le nombre de passages notés. ▲ / ▼ : progression depuis le premier passage.</p>
+        <p class="acc-hint">Niveau de chaque chapitre (moyenne des passages notés, pondérée par leur ancienneté) et, entre parenthèses, le nombre de passages notés. ▲ / ▼ : progrès ou baisse nets depuis le premier passage. ! : réponse critique à débriefer.</p>
         <div class="acc-table-wrap">
         <table class="acc-table" id="chapter-levels">
             <thead><tr>
@@ -85,8 +110,9 @@
                 {%- set lv = c.level %}
                 <td class="num">
                     {%- if lv %}{{ lv.level | note }} <span class="muted">({{ lv.n_passages }})</span>
-                    {%- if lv.progression is not none and lv.progression > 0 %} <span class="delta-up" title="Progression {{ lv.progression | round | int }} %">▲</span>
-                    {%- elif lv.progression is not none and lv.progression < 0 %} <span class="delta-down" title="Progression {{ lv.progression | round | int }} %">▼</span>{% endif %}
+                    {%- if lv.progress and lv.progress.status == 'net_gain' %} <span class="delta-up" title="Progrès net : {{ '%+d' % (lv.gain | round | int) }} points">▲</span>
+                    {%- elif lv.progress and lv.progress.status == 'net_loss' %} <span class="delta-down" title="Baisse nette : {{ '%+d' % (lv.gain | round | int) }} points">▼</span>{% endif %}
+                    {%- if lv.critical_capped %} <span class="delta-down" title="Réponse critique à débriefer">!</span>{% endif %}
                     {%- else %}<span class="muted">—</span>{% endif -%}
                 </td>
                 {%- endfor %}
@@ -97,6 +123,32 @@
             </tbody>
         </table>
         </div>
+    </section>
+
+    <section class="acc-card" aria-labelledby="h-group">
+        <h2 id="h-group">Progrès du groupe · {{ detail_book.title | e }}</h2>
+        <p class="acc-hint">Personnes qui ont au moins deux passages notés d'un chapitre : moyenne du premier et du dernier passage, et <em>d</em> de Cohen (écart des moyennes divisé par l'écart-type moyen), avec la corrélation entre les deux passages. Repères usuels : 0,2 petit, 0,5 moyen, 0,8 grand. C'est la mesure recommandée pour un groupe, plutôt que le gain normalisé (Nissen et al. 2018).</p>
+        {%- if group | selectattr('change') | list %}
+        <div class="acc-table-wrap">
+        <table class="acc-table">
+            <thead><tr><th>Chapitre</th><th class="num">Personnes</th><th class="num">1ᵉʳ passage</th><th class="num">Dernier passage</th><th class="num"><em>d</em> de Cohen</th><th class="num">Corrélation</th></tr></thead>
+            <tbody>
+            {%- for g in group if g.change %}
+            <tr>
+                <td>{{ g.id }}. {{ g.name | e }}</td>
+                <td class="num">{{ g.change.n }}</td>
+                <td class="num">{{ g.change.mean_first | note(1) }} <span class="muted">(σ {{ g.change.sd_first | note(1) }})</span></td>
+                <td class="num">{{ g.change.mean_last | note(1) }} <span class="muted">(σ {{ g.change.sd_last | note(1) }})</span></td>
+                <td class="num"><strong>{% if g.change.d is not none %}{{ '%+.2f' | format(g.change.d) | replace('.', ',') }}{% else %}—{% endif %}</strong></td>
+                <td class="num">{% if g.change.r is not none %}{{ '%.2f' | format(g.change.r) | replace('.', ',') }}{% else %}—{% endif %}</td>
+            </tr>
+            {%- endfor %}
+            </tbody>
+        </table>
+        </div>
+        {%- else %}
+        <p class="acc-empty">Apparaît dès que deux personnes ont rejoué un même chapitre en passage noté.</p>
+        {%- endif %}
     </section>
 
     <section class="acc-card" aria-labelledby="h-export">

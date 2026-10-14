@@ -7,7 +7,7 @@
 // « Commencer », et le serveur dit avec quels états narratifs repartir.
 
 import { postJSON } from "../shared/http.js";
-import { SKILL_LABELS_FR } from "../shared/skills.js";
+import { SKILL_LABELS_FR, SKILL_NAMES_FR } from "../shared/skills.js";
 import { createAudio } from "./audio.js";
 import {
     SCORE_SKILLS,
@@ -111,6 +111,7 @@ function recordScene() {
         scene_id: s.scene_id,
         entry_id: parseInt(game.entryId, 10),
         choices: game.choices.slice(),
+        times: (game.times || []).slice(),
         flags: flagList(game),
         passage_id: passage ? passage.id : undefined,
     };
@@ -153,7 +154,7 @@ function completeChapter() {
         ).then(
             (res) => {
                 session = res.session;
-                renderEndScore(res.passage, res.progress);
+                renderEndScore(res.passage, res.progress, res);
                 const done = session.completed_chapters.length;
                 if (res.book_completed) {
                     setStatus(status, "Livre terminé ! Votre bilan de la session " + session.number + " est prêt.", "ok");
@@ -182,28 +183,69 @@ function completeChapter() {
     send();
 }
 
-function renderEndScore(p, progress) {
-    const el = $("end-score");
+function skillList(keys) {
+    return (keys || []).map((k) => SKILL_NAMES_FR[k] || k).join(", ");
+}
+
+// Fin de chapitre, feedback d'abord (proposition v3, § 2.7) : ce qu'il faut
+// retenir, puis la bande et la tendance par compétence ; la note sur 100 et les
+// points seulement à la demande (« Voir la note »).
+function renderEndScore(p, progress, extra) {
+    const score = $("end-score");
+    const trend = $("end-trend");
+    const details = $("end-details");
     if (!p || p.global === null || p.global === undefined) {
-        el.hidden = true;
+        score.hidden = trend.hidden = details.hidden = true;
         return;
     }
-    let html = "Qualité de vos choix dans ce chapitre : <strong>" + fmtNote(p.global) + "/100</strong>.";
-    if (!p.counted) {
-        html += " Passage d'entraînement : il n'entre pas dans votre niveau.";
+    extra = extra || {};
+    fillReview(
+        { box: "end-review", list: "end-review-list", note: "end-review-critical-note", withScene: true },
+        extra.review,
+        "Ce qu'il faut retenir de ce chapitre."
+    );
+
+    let html = "";
+    let note = "Qualité de vos choix dans ce passage : <strong>" + fmtNote(p.global) + "/100</strong>.";
+    if (p.too_fast) {
+        html =
+            "Passage joué trop vite (plus d'un quart des choix en moins de 2 secondes) : " +
+            "il ne compte pas dans votre niveau, et le prochain passage pourra compter.";
+    } else if (!p.counted) {
+        html = "Passage d'entraînement : il n'entre pas dans votre niveau.";
     } else if (progress) {
-        html +=
+        const band = progress.band;
+        html =
+            "Votre niveau dans ce chapitre : <strong>" + esc(band ? band.label : "—") + "</strong>" +
+            (progress.critical_capped
+                ? ", plafonné tant qu'un passage noté contient une réponse critique"
+                : "") +
+            (progress.progress ? ". Depuis votre premier passage : " + esc(progress.progress.label) : "") +
+            ".";
+        note +=
             " Niveau du chapitre : <strong>" + fmtNote(progress.level) + "/100</strong>" +
             (progress.margin !== null && progress.margin !== undefined ? " (± " + fmtNote(progress.margin) + ")" : "") +
             (progress.n_passages > 1 ? ", " + progress.n_passages + " passages notés" : "") +
-            (progress.progression !== null && progress.progression !== undefined
-                ? ", progression " + (progress.progression > 0 ? "+" : "") + fmtNote(progress.progression) + " %"
+            (progress.gain !== null && progress.gain !== undefined
+                ? ", progression " + (progress.gain > 0 ? "+" : progress.gain < 0 ? "−" : "±") +
+                  fmtNote(Math.abs(progress.gain)) + " points"
                 : "") +
             ".";
     }
-    el.innerHTML = html;
-    el.hidden = false;
-    audio.append({ parts: [el.textContent] });
+    score.innerHTML = html;
+    score.hidden = !html;
+
+    const t = extra.trend || {};
+    const strong = skillList(t.strengths);
+    const weak = skillList(t.weaknesses);
+    trend.textContent =
+        (strong ? "Vos points forts dans ce chapitre : " + strong + ". " : "") +
+        (weak ? "À travailler : " + weak + "." : "");
+    trend.hidden = !trend.textContent;
+
+    $("end-note").innerHTML = note;
+    details.hidden = false;
+    audio.append({ parts: [score.textContent, trend.textContent] });
 }
 
 const $ = (id) => document.getElementById(id);
@@ -371,6 +413,8 @@ function renderDialogue() {
         return;
     }
 
+    // Temps de réponse : depuis l'affichage des réponses jusqu'au clic.
+    const shownAt = performance.now();
     shuffled.forEach((r, idx) => {
         const btn = document.createElement("button");
         btn.className = "choice";
@@ -378,7 +422,7 @@ function renderDialogue() {
             '<span class="choice-key">' + (idx + 1) + "</span>" +
             '<span class="choice-text">' + esc(r.text || "Continuer") + "</span>";
         btn.addEventListener("click", () => {
-            choose(game, r);
+            choose(game, r, performance.now() - shownAt);
             // Une interaction finale sans réponse est d'abord affichée (son texte
             // clôt la scène) ; son bouton « Continuer » mène au bilan.
             if (!game.current) renderDebrief();
@@ -420,21 +464,22 @@ function reviewWhy(rationale) {
     return '<p class="moment-why"><span class="who">Pourquoi</span><span>' + esc(rationale) + "</span></p>";
 }
 
-// Feedback d'abord (proposition v3) : les choix décisifs de la scène, la
-// réponse attendue et sa justification, avant les points.
-function renderReview(items) {
-    const box = $("debrief-review");
-    const list = $("review-list");
+// Feedback d'abord (proposition v3) : les choix décisifs, la réponse attendue
+// et sa justification, avant les points.
+function fillReview(ids, items, spokenTitle) {
+    const box = $(ids.box);
+    const list = $(ids.list);
     list.innerHTML = "";
     items = Array.isArray(items) ? items : [];
     box.hidden = !items.length;
-    $("review-critical-note").hidden = !items.some((it) => it.choice.critical);
+    $(ids.note).hidden = !items.some((it) => it.choice.critical);
     if (!items.length) return;
-    const spoken = ["Ce qui était attendu."];
+    const spoken = [spokenTitle];
     items.forEach((it) => {
         const li = document.createElement("li");
         li.className = "moment" + (it.choice.critical ? " is-critical" : "");
         li.innerHTML =
+            (ids.withScene && it.scene_title ? '<p class="moment-scene">' + esc(it.scene_title) + "</p>" : "") +
             '<p class="moment-prompt">' + (it.actor ? esc(it.actor) + " : " : "") +
             esc(quoted(clip(it.prompt, 220))) + "</p>" +
             reviewLine(it.is_best ? "Votre réponse, la plus ajustée" : "Votre réponse", it.choice.text, it.choice.critical) +
@@ -449,6 +494,10 @@ function renderReview(items) {
         );
     });
     audio.append({ parts: spoken });
+}
+
+function renderReview(items) {
+    fillReview({ box: "debrief-review", list: "review-list", note: "review-critical-note" }, items, "Ce qui était attendu.");
 }
 
 function renderBars(container, scores) {

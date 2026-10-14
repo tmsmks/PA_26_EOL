@@ -1,6 +1,6 @@
 // Graphiques des pages de suivi — HTML/SVG natifs, sans dépendance.
 //
-// - skillBars : profil des 7 compétences, trié, avec repère de comparaison ;
+// - skillRose : profil des 7 compétences en diagramme en rose, avec repère de comparaison ;
 // - heatmap   : chapitres × compétences (rampe séquentielle bleue) ;
 // - trendLine : note globale par session.
 // Chaque graphique a une infobulle (survol + focus clavier) et les valeurs
@@ -81,72 +81,248 @@ function bindTip(el, html) {
     el.addEventListener("blur", hideTip);
 }
 
-/* --- Profil de compétences --- */
+/* --- Profil de compétences (diagramme en rose) --- */
+
+// Une couleur par compétence, dans l'ordre du profil (1 à 7) : `fill` pour le
+// secteur, `ink` (plus foncée) pour le pourcentage et le trait de rappel, lisible
+// sur fond clair — le jaune, en particulier, ne l'est pas tel quel.
+const ROSE = {
+    RespectAndDignity: { fill: "#ef2b2d", ink: "#c8161c", lines: ["Respect", "et dignité"] },
+    Empathy: { fill: "#f8891f", ink: "#c2610a", lines: ["Empathie"] },
+    Compassion: { fill: "#fbd122", ink: "#8f6d00", lines: ["Compassion"] },
+    EmotionalRegulation: { fill: "#17a548", ink: "#0f7d35", lines: ["Régulation", "émotionnelle"] },
+    CommunicationClarity: { fill: "#0b6cf4", ink: "#0a57c4", lines: ["Clarté de", "communication"] },
+    ProfessionalBoundaries: { fill: "#55269a", ink: "#4a1f88", lines: ["Frontières", "professionnelles"] },
+    InterprofessionalCollaboration: { fill: "#a828e4", ink: "#8618bd", lines: ["Collaboration", "interprofessionnelle"] },
+};
+const ROSE_FALLBACK = { fill: "#6787c3", ink: "#365daa" };
+const ROSE_NARROW = 560; // en dessous (px), étiquettes dans une liste sous le graphique
+
+function svgNode(tag, attrs, parent) {
+    const n = document.createElementNS(SVG, tag);
+    Object.entries(attrs || {}).forEach(([k, v]) => n.setAttribute(k, v));
+    if (parent) parent.appendChild(n);
+    return n;
+}
+
+/** Point à la distance `r` du centre, angle en degrés compté depuis midi, sens horaire. */
+function polar(cx, cy, r, deg) {
+    const a = (deg * Math.PI) / 180;
+    return [cx + r * Math.sin(a), cy - r * Math.cos(a)];
+}
+
+function sectorPath(cx, cy, r, a0, a1) {
+    const [x0, y0] = polar(cx, cy, r, a0);
+    const [x1, y1] = polar(cx, cy, r, a1);
+    return "M" + cx + " " + cy + " L" + x0 + " " + y0 + " A" + r + " " + r + " 0 0 1 " + x1 + " " + y1 + " Z";
+}
+
+function arcPath(cx, cy, r, a0, a1) {
+    const [x0, y0] = polar(cx, cy, r, a0);
+    const [x1, y1] = polar(cx, cy, r, a1);
+    return "M" + x0 + " " + y0 + " A" + r + " " + r + " 0 0 1 " + x1 + " " + y1;
+}
 
 /**
+ * Profil des 7 compétences en diagramme en rose (secteurs égaux, rayon = score
+ * sur 100), chaque compétence avec sa couleur, son numéro et son pourcentage.
+ * Option `compare` : arc pointillé au niveau de la session de comparaison.
+ *
  * @param {HTMLElement} el
  * @param {{skills: string[], labels: object, current: object, compare?: object,
  *          compareLabel?: string, currentLabel?: string,
  *          strengths?: string[], weaknesses?: string[]}} opts
  */
-export function skillBars(el, opts) {
+export function skillRose(el, opts) {
+    const draw = () => renderRose(el, opts, el.clientWidth > 0 && el.clientWidth < ROSE_NARROW);
+    draw();
+    if (typeof ResizeObserver === "function" && !el._roseObserver) {
+        let narrow = el.clientWidth < ROSE_NARROW;
+        el._roseObserver = new ResizeObserver(() => {
+            const now = el.clientWidth < ROSE_NARROW;
+            if (now !== narrow) {
+                narrow = now;
+                draw();
+            }
+        });
+        el._roseObserver.observe(el);
+    }
+}
+
+function renderRose(el, opts, narrow) {
     const current = opts.current || {};
     const compare = opts.compare || null;
     const strengths = opts.strengths || [];
     const weaknesses = opts.weaknesses || [];
-    const rows = opts.skills
-        .filter((k) => current[k] !== null && current[k] !== undefined)
-        .sort((a, b) => current[b] - current[a]);
-    const missing = opts.skills.filter((k) => current[k] === null || current[k] === undefined);
+    const skills = opts.skills;
+    const has = (o, k) => o && o[k] !== null && o[k] !== undefined;
+    const step = 360 / skills.length;
+    const R = 215; // rayon du 100 %
+
+    // Grand format : étiquettes autour du cercle. Petit format : numéros autour,
+    // étiquettes dans une liste sous le graphique (le texte du SVG serait illisible).
+    // Le cadre est resserré sur le dessin une fois celui-ci en place (getBBox).
+    const W = narrow ? 2 * (R + 34) : 1000;
+    const H = narrow ? 2 * (R + 34) : 760;
+    const cx = W / 2;
+    const cy = H / 2;
 
     el.innerHTML = "";
     const wrap = document.createElement("div");
-    wrap.className = "skill-bars";
-    rows.forEach((k) => {
-        const v = current[k];
-        const p = compare ? compare[k] : null;
-        const hasPrev = p !== null && p !== undefined;
-        const row = document.createElement("div");
-        row.className = "skill-row";
-        row.tabIndex = 0;
-        let tag = "";
-        if (strengths.includes(k)) tag = '<span class="up" aria-hidden="true">▲</span> Point fort';
-        else if (weaknesses.includes(k)) tag = '<span class="down" aria-hidden="true">▼</span> À travailler';
-        row.innerHTML =
-            '<span class="skill-label">' + esc(opts.labels[k] || k) + "</span>" +
-            '<span class="skill-track">' +
-            '<span class="skill-fill" style="width:' + Math.max(0.5, v) + '%"></span>' +
-            (hasPrev ? '<span class="skill-prev" style="left:' + p + '%"></span>' : "") +
-            "</span>" +
-            '<span class="skill-value">' + fmt(v) + "</span>" +
-            '<span class="skill-tag">' + tag + "</span>";
-        const label = opts.labels[k] || k;
-        row.setAttribute(
-            "aria-label",
-            label + " : " + fmt(v) + " sur 100" +
-                (hasPrev ? ", " + (opts.compareLabel || "comparaison") + " " + fmt(p) : "")
-        );
-        bindTip(
-            row,
-            "<b>" + esc(label) + "</b><br>" +
-                esc(opts.currentLabel || "Cette session") + " : <b>" + fmt(v) + "</b>/100" +
-                (hasPrev
-                    ? "<br>" + esc(opts.compareLabel || "Comparaison") + " : " + fmt(p) +
-                      " (" + signed(v - p) + ")"
-                    : "")
-        );
-        wrap.appendChild(row);
+    wrap.className = "skill-rose" + (narrow ? " is-narrow" : "");
+    const svg = svgNode("svg", {
+        viewBox: "0 0 " + W + " " + H,
+        role: "group",
+        "aria-label": "Profil de compétences : diagramme en rose, une part par compétence, le rayon donne le score sur 100",
+    }, wrap);
+
+    // Grille : cercles à 25, 50, 75 et 100 %, rayons entre les parts.
+    const grid = svgNode("g", { class: "rose-grid", "aria-hidden": "true" }, svg);
+    [25, 50, 75, 100].forEach((p) => svgNode("circle", { cx, cy, r: (R * p) / 100 }, grid));
+    skills.forEach((_, i) => {
+        const [x, y] = polar(cx, cy, R + 12, i * step);
+        svgNode("line", { x1: cx, y1: cy, x2: x, y2: y }, grid);
     });
 
-    const axis = document.createElement("div");
-    axis.className = "skill-axis";
-    axis.innerHTML =
-        "<span></span>" +
-        '<span class="skill-axis-ticks"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></span>' +
-        "<span></span><span></span>";
-    wrap.appendChild(axis);
-    el.appendChild(wrap);
+    // Parts.
+    const sectors = svgNode("g", { class: "rose-sectors", style: "transform-origin:" + cx + "px " + cy + "px" }, svg);
+    skills.forEach((k, i) => {
+        const c = ROSE[k] || ROSE_FALLBACK;
+        const a0 = i * step;
+        const a1 = (i + 1) * step;
+        const label = opts.labels[k] || k;
+        const v = has(current, k) ? current[k] : null;
+        const p = has(compare, k) ? compare[k] : null;
+        const g = svgNode("g", { class: "rose-part", tabindex: "0" }, sectors);
+        if (v === null) {
+            svgNode("path", { d: sectorPath(cx, cy, R, a0, a1), class: "rose-empty" }, g);
+        } else {
+            svgNode("path", {
+                d: sectorPath(cx, cy, Math.max(2, (R * v) / 100), a0, a1),
+                fill: c.fill,
+                class: "rose-fill",
+            }, g);
+        }
+        if (p !== null) {
+            svgNode("path", { d: arcPath(cx, cy, Math.max(2, (R * p) / 100), a0, a1), class: "rose-prev" }, g);
+        }
+        g.setAttribute(
+            "aria-label",
+            (i + 1) + ". " + label + " : " + (v === null ? "non évalué" : fmt(v) + " %") +
+                (p !== null ? ", " + (opts.compareLabel || "comparaison") + " " + fmt(p) + " %" : "")
+        );
+        bindTip(
+            g,
+            "<b>" + (i + 1) + ". " + esc(label) + "</b><br>" +
+                (v === null
+                    ? "Non évalué : pas assez de choix la mettent en jeu"
+                    : esc(opts.currentLabel || "Cette session") + " : <b>" + fmt(v) + " %</b>") +
+                (p !== null
+                    ? "<br>" + esc(opts.compareLabel || "Comparaison") + " : " + fmt(p) + " %" +
+                      (v !== null ? " (" + signed(v - p) + ")" : "")
+                    : "")
+        );
+    });
 
+    // Axe gradué, au-dessus des parts.
+    const axis = svgNode("g", { class: "rose-axis", "aria-hidden": "true" }, svg);
+    svgNode("line", { x1: cx, y1: cy, x2: cx, y2: cy - R - 14 }, axis);
+    [25, 50, 75, 100].forEach((p) => {
+        const t = svgNode("text", { x: cx + 6, y: cy - (R * p) / 100 - 5, "text-anchor": "start" }, axis);
+        t.textContent = p + " %";
+    });
+
+    // Étiquettes : point sur le bord de la part, trait de rappel, nom et pourcentage.
+    const labels = svgNode("g", { class: "rose-labels" }, svg);
+    skills.forEach((k, i) => {
+        const c = ROSE[k] || ROSE_FALLBACK;
+        const mid = (i + 0.5) * step;
+        const v = has(current, k) ? current[k] : null;
+        const rv = v === null ? R : Math.max(10, (R * v) / 100 - 8);
+        const [dx, dy] = polar(cx, cy, rv, mid);
+
+        if (narrow) {
+            const [bx, by] = polar(cx, cy, R + 20, mid);
+            svgNode("line", { x1: dx, y1: dy, x2: bx, y2: by, stroke: c.ink, class: "rose-leader" }, labels);
+            svgNode("circle", { cx: bx, cy: by, r: 13, fill: c.ink, class: "rose-badge" }, labels);
+            const t = svgNode("text", { x: bx, y: by + 5, "text-anchor": "middle", class: "rose-badge-num" }, labels);
+            t.textContent = String(i + 1);
+            svgNode("circle", { cx: dx, cy: dy, r: 6, fill: c.ink, class: "rose-dot" }, labels);
+            return;
+        }
+
+        const s = Math.sin((mid * Math.PI) / 180);
+        const side = s > 0.2 ? 1 : s < -0.2 ? -1 : 0;
+        const [ex, ey] = polar(cx, cy, R + 30, mid);
+        const tx = side === 0 ? ex : ex + side * 26;
+        const lines = ((ROSE[k] && ROSE[k].lines) || [opts.labels[k] || k]).slice();
+        lines[0] = i + 1 + ". " + lines[0];
+        let tag = "";
+        if (strengths.includes(k)) tag = "▲ Point fort";
+        else if (weaknesses.includes(k)) tag = "▼ À travailler";
+        const rows = lines.length + 1 + (tag ? 1 : 0);
+        const lh = 21;
+        // Bloc centré sur le coude ; sous le coude pour la part du bas.
+        const top = side === 0 ? ey + 22 : ey - ((rows - 1) * lh) / 2 + 6;
+
+        svgNode("polyline", {
+            points: dx + "," + dy + " " + ex + "," + ey + " " + (side === 0 ? ex + "," + (ey + 4) : tx - side * 6 + "," + ey),
+            stroke: c.ink,
+            class: "rose-leader",
+        }, labels);
+        svgNode("circle", { cx: dx, cy: dy, r: 7, fill: c.ink, class: "rose-dot" }, labels);
+
+        const anchor = side === 1 ? "start" : side === -1 ? "end" : "middle";
+        const text = svgNode("text", { x: tx, y: top, "text-anchor": anchor, class: "rose-label" }, labels);
+        lines.forEach((line, j) => {
+            const span = svgNode("tspan", { x: tx, dy: j === 0 ? 0 : lh }, text);
+            span.textContent = line;
+        });
+        const pct = svgNode("tspan", { x: tx, dy: lh + 2, class: "rose-pct", fill: c.ink }, text);
+        pct.textContent = v === null ? "non évalué" : fmt(v) + " %";
+        if (v === null) pct.setAttribute("class", "rose-pct is-empty");
+        if (tag) {
+            const tg = svgNode("tspan", {
+                x: tx,
+                dy: lh - 2,
+                class: "rose-tag " + (strengths.includes(k) ? "is-up" : "is-down"),
+            }, text);
+            tg.textContent = tag;
+        }
+    });
+
+    el.appendChild(wrap);
+    try {
+        const bb = svg.getBBox();
+        const pad = 6;
+        if (bb.width > 0) {
+            svg.setAttribute("viewBox", [bb.x - pad, bb.y - pad, bb.width + 2 * pad, bb.height + 2 * pad].join(" "));
+        }
+    } catch (e) {
+        /* getBBox indisponible (élément masqué) : on garde le cadre par défaut. */
+    }
+
+    if (narrow) {
+        const list = document.createElement("ol");
+        list.className = "rose-list";
+        skills.forEach((k) => {
+            const c = ROSE[k] || ROSE_FALLBACK;
+            const v = has(current, k) ? current[k] : null;
+            let tag = "";
+            if (strengths.includes(k)) tag = '<span class="rose-tag-html is-up">▲ Point fort</span>';
+            else if (weaknesses.includes(k)) tag = '<span class="rose-tag-html is-down">▼ À travailler</span>';
+            const li = document.createElement("li");
+            li.innerHTML =
+                '<i class="rose-swatch" style="background:' + c.fill + '" aria-hidden="true"></i>' +
+                '<span class="rose-name">' + esc(opts.labels[k] || k) + "</span>" +
+                '<span class="rose-val" style="color:' + c.ink + '">' + (v === null ? "—" : fmt(v) + " %") + "</span>" +
+                tag;
+            list.appendChild(li);
+        });
+        el.appendChild(list);
+    }
+
+    const missing = skills.filter((k) => !has(current, k));
     if (missing.length) {
         const note = document.createElement("p");
         note.className = "acc-hint";

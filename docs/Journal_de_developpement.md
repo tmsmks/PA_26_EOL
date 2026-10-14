@@ -62,7 +62,7 @@ Claude Code bloque la fin d'une réponse tant que le journal n'a pas été compl
 | **18 → 23 sept.** | Nouvelle mission : des livres pour les étudiant·e·s en médecine. Analyse des programmes de trois facultés. | 18 plans d'études officiels · indices de divergence entre facultés · plan de 6 livres · livre 4 v1 (217 interactions) · parcours joueur séparé de l'éditeur · support de présentation pour le professeur |
 | **24 → 27 sept.** | Narration ambitieuse et suivi des joueur·euse·s | Livre 4 v2 (6 chapitres, erreur médicale et ses conséquences) · moteur d'« états narratifs » · 4 à 6 réponses par choix · tableaux comparatifs des matières · comptes, historique, note pondérée, feedback IA · données de démonstration |
 | **28 sept. → 5 oct.** | Qualité, contenu et données | Palette d'interface tirée des trois universités · refonte ergonomique · diagnostic d'un bug de perte de données dans l'éditeur · livre 2 v2 « Le corps donné » (43 scènes) · export Excel/CSV/JSON · recherche bibliographique et plan de scoring v2 |
-| **6 oct. →** | Un scoring fondé sur la recherche | Journal de développement · scoring v2, étape 1 : note par choix (100 atteignable, ≈ 50 au hasard), passage de chapitre comme unité de note, niveau, progression et fiabilité par chapitre · étape 2 : outils de validation de la clé par un panel d'experts (grille à l'aveugle, ICC, Delphi) · livre 2 refondu en 5 chapitres (509 interactions), clé de notation auditée et contrôlée au build · bibliographie réduite à 33 articles en libre accès, proposition de scoring v3 · clé du livre 2 cotée par Claude (2 017 réponses) |
+| **6 oct. →** | Un scoring fondé sur la recherche | Journal de développement · scoring v2, étape 1 : note par choix (100 atteignable, ≈ 50 au hasard), passage de chapitre comme unité de note, niveau, progression et fiabilité par chapitre · étape 2 : outils de validation de la clé par un panel d'experts (grille à l'aveugle, ICC, Delphi) · livre 2 refondu en 5 chapitres (509 interactions), clé de notation auditée et contrôlée au build · bibliographie réduite à 27 articles en libre accès et utiles au scoring, proposition de scoring v3 · clé du livre 2 cotée par Claude (2 017 réponses) |
 
 ### 1.2 Avant / après en chiffres
 
@@ -1515,6 +1515,307 @@ Les heures sont en heure suisse.
     - tests : `tests/test_scoring_service.py`, `tests/test_session_flow.py`,
       `tests/test_passages.py`.
 
+### 2.30 — 13 oct. · Test de bout en bout de la clé et du bilan, gardé en base
+
+- **Besoin.** Demande de l'étudiant : tester le nouveau système sur une vraie partie, et
+  **garder** le résultat pour le voir sur la fiche de performance d'un joueur.
+- **Réalisation.**
+  - La base locale `instance/eol.db` a d'abord été sauvegardée dans
+    `instance/eol-backup-2026-10-13-avant-test-cle.db`.
+  - Un compte participant `test.cle.y2` (« Test clé Y2 (joueur simulé) ») a été créé. Il
+    utilise le mot de passe commun des comptes de démo, déjà dans
+    `instance/demo_credentials.txt`, où le compte est ajouté à la liste.
+  - Une partie complète du livre 2 a été jouée via l'API, comme le navigateur (mêmes
+    règles que `seed_demo.py`) : 5 chapitres, 30 scénarios notés, 208 choix. Le joueur
+    simulé ressemble à un·e étudiant·e moyen-bon :
+    - 110 fois la meilleure réponse ;
+    - 49 fois la 2ᵉ ;
+    - 41 fois une réponse moyenne ;
+    - 8 fois la pire.
+- **Résultats** (session n° 15, page `/sessions/15`) :
+  - note de la session 76/100, note du livre 75,7 ;
+  - chapitres de 69 (ch. 4) à 79 (ch. 3) ;
+  - point fort : frontières professionnelles (83) ; à travailler : compassion (51) ;
+  - **3 réponses critiques** affichées en tête du bilan, chacune avec sa justification et la
+    réponse attendue : demander la photo du tatouage en 1.1, et deux fois laisser Noah seul
+    en 4.3 ;
+  - occasions manquées et réussites, toutes avec leur justification.
+- **Vérification.**
+  - Les pages `/me` et `/sessions/15` ont été rendues par le serveur pour ce compte (statut
+    200, contenu relu).
+  - La fiche a ensuite été ouverte dans le navigateur, sur le serveur habituel (`eol`) : pas
+    d'erreur dans la console.
+  - À l'ouverture, le bilan a produit le feedback automatique par règles (« IA
+    indisponible »), car aucune clé d'API n'est configurée.
+- **Limites.** C'est un joueur simulé, pas un·e étudiant·e : il teste la chaîne (clé, rejeu
+  serveur, notes, bilan), pas la difficulté réelle du livre.
+- **Fichiers.** Aucun fichier du dépôt n'est modifié. Seule la base locale change (compte et
+  session de test), ainsi que `instance/demo_credentials.txt`, qui n'est pas versionné.
+
+### 2.31 — 13 oct. · Profil de compétences en diagramme en rose
+
+- **Besoin.** Demande de l'étudiant, avec une image modèle : sur les fiches des participants,
+  remplacer les histogrammes du profil de compétences par un diagramme « camembert » du même
+  style, avec le pourcentage de chaque compétence.
+- **Réalisation.** Le profil devient un diagramme en rose (diagramme de Nightingale) : 7 parts
+  égales, une par compétence. `skillRose` (`static/account/charts.js`) remplace `skillBars`.
+  - **Rayon.** Il est proportionnel au score sur 100. Cercles pointillés à 25, 50, 75 et
+    100 %, avec un axe gradué.
+  - **Couleurs.** Celles du modèle, dans l'ordre 1 à 7 : rouge, orange, jaune, vert, bleu,
+    indigo, violet. Contour foncé.
+  - **Étiquettes.** Chaque compétence a son étiquette autour du cercle : numéro, nom,
+    **pourcentage** dans sa couleur, et « ▲ Point fort » / « ▼ À travailler ». Un trait de
+    rappel coloré part d'un point posé sur la part.
+  - **Comparaison.** La session précédente est montrée par un arc pointillé dans chaque part.
+  - **Non évalué.** Une compétence non évaluée est une part grisée, marquée « non évalué ».
+  - **Lecture.** Chaque part a une infobulle et se lit au clavier (focus, `aria-label`).
+- **Choix et justifications.**
+  - Le rayon est linéaire, avec des cercles également espacés, comme dans le modèle : on lit
+    directement le pourcentage sur la grille.
+  - Pour le texte, chaque couleur a une variante plus foncée, lisible sur fond clair (le
+    jaune en particulier).
+  - Sous 560 px de large, le texte du SVG deviendrait illisible. Les étiquettes laissent
+    alors la place à des pastilles numérotées, avec une liste colorée sous le graphique
+    (nom, pourcentage, point fort ou à travailler).
+  - Le cadre du SVG se resserre sur le dessin (`getBBox`).
+  - L'apparition est animée, sauf si la personne a demandé de réduire les animations.
+  - Cela revient sur la décision 22 du § 4 (barres triées), à la demande de l'étudiant.
+- **Où.**
+  - Le bilan de session (`/sessions/<id>`), dont la légende montre une pastille aux 7
+    couleurs et un arc pointillé.
+  - La page « Mon parcours » (`/me`), que le formateur voit aussi pour chaque participant.
+- **Vérification.**
+  - Dans le navigateur, sur la session de test du § 2.30 : bureau et mobile (375 px, liste
+    sous le graphique, pas de défilement horizontal), sans erreur dans la console.
+  - Avec des valeurs fictives, injectées dans la page puis retirées : arcs de comparaison et
+    part non évaluée.
+  - 146 tests verts.
+- **Fichiers.**
+  - `static/account/charts.js`, `static/account/report.js`, `static/account/history.js` ;
+  - `static/account.css` : styles de la rose ; ceux des barres sont retirés ;
+  - `templates/session_report.html.jinja` : légende.
+
+### 2.32 — 13 oct. · Bibliographie réduite aux articles qui servent au scoring (33 → 27)
+
+- **Besoin.** Question de l'étudiant : « est-ce qu'on utilise vraiment toutes les
+  références ? » Réponse : non. Après examen de chaque article face au code :
+  - 16 justifient une règle en place ;
+  - 7 l'ont inspirée en partie ;
+  - 4 fondent une étape prévue (plafond critique, seuils Angoff, validation, pilote) ;
+  - 6 ne servaient que de contexte. Sur recommandation, l'étudiant a demandé de retirer ces 6.
+- **Articles retirés.**
+  - Arieli-Attali et al. 2019 (Evidence-Centered Design étendu) ;
+  - Shute et al. 2016 (évaluation furtive) ;
+  - Lievens & Sackett 2012 (validité prédictive des SJT) ;
+  - Kepes et al. 2025 (revue des SJT) ;
+  - Harenbrock et al. 2023 (fidélité test-retest) ;
+  - Pelánek 2016 (système Elo).
+- **Réalisation.**
+  - **Plan de scoring.**
+    - Le § 7 est régénéré : 27 références, avec un troisième critère, « sert au scoring ».
+    - Les phrases du § 2 qui citaient les articles retirés sont supprimées ou reformulées.
+    - Le statut est mis à jour.
+  - **PDF de la bibliographie** régénéré : 27 articles, 4 pages, daté du 13 oct.
+  - **Proposition v3.**
+    - Titre et introduction corrigés.
+    - Constats 1, 2, 4, 9 et 10 sans les articles retirés.
+    - § 2.2, § 2.3 et § 2.6 sans les articles retirés.
+    - Plan de validation : la cible de fidélité test-retest devient « à mesurer » (source :
+      Hausknecht et al. 2007) ; l'extrapolation n'a plus de chiffre tiré de la littérature
+      (source : Cook & Hatala 2016).
+    - Étape D sans le système Elo.
+    - Tableau final : 27 articles.
+- **Choix.**
+  - Les entrées historiques du journal (§ 2.26 et § 2.27) restent telles quelles : elles
+    décrivent ce qui a été fait le 12 oct.
+  - Les valeurs chiffrées du jeu (8 choix, 7 jours, poids 0,25) ne viennent d'aucun article :
+    les articles justifient le principe, et les valeurs restent à calibrer sur un pilote.
+- **Limites.**
+  - Deux articles gardés vont en partie contre le système actuel :
+    - Nissen et al. 2018 critique le gain normalisé, utilisé pour la progression ;
+    - Weng et al. 2018 trouve peu valide la cote brute.
+  - Ils restent dans la liste, car la proposition v3 s'appuie sur eux pour corriger ces deux
+    points.
+- **Fichiers.** `docs/Scoring_v2_recherche_et_plan.md`, `docs/Scoring_v2_bibliographie.pdf`,
+  `docs/Scoring_v3_proposition.md`, `docs/Journal_de_developpement.md` (annexes A et B, § 1.1).
+
+### 2.33 — 13 oct. · Scoring v3, étape A : bandes, plafond critique, progression en points, temps de réponse
+
+- **Besoin.** Demande de l'étudiant : faire toutes les tâches de scoring possibles tout de
+  suite, sans enseignant·e·s ni étudiant·e·s. Ce sont les points 1 à 6 de l'étape A de la
+  proposition v3 (§ 2.27).
+- **Réalisation.**
+  1. **Plafond en cas d'erreur critique.**
+     - Si le dernier passage compté d'un chapitre contient une réponse critique, la bande du
+       chapitre ne dépasse pas « À consolider », quelle que soit la note. La note elle-même
+       ne change pas.
+     - Un passage compté suivant, sans réponse critique, lève le plafond.
+     - Le formateur voit une carte « À débriefer » dans son tableau de bord, avec les
+       réponses en cause, et un « ! » dans la matrice des chapitres.
+     - Le participant voit une carte « Réponses critiques à revoir », avec le pourquoi.
+  2. **Progression en points.**
+     - Gain = moyenne pondérée des passages suivants − 1ᵉʳ passage, avec sa marge.
+     - « Progrès net » seulement si le gain dépasse sa marge et un tiers de l'écart-type de
+       la cohorte (cohorte d'au moins 10 personnes). Sinon : « progrès probable, pas encore
+       démontré », « baisse nette » ou « pas de changement démontré ».
+     - Le changement normalisé, critiqué par Nissen et al. 2018, n'est plus affiché. Il
+       reste une version dans l'export, avec une note.
+  3. **Bandes** Insuffisant, À consolider, Compétent, Avancé (seuils provisoires 60, 75, 90).
+     - Elles sont données avec leur marge : « entre À consolider et Compétent » si
+       l'intervalle déborde d'une bande.
+     - Au livre, la règle conjonctive s'applique : pas au-dessus d'« À consolider » si un
+       chapitre est « Insuffisant » ou garde une réponse critique.
+  4. **Temps de réponse.**
+     - Le navigateur mesure le temps entre l'affichage des réponses et le clic, et l'envoie
+       avec chaque scène. Il est gardé dans la trace et dans l'export.
+     - Un passage où plus d'un quart des choix sont faits en moins de 2 secondes (sur au
+       moins 8 choix chronométrés) est « trop rapide ». Il ne compte pas, et le suivant peut
+       compter tout de suite.
+     - Le formateur voit ces passages dans « À débriefer ».
+  5. **Poids selon l'âge.**
+     - Un passage pèse 2^(−âge / 90 jours) au lieu de 1 + 0,25 × (n − 1) : 1 aujourd'hui,
+       0,5 à 90 jours.
+     - « À rafraîchir » s'affiche si le dernier passage compté a plus de 90 jours.
+  6. **Fin de scène.** Une réponse critique donne un bilan « dur », même si la note de la
+     scène est bonne : « Une réponse critique dans ce scénario… Voyez ci-dessous ce qui était
+     attendu. » Le drapeau critique est maintenant envoyé au navigateur avec chaque réponse ;
+     les points l'étaient déjà.
+- **Où cela se voit.**
+  - Page « Mon parcours » : bande et marge du livre, progression en points, colonne
+    « Bande », « à rafraîchir », passages trop rapides, réponses critiques à revoir.
+  - Sommaire du livre : bande de chaque chapitre.
+  - Fin de chapitre : bande, plafond, progression, passage trop rapide.
+  - Bilan de session : bande du livre.
+  - Tableau de bord du formateur.
+  - Export : `bande`, `plafond_critique`, `gain_points`, `marge_gain`, `progres`,
+    `a_rafraichir`, `trop_rapide`, `choix_rapides`, `temps_median_s`, `reponses_critiques`,
+    `temps_s`.
+- **Choix et justifications.**
+  - Le plafond porte sur la bande, pas sur la note : un décompte d'erreurs est moins fiable
+    qu'une note, et on ne décide rien sur un seul point de mesure (Homer & Russell 2021 ;
+    Heeneman et al. 2021). Le débriefing humain est l'ingrédient efficace (Lee et al. 2020).
+  - Seuil de 2 secondes, 25 % des choix et 8 choix au minimum : valeurs de départ. Aucun
+    article ne fixe de seuil (Baker et al. 2004) : elles se calibrent sur le pilote.
+  - Les passages notés avant aujourd'hui gardent leurs résultats. Leurs réponses critiques
+    sont recomptées depuis les traces.
+  - Le texte des gabarits ajoutés est échappé explicitement (`| e`). L'échappement
+    automatique reste à activer (§ 7.1).
+- **Vérification.**
+  - **158 tests verts** (12 nouveaux) :
+    - poids selon l'âge, gain et marge, statut du progrès, bandes et marge ;
+    - plafond critique et sa levée, règle conjonctive du livre, « à rafraîchir » ;
+    - passage trop rapide (unité et parcours complet), temps mal formés ignorés ;
+    - plafond et débriefing de bout en bout ;
+    - fin de scène critique (test JavaScript).
+  - Dans le navigateur, sur la base locale (serveur `eol`) :
+    - le joueur de test du § 2.30 a une note de livre de 75,7 ± 4, plafonnée à « À
+      consolider » par ses réponses critiques des chapitres 1 et 4 ;
+    - le tableau de bord du formateur de démo liste ces 3 réponses dans « À débriefer » ;
+    - la page de jeu se charge sans erreur, et le moteur donne un bilan « dur » après une
+      réponse critique.
+- **Limites.**
+  - Les seuils des bandes, du temps et du progrès net sont provisoires : Angoff et pilote.
+  - L'écart-type de cohorte n'existe qu'à partir de 10 personnes ; avant, seule la marge
+    décide du « progrès net ».
+  - Restent dans l'étape A :
+    - le point 7 : taux de meilleure réponse et *d* de Cohen du groupe ;
+    - le point 8 : écran « feedback d'abord, note à la demande » et page qui explique la
+      notation.
+- **Fichiers.**
+  - Code : `services/scoring_service.py`, `services/history_service.py`,
+    `services/session_service.py`, `services/graph_service.py`, `services/export_service.py`,
+    `views/session_api.py`, `views/account.py`, `views/pages.py`.
+  - Interface : `static/play/engine.js`, `static/play/main.js`, `static/account.css`,
+    `templates/account_history.html.jinja`, `templates/trainer_dashboard.html.jinja`,
+    `templates/play_book.html.jinja`, `templates/session_report.html.jinja`.
+  - Tests : `tests/test_scoring_service.py`, `tests/test_passages.py`,
+    `tests/js/engine.test.mjs`, `tests/test_play_engine.py` (nouveaux pour les deux derniers).
+  - Documents : `docs/Scoring_v3_proposition.md`, `docs/Scoring_v2_recherche_et_plan.md`
+    (statuts).
+
+### 2.34 — 13 oct. · Scoring v3, fin de l'étape A et outils des étapes B et C
+
+- **Besoin.** Demande de l'étudiant : « fais le reste ». C'est tout ce qui peut se faire sans
+  enseignant·e·s ni étudiant·e·s ; pas de sauvegarde dans git, à sa demande.
+- **Réalisation.**
+  1. **Taux de meilleure réponse** (étape A, point 7), calculé à côté de la qualité : part des
+     choix où la meilleure réponse a été choisie (cotation dichotomique, environ 20 % au
+     hasard). Il est dans les résultats de chaque passage et dans l'export
+     (`taux_meilleure_reponse`).
+  2. **Progrès du groupe** (point 7) : dans le tableau de bord du formateur, par chapitre, le
+     *d* de Cohen entre le 1ᵉʳ et le dernier passage, avec les moyennes, les écarts-types et
+     la corrélation (Nissen et al. 2018).
+  3. **Feedback d'abord** (point 8).
+     - **Fin de scène** : « Ce qui était attendu » vient en premier ; les points de la scène
+       sont repliés sous « Voir les points ».
+     - **Fin de chapitre**, dans l'ordre :
+       - « Ce qu'il faut retenir de ce chapitre » : les 3 choix les plus décisifs du
+         passage, les réponses critiques d'abord, avec leur scène et le pourquoi ;
+       - la bande, et la mention de progrès ;
+       - les points forts et à travailler ;
+       - la note sur 100 et les points, seulement sous « Voir la note ».
+     - Pas de comparaison avec les autres (Shute 2008 ; Wisniewski et al. 2020).
+  4. **Page « Comment est-ce noté ? »** (`/notation`, point 8). Elle reprend les valeurs du
+     code (seuils, délais, temps), avec des exemples et les formules. Elle est accessible depuis
+     l'écran d'entrée de chaque chapitre, la fin de chapitre, « Mon parcours » et le
+     sommaire. Il faut dire comment le test est noté (Frary 1988), dans un climat où la note
+     sert à apprendre (Heeneman et al. 2021).
+  5. **Grille de relecture ciblée** (étape B) dans `/trainer/cle/` : 186 réponses. Ce sont les
+     deux réponses en concurrence aux 36 points où la clé actuelle diffère de l'auteur, et
+     les 114 réponses critiques ; elles sont lues dans `data/keys/`.
+  6. **Seuils par la méthode d'Angoff** (étape B), dans la même page.
+     - Une grille Excel à l'aveugle : pour chaque point de choix, chaque juge indique la
+       réponse que choisirait un·e étudiant·e « tout juste compétent·e ».
+     - Import des grilles, nouvelle table `angoff_ratings`.
+     - Le seuil d'un·e juge est la qualité des choix de cet·te étudiant·e imaginaire. La
+       médiane des juges devient le seuil « Compétent » du chapitre dès 3 juges ;
+       « À consolider » et « Avancé » restent à 15 points de part et d'autre.
+     - Ces seuils s'appliquent partout : bandes des chapitres et du livre, fin de chapitre,
+       sommaire, tableau de bord, export. Les seuils du livre sont la moyenne de ceux de ses
+       chapitres.
+  7. **Protocole du pilote** (étape C) :
+     [Pilote_protocole.md](Pilote_protocole.md). Il décrit les valeurs à calibrer, les
+     participant·e·s, le calendrier (avec un chapitre témoin jamais rejoué), les analyses
+     faites à partir de l'export, les règles de décision et l'éthique.
+- **Choix et justifications.**
+  - **Angoff « réponse la plus probable »** plutôt que des probabilités par réponse : une
+    seule décision par point de choix, plus rapide pour les juges, et qui se calcule comme
+    la note d'un joueur.
+  - **Un seul seuil jugé, les deux autres à 15 points** : c'est l'écart des seuils
+    provisoires. Ce choix est à revoir si le pilote le contredit.
+  - La note sur 100 reste accessible : elle est cachée, pas supprimée.
+- **Vérification.** **166 tests verts** (8 nouveaux) :
+  - relecture ciblée ;
+  - seuils Angoff (calcul, 3 juges au minimum ; aller-retour de la grille, application aux
+    bandes, grille invalide refusée) ;
+  - bandes avec seuils de juges ;
+  - taux de meilleure réponse ;
+  - *d* de Cohen ;
+  - page d'explication ;
+  - retour de fin de chapitre ;
+  - progrès du groupe.
+- **Limites.** Les étapes B et C demandent des personnes : la relecture de la clé, au moins
+  3 juges pour les seuils, et le pilote.
+- **Fichiers.**
+  - Nouveaux :
+    - `services/angoff_service.py`, `repositories/angoff_ratings.py`, `exporters/angoff.py`,
+      `views/scoring_context.py` ;
+    - `templates/scoring_explained.html.jinja`, `docs/Pilote_protocole.md`.
+  - Modifiés :
+    - `repositories/orm.py` (table `angoff_ratings`) ;
+    - services : `scoring_service`, `history_service`, `expert_key_service`, `export_service` ;
+    - vues : `views/expert_key.py`, `views/account.py`, `views/pages.py`, `views/session_api.py` ;
+    - gabarits : `templates/play.html.jinja`, `expert_key`, `trainer_dashboard`,
+      `account_history`, `play_book` ;
+    - interface : `static/play/main.js`, `static/shared/skills.js`, `static/play.css`,
+      `static/account.css` ;
+    - tests : `tests/test_expert_key.py`, `tests/test_scoring_service.py`,
+      `tests/test_passages.py` ;
+    - documents : `docs/MedStudents_Y2_v2_cle.md` (relecture ciblée : 186 réponses, grille
+      disponible), `docs/Scoring_v3_proposition.md` (statut : étape A faite, outils des
+      étapes B et C en place) et `docs/Scoring_v2_recherche_et_plan.md` (statut : renvoi au
+      § 2.34 et au protocole du pilote).
+
 ---
 
 ## 3. Architecture technique au 6 octobre 2026
@@ -1617,6 +1918,7 @@ Matière pour les chapitres « Conception » et « Discussion » du mémoire.
 21. **Un feedback IA avec une version de secours par règles** : l'application ne dépend jamais
     de la disponibilité du modèle.
 22. **Des barres triées plutôt qu'un radar** pour le profil : la comparaison est plus lisible.
+    *Remplacé le 13 oct. par un diagramme en rose, à la demande de l'étudiant (§ 2.31).*
 
 ---
 
@@ -1638,9 +1940,12 @@ Matière pour les chapitres « Conception » et « Discussion » du mémoire.
 | 10 oct. (lecture audio) | 126 | page de jeu avec la lecture audio, modules servis, 8 tests JavaScript de préparation du texte (via Node) |
 | 12 oct. (voix naturelles) | 138 | voix serveur : cache, validation, limites, choix du moteur, Azure simulé, API, synthèse Piper réelle |
 | 12 oct. (clé IA du Y2) | 140 | la clé couvre toutes les réponses des points de choix ; une réponse réécrite depuis la cotation arrête le build |
-| 13 oct. (justification au joueur) | **146** | justification dans la trace, retour de fin de scène, réponses critiques dans le bilan, prompt IA et export, guillemets |
+| 13 oct. (justification au joueur) | 146 | justification dans la trace, retour de fin de scène, réponses critiques dans le bilan, prompt IA et export, guillemets |
+| 13 oct. (scoring v3, étape A) | 158 | poids selon l'âge, progression en points, bandes et marge, plafond critique et sa levée, règle conjonctive, passages trop rapides, fin de scène critique (JavaScript) |
 
-Vérifié le 13 octobre : `146 passed`.
+| 13 oct. (fin de l'étape A, outils B et C) | **166** | relecture ciblée, seuils Angoff, taux de meilleure réponse, *d* de Cohen, page d'explication, retour de fin de chapitre |
+
+Vérifié le 13 octobre : `166 passed`.
 
 ### 5.2 Validation automatique des livres (au build)
 
@@ -1754,18 +2059,23 @@ petites étapes, une scène à la fois, et validé à chaque étape.
   (§ 2.23).
 - [x] Clé du livre 2 cotée par Claude (tour à l'aveugle, revue des divergences, calibrage) et
   appliquée au jeu, à titre provisoire (§ 2.28).
-- [ ] Faire relire par 2 ou 3 enseignant·e·s un échantillon ciblé de la clé du livre 2 : les
-  36 points dont la meilleure réponse diffère de l'auteur et les 114 réponses critiques.
+- [ ] Faire relire par 2 ou 3 enseignant·e·s la grille ciblée de la clé du livre 2 (186
+  réponses : 36 points dont la meilleure réponse diffère de l'auteur, et les 114 réponses
+  critiques). La grille est prête dans `/trainer/cle/` (§ 2.34).
 - [x] Afficher la justification de la clé et le marquage critique au joueur : fin de scène,
   bilan de session, feedback IA et export (§ 2.29).
-- [ ] Appliquer le plafond en cas d'erreur critique, avec l'alerte de débriefing pour le
-  formateur (proposition v3, décision en attente).
+- [x] Appliquer le plafond en cas d'erreur critique, avec l'alerte de débriefing pour le
+  formateur (§ 2.33).
+- [x] Scoring v3, étape A, points 1 à 6 : temps de réponse, gain en points, poids selon
+  l'âge, bandes avec marge, règle conjonctive, plafond critique (§ 2.33).
+- [x] Scoring v3, étape A, points 7 et 8 : taux de meilleure réponse et *d* de Cohen ;
+  écran « feedback d'abord » et page d'explication de la notation (§ 2.34).
+- [x] Outils des étapes B et C : grille ciblée, seuils Angoff, protocole du pilote (§ 2.34).
 - [ ] Faire valider la grille ancrée ; coter de même le livre 4.
 - [ ] Étape 3 : bandes de niveau (Angoff), plafond en cas d'erreur critique, calibrage du
   coefficient 0,25, du délai de 7 jours et du seuil de 8 choix sur un pilote.
-- [ ] Décider de la proposition de scoring v3 (§ 2.27) ; l'étape A peut se faire sans
-  données : temps de réponse, gain en points, bandes avec marge, poids selon l'âge, feedback
-  d'abord.
+- [ ] Faire remplir la grille des seuils par au moins 3 juges (Angoff), puis mener le pilote
+  selon [Pilote_protocole.md](Pilote_protocole.md) pour calibrer les valeurs provisoires.
 - [ ] Constituer un panel d'experts pour valider la clé de cotation. En attendant, les points
   actuels doivent être présentés comme provisoires.
 
@@ -1821,8 +2131,9 @@ petites étapes, une scène à la fois, et validé à chaque étape.
 ### Annexe A — Références principales pour le scoring
 
 La liste complète est dans [Scoring_v2_recherche_et_plan.md](Scoring_v2_recherche_et_plan.md),
-§ 7 : 33 articles à comité de lecture, chacun avec un lien vers son PDF gratuit, depuis le tri du
-12 oct. (§ 2.26). Il y avait 43 références au 7 oct. (41 au 5 oct., plus 2 sur l'ICC le 6 oct.).
+§ 7 : 27 articles à comité de lecture, chacun avec un lien vers son PDF gratuit et une utilité
+pour le scoring (§ 2.32). Il y avait 43 références au 7 oct. (41 au 5 oct., plus 2 sur l'ICC le
+6 oct.), 33 après le tri du 12 oct. (§ 2.26).
 
 **Noter les réponses**
 
@@ -1879,8 +2190,9 @@ La liste complète est dans [Scoring_v2_recherche_et_plan.md](Scoring_v2_recherc
 | [MedStudents_Y2_v2_soft_skills.md](MedStudents_Y2_v2_soft_skills.md) · `.json` | Répartition des soft skills du livre 2 v2 |
 | [MedStudents_Y2_v2_assets.md](MedStudents_Y2_v2_assets.md) | 139 portraits à produire |
 | [Scoring_v2_recherche_et_plan.md](Scoring_v2_recherche_et_plan.md) | Diagnostic, recherche et plan de scoring |
-| [Scoring_v2_bibliographie.pdf](Scoring_v2_bibliographie.pdf) | Les 33 articles du scoring, à comité de lecture et en libre accès, classés par usage, chacun avec le lien de son PDF (7 oct., refait le 12 oct.) |
+| [Scoring_v2_bibliographie.pdf](Scoring_v2_bibliographie.pdf) | Les 27 articles du scoring (33 avant le 13 oct.), à comité de lecture et en libre accès, classés par usage, chacun avec le lien de son PDF (7 oct., refait le 12 oct.) |
 | [Scoring_v3_proposition.md](Scoring_v3_proposition.md) | Proposition de scoring v3 fondée sur la lecture des 33 articles, non implémentée (12 oct.) |
+| [Pilote_protocole.md](Pilote_protocole.md) | Protocole du pilote : valeurs à calibrer, calendrier avec chapitre témoin, analyses depuis l'export, règles de décision, éthique (13 oct.) |
 | [MedStudents_Y2_v2_cle.md](MedStudents_Y2_v2_cle.md) | Clé de cotation du livre 2 cotée par Claude : méthode en trois tours, accord avec l'auteur, application au build, limites (12 oct.) |
 | [../README.md](../README.md) | Mis à jour : architecture, routes, comptes, base de données, export |
 

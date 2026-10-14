@@ -148,42 +148,84 @@
 
 .chart-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--acc-ink-soft); }
 .chart-legend span { display: inline-flex; align-items: center; gap: 8px; }
-.key-bar { width: 16px; height: 10px; border-radius: 2px; background: var(--series-1); }
-.key-tick { width: 3px; height: 16px; border-radius: 1px; background: var(--series-prev); }
+.key-rose {
+    width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--ink);
+    background: conic-gradient(#ef2b2d 0 14.3%, #f8891f 0 28.6%, #fbd122 0 42.9%, #17a548 0 57.1%,
+        #0b6cf4 0 71.4%, #55269a 0 85.7%, #a828e4 0 100%);
+}
+.key-arc { width: 20px; height: 0; border-top: 3px dashed var(--ink); }
 
-/* ---------- Profil de compétences (barres) ---------- */
+/* ---------- Page « Comment est-ce noté ? » ---------- */
 
-.skill-bars { display: flex; flex-direction: column; gap: 4px; container-type: inline-size; }
-.skill-row {
-    display: grid; grid-template-columns: minmax(150px, 210px) minmax(0, 1fr) 44px minmax(0, 118px);
-    align-items: center; gap: 12px; padding: 6px 8px; border-radius: 8px; outline: none;
+.acc-explain .acc-card > p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--acc-ink); max-width: 70ch; }
+.explain-ex {
+    border-left: 4px solid var(--acc-accent); background: var(--surface-2); border-radius: 0 10px 10px 0;
+    padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; font-size: 15px;
 }
-.skill-row:hover, .skill-row:focus-visible { background: var(--surface-2); }
-.skill-row:focus-visible { box-shadow: 0 0 0 2px var(--acc-accent); }
-.skill-label { font-size: 14px; color: var(--acc-ink); }
-.skill-track {
-    position: relative; height: 16px;
-    background-image: linear-gradient(to right, var(--grid) 1px, transparent 1px);
-    background-size: 25% 100%;
-    border-left: 1px solid var(--axis);
+.explain-ex p { margin: 0; }
+.explain-calc { font-weight: 700; font-variant-numeric: tabular-nums; }
+.explain-formula { margin: 0; font-size: 14px; color: var(--acc-ink-soft); font-variant-numeric: tabular-nums; }
+
+/* ---------- Bandes de niveau, plafond critique ---------- */
+
+.band-chip {
+    display: inline-block; align-self: flex-start; margin-top: 4px; padding: 2px 10px; border-radius: 999px;
+    font-size: 13px; font-weight: 700; color: var(--acc-accent); background: var(--surface-2);
+    border: 1px solid var(--line-strong); white-space: nowrap;
 }
-.skill-fill {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    background: var(--series-1); border-radius: 0 4px 4px 0; transition: width .5s ease;
+.band-chip.small { margin-top: 0; font-size: 12px; padding: 1px 8px; }
+.band-chip.is-capped { color: var(--acc-neg); border-color: var(--acc-neg); background: var(--neg-soft); }
+.band-note { display: block; font-size: 12px; color: var(--acc-ink-faint); line-height: 1.35; }
+.band-note.is-warn { display: inline; color: var(--warn); font-weight: 600; }
+.acc-critical { border-left: 4px solid var(--acc-neg); }
+.acc-targeted { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 10px; background: var(--surface-2); }
+.acc-targeted p { margin: 0; font-size: 14px; line-height: 1.55; }
+.critical-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.5; }
+.critical-list ul { margin: 4px 0 0; padding-left: 18px; }
+
+/* ---------- Profil de compétences (diagramme en rose) ---------- */
+
+.skill-rose { max-width: 860px; margin: 8px auto 0; }
+.skill-rose.is-narrow { max-width: 360px; }
+.skill-rose svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rose-grid circle { fill: none; stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 5 5; }
+.rose-grid line { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 5 5; }
+.rose-sectors { transform-box: view-box; animation: rose-grow .6s ease-out both; }
+.rose-part { outline: none; cursor: default; }
+.rose-fill { stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; transition: opacity .15s ease; }
+.rose-part:hover .rose-fill, .rose-part:focus-visible .rose-fill { opacity: .85; }
+.rose-part:focus-visible .rose-fill, .rose-part:focus-visible .rose-empty { stroke: var(--acc-accent); stroke-width: 4; }
+.rose-empty { fill: var(--surface-2); stroke: var(--line-strong); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.rose-prev { fill: none; stroke: var(--ink); stroke-width: 3; stroke-dasharray: 7 5; stroke-linecap: round; }
+.rose-axis line { stroke: var(--ink-faint); stroke-width: 1.5; }
+.rose-axis text {
+    font-family: inherit; font-size: 15px; font-weight: 700; fill: var(--acc-ink-soft);
+    paint-order: stroke; stroke: var(--acc-card); stroke-width: 4px; stroke-linejoin: round;
 }
-.skill-prev {
-    position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px;
-    background: var(--series-prev); border-radius: 1px; box-shadow: 0 0 0 2px var(--acc-card);
+.rose-leader { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.rose-dot { stroke: none; }
+.rose-label { font-family: inherit; font-size: 19px; font-weight: 700; fill: var(--acc-ink); }
+.rose-pct { font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rose-pct.is-empty { fill: var(--acc-ink-faint); font-weight: 600; font-size: 15px; }
+.rose-tag { font-size: 13px; font-weight: 600; }
+.rose-tag.is-up { fill: var(--acc-pos); }
+.rose-tag.is-down { fill: var(--acc-neg); }
+.rose-badge { stroke: var(--acc-card); stroke-width: 2; }
+.rose-badge-num { font-family: inherit; font-size: 15px; font-weight: 800; fill: #fff; }
+.rose-list { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; counter-reset: rose; }
+.rose-list li {
+    counter-increment: rose; display: grid; grid-template-columns: 14px minmax(0, 1fr) auto;
+    align-items: center; column-gap: 10px; font-size: 14px; color: var(--acc-ink);
 }
-.skill-value { font-size: 15px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
-.skill-tag { font-size: 12px; color: var(--acc-ink-soft); white-space: nowrap; }
-.skill-tag .up { color: var(--acc-pos); }
-.skill-tag .down { color: var(--acc-neg); }
-.skill-axis {
-    display: grid; grid-template-columns: minmax(150px, 210px) minmax(0, 1fr) 44px minmax(0, 118px);
-    gap: 12px; padding: 0 8px; font-size: 11px; color: var(--acc-ink-faint);
-}
-.skill-axis-ticks { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.rose-list li::before { content: none; }
+.rose-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--ink); }
+.rose-name::before { content: counter(rose) ". "; font-weight: 700; }
+.rose-val { font-weight: 800; font-variant-numeric: tabular-nums; }
+.rose-tag-html { grid-column: 2 / -1; font-size: 12px; font-weight: 600; }
+.rose-tag-html.is-up { color: var(--acc-pos); }
+.rose-tag-html.is-down { color: var(--acc-neg); }
+@keyframes rose-grow { from { transform: scale(.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .rose-sectors { animation: none; } }
 
 /* ---------- Carte des chapitres (heatmap) ---------- */
 
@@ -330,22 +372,10 @@ details.acc-table-view[open] summary { margin-bottom: 10px; }
     .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .acc-grid-2, .fb-cols { grid-template-columns: minmax(0, 1fr); }
     .acc-header h1 { font-size: 30px; }
-    .skill-row, .skill-axis { grid-template-columns: minmax(0, 1fr) 40px; row-gap: 6px; }
-    .skill-label { grid-column: 1 / -1; }
-    .skill-tag { grid-column: 1 / -1; }
-    .skill-axis > span:first-child { display: none; }
     .moment-line, .moment-why { grid-template-columns: minmax(0, 1fr) 40px; }
     .moment-line .who, .moment-why .who { grid-column: 1 / -1; }
     .moment-why { margin-top: 0; }
     .userbar { padding: 12px 16px; justify-content: flex-start; }
-}
-/* Profil affiché dans un bloc étroit : l'intitulé passe au-dessus de la barre
-   plutôt que d'écraser la piste. */
-@container (max-width: 620px) {
-    .skill-row, .skill-axis { grid-template-columns: minmax(0, 1fr) 40px; row-gap: 6px; }
-    .skill-label, .skill-tag { grid-column: 1 / -1; }
-    .skill-axis > span:first-child { display: none; }
-    .skill-tag:empty { display: none; }
 }
 
 @media (max-width: 520px) {

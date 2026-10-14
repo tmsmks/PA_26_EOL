@@ -11,9 +11,10 @@
 > Mise à jour (10.10.2026) : la clé du livre 2 a été auditée et corrigée (indice de longueur,
 > Compassion sous-mesurée), et le build la contrôle désormais (§ 3.1, point 6).
 > Mise à jour (12.10.2026) : bibliographie refaite. Ne restent que des articles publiés avec
-> comité de lecture **et lisibles gratuitement** : 33 références (§ 7), chacune avec un lien
-> qui ouvre son PDF.
-> **Proposition v3 (12.10.2026), non implémentée :** après lecture intégrale des 33 articles,
+> comité de lecture **et lisibles gratuitement**, chacune avec un lien qui ouvre son PDF.
+> Le 13.10.2026, la liste passe de 33 à **27 références** (§ 7) : seuls restent les articles qui
+> servent au scoring ; les 6 articles de simple contexte sont retirés.
+> **Proposition v3 (12.10.2026), non implémentée :** après lecture intégrale des articles de la bibliographie,
 > [Scoring_v3_proposition.md](Scoring_v3_proposition.md) garde l'essentiel de ce plan et en
 > corrige trois points : la progression, les bandes et ce que voit l'étudiant·e.
 > **Clé du livre 2 (12.10.2026) :** plutôt qu'un panel humain (2 017 réponses à coter),
@@ -22,6 +23,15 @@
 > reste **provisoire** : il faut encore qu'un échantillon ciblé soit relu par des
 > enseignant·e·s. Méthode, accord (ICC du total : 0,90) et limites :
 > [MedStudents_Y2_v2_cle.md](MedStudents_Y2_v2_cle.md).
+> **Scoring v3, étape A (13.10.2026) :** la pondération par le rang (§ 3.4), le changement
+> normalisé et les bandes « à faire » (§ 3.6) sont remplacés dans le code par la proposition
+> v3 : poids selon l'âge (demi-vie de 90 jours), progression en points avec « progrès net »,
+> bandes données avec leur marge (seuils provisoires 60, 75, 90), plafond « À consolider » en
+> cas de réponse critique, règle conjonctive du livre, passages trop rapides non comptés.
+> Voir [Scoring_v3_proposition.md](Scoring_v3_proposition.md) et le journal, § 2.33. Le même jour
+> (§ 2.34) : feedback d'abord, page « Comment est-ce noté ? », taux de meilleure réponse,
+> *d* de Cohen du groupe, grille de relecture ciblée, seuils par la méthode d'Angoff, protocole
+> du pilote ([Pilote_protocole.md](Pilote_protocole.md)).
 
 ## 0. En bref
 
@@ -97,10 +107,7 @@ Une évaluation par le jeu se construit en trois modèles :
 - les **tâches** qui provoquent ces comportements.
 
 Le score n'est pas un compteur de points. C'est un *argument* qui va de l'action observée à la
-compétence. C'est le cadre de l'Evidence-Centered Design, que Arieli-Attali et al. (2019) étendent
-aux systèmes qui mêlent apprentissage et évaluation. L'« évaluation furtive » applique ce cadre
-dans le jeu lui-même : dans un jeu vidéo, les estimations tirées des actions des élèves corrèlent
-avec des tests externes de résolution de problèmes (Shute et al. 2016).
+compétence : c'est le principe de l'Evidence-Centered Design.
 
 → Pour nous : documenter, pour chaque compétence, quels choix la renseignent et pourquoi. La
 grille du § 3.1 sert à ça.
@@ -110,17 +117,13 @@ Un SJT présente une situation et des réponses possibles ; on note la réponse 
 à une **clé**. C'est exactement notre format.
 - **En médecine :** le guide AMEE n° 100 fait la synthèse du format, de son origine (la
   « simulation basse fidélité ») et de sa validité (Patterson, Zibarras & Ashworth 2016).
-- **Validité prédictive :** une mesure des connaissances sur le comportement interpersonnel chez des
-  étudiant·e·s en médecine prédit leur performance en stage 7 ans plus tard, et au travail 9 ans
-  plus tard (Lievens & Sackett 2012).
 
 **La manière de noter change la qualité de la mesure :**
 - à l'admission en médecine, la fidélité et les écarts entre groupes dépendent de la méthode
   de cotation (de Leng et al. 2017) ;
 - parmi cinq méthodes de cotation par consensus, l'une des plus courantes (la cote brute) était
   la moins valide ; les méthodes qui neutralisent les réponses extrêmes donnent une meilleure
-  validité (Weng et al. 2018) ;
-- revue d'ensemble récente : Kepes et al. 2025.
+  validité (Weng et al. 2018).
 
 → Pour nous : la clé (les −3…+3) doit être **établie par des experts, puis contrôlée sur les
 données**. Elle ne peut pas rester le jugement d'un seul auteur.
@@ -166,7 +169,7 @@ quand elle repose sur trop peu de choix.
   qui gère aussi les reculs. Les deux favorisent les personnes qui partent haut : ils se lisent
   avec prudence (Nissen et al. 2018).
 - **Modèles de l'apprenant :** ils estiment le niveau courant en donnant plus de poids aux
-  observations récentes (Corbett & Anderson 1995 ; Pelánek 2016 ; Pelánek 2017). Dans ce domaine,
+  observations récentes (Corbett & Anderson 1995 ; Pelánek 2017). Dans ce domaine,
   on juge un modèle à sa capacité à prédire la réponse suivante (Pelánek 2017).
 - **Oubli :** même apprises en simulation, des compétences baissent dans les mois qui suivent
   (Legoux et al. 2021). Une vieille performance représente moins bien le niveau actuel.
@@ -176,7 +179,6 @@ quand elle repose sur trop peu de choix.
   un SJT gagnent environ un tiers d'écart-type (Lievens, Buyse & Sackett 2005).
 - **Méta-analyse :** les gains au retest sont plus forts quand on repasse **exactement le même
   test** (Hausknecht et al. 2007).
-- **Fidélité test-retest des SJT :** environ 0,70 (Harenbrock et al. 2023).
 - **Versions alternatives :** même de petits changements de contexte changent la mesure (Lievens &
   Sackett 2007).
 - **« Jouer avec le système » :** dans les logiciels d'apprentissage, exploiter les régularités du
@@ -405,7 +407,7 @@ Encore ouvertes :
 
 ## 7. Bibliographie
 
-**Critères (revus le 12.10.2026).** Chaque référence remplit deux conditions :
+**Critères (revus le 12.10.2026, liste réduite le 13.10.2026).** Chaque référence remplit trois conditions :
 - c'est un article publié dans une revue scientifique à comité de lecture, ou dans les actes
   d'une conférence à comité de lecture (CHI) ; son DOI a été vérifié auprès de Crossref,
   d'OpenAlex et de PubMed (type de publication, revue, pages, absence de rétractation) ;
@@ -413,28 +415,23 @@ Encore ouvertes :
   paiement. Il mène à une source sûre : l'éditeur en libre accès, PubMed Central, un dépôt
   d'université, l'archive HAL ou la page universitaire de l'auteur·e. Chaque lien a été ouvert
   dans un navigateur le 12.10.2026 ; certains sites font d'abord une vérification automatique de
-  quelques secondes.
+  quelques secondes ;
+- elle sert au scoring : elle justifie une règle du jeu, l'a inspirée, ou fonde une étape prévue
+  (seuils, validation). Les 6 articles de simple contexte ont été retirés le 13.10.2026.
 
 Une « version acceptée » est le texte accepté après relecture par les pairs, sans la mise en
 page de la revue. Les articles payants sans version gratuite ont été retirés ou remplacés par
-des articles en libre accès (journal de développement, § 2.26). 33 références.
-
-**Concevoir une évaluation par le jeu**
-- Arieli-Attali, M., Ward, S., Thomas, J., Deonovic, B., & von Davier, A. A. (2019). The expanded evidence-centered design (e-ECD) for learning and assessment systems: A framework for incorporating learning goals and processes within assessment design. *Frontiers in Psychology*, 10, 853. *Article méthodologique.* doi:10.3389/fpsyg.2019.00853 · **[PDF](https://www.frontiersin.org/articles/10.3389/fpsyg.2019.00853/pdf)** (version publiée, libre accès, Frontiers)
-- Shute, V. J., Wang, L., Greiff, S., Zhao, W., & Moore, G. (2016). Measuring problem solving skills via stealth assessment in an engaging video game. *Computers in Human Behavior*, 63, 106–117. *Étude empirique.* doi:10.1016/j.chb.2016.05.047 · **[PDF](https://myweb.fsu.edu/vshute/pdf/pvz.pdf)** (version publiée, page de l'autrice, Florida State University)
+des articles en libre accès (journal de développement, § 2.26 et § 2.32). 27 références.
 
 **Nos scènes sont des tests de jugement situationnel (SJT)**
 - Patterson, F., Zibarras, L., & Ashworth, V. (2016). Situational judgement tests in medical education and training: Research, theory and practice: AMEE Guide No. 100. *Medical Teacher*, 38(1), 3–17. *Revue de la littérature (guide AMEE).* doi:10.3109/0142159X.2015.1072619 · **[PDF](https://openaccess.city.ac.uk/id/eprint/12506/1/AMEE%20SJT%20Guide%202015.pdf)** (version acceptée, City Research Online)
 - de Leng, W. E., Stegers-Jager, K. M., Husbands, A., Dowell, J. S., Born, M. P., & Themmen, A. P. N. (2017). Scoring method of a Situational Judgment Test: influence on internal consistency reliability, adverse impact and correlation with personality? *Advances in Health Sciences Education*, 22(2), 243–265. *Étude empirique.* doi:10.1007/s10459-016-9720-7 · **[PDF](https://repub.eur.nl/pub/96435/REPUB_96435-OA.pdf)** (version publiée, libre accès, Université Érasme de Rotterdam)
 - Weng, Q., Yang, H., Lievens, F., & McDaniel, M. A. (2018). Optimizing the validity of situational judgment tests: The importance of scoring methods. *Journal of Vocational Behavior*, 104, 199–209. *Étude empirique.* doi:10.1016/j.jvb.2017.11.005 · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=6772&context=lkcsb_research)** (version acceptée, dépôt de la Singapore Management University)
-- Lievens, F., & Sackett, P. R. (2012). The validity of interpersonal skills assessment via situational judgment tests for predicting academic success and job performance. *Journal of Applied Psychology*, 97(2), 460–468. *Étude empirique longitudinale.* doi:10.1037/a0025741 · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=6617&context=lkcsb_research)** (version acceptée, dépôt de la Singapore Management University)
-- Kepes, S., Keener, S. K., Lievens, F., & McDaniel, M. A. (2025). An integrative, systematic review of the situational judgment test literature. *Journal of Management*, 51(6), 2278–2319. *Revue systématique.* doi:10.1177/01492063241288545 · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=8698&context=lkcsb_research)** (version acceptée, dépôt de la Singapore Management University)
 
 **Répétition : pourquoi un délai avant qu'un chapitre rejoué compte**
 - Lievens, F., Buyse, T., & Sackett, P. R. (2005). Retest effects in operational selection settings: Development and test of a framework. *Personnel Psychology*, 58(4), 981–1007. *Étude empirique.* doi:10.1111/j.1744-6570.2005.00713.x · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=6678&context=lkcsb_research)** (manuscrit de l'auteur, dépôt de la Singapore Management University)
 - Lievens, F., & Sackett, P. R. (2007). Situational judgment tests in high-stakes settings: Issues and strategies with generating alternate forms. *Journal of Applied Psychology*, 92(4), 1043–1055. *Étude empirique.* doi:10.1037/0021-9010.92.4.1043 · **[PDF](https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=6674&context=lkcsb_research)** (version acceptée, dépôt de la Singapore Management University)
 - Hausknecht, J. P., Halpert, J. A., Di Paolo, N. T., & Moriarty Gerrard, M. O. (2007). Retesting in selection: A meta-analysis of coaching and practice effects for tests of cognitive ability. *Journal of Applied Psychology*, 92(2), 373–385. *Méta-analyse.* doi:10.1037/0021-9010.92.2.373 · **[PDF](https://ecommons.cornell.edu/server/api/core/bitstreams/4fbba765-0d9c-4940-8492-66fecaca5227/content)** (version acceptée, eCommons, Cornell University)
-- Harenbrock, J., Forthmann, B., & Holling, H. (2023). Retest reliability of situational judgment tests: A meta-analysis. *Journal of Personnel Psychology*, 22(4), 169–184. *Méta-analyse.* doi:10.1027/1866-5888/a000323 · **[PDF](https://econtent.hogrefe.com/doi/pdf/10.1027/1866-5888/a000323)** (version publiée, libre accès, Hogrefe)
 - Baker, R. S., Corbett, A. T., Koedinger, K. R., & Wagner, A. Z. (2004). Off-task behavior in the cognitive tutor classroom: When students “game the system”. *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems (CHI 2004)*, 383–390. *Étude empirique (actes de conférence).* doi:10.1145/985692.985741 · **[PDF](https://hal.science/hal-00190176/document)** (archive ouverte HAL)
 
 **La note sur 100 et la correction du hasard**
@@ -448,7 +445,6 @@ des articles en libre accès (journal de développement, § 2.26). 33 référenc
 - Howard, N., Edwards, R., Boutis, K., Alexander, S., & Pusic, M. (2023). Twelve tips for using learning curves in health professions education research. *MedEdPublish*, 13, 269. *Article méthodologique.* doi:10.12688/mep.19723.1 · **[PDF](https://pmc.ncbi.nlm.nih.gov/articles/PMC10696298/pdf/mep-13-21130.pdf)** (version publiée, PubMed Central)
 - Nissen, J. M., Talbot, R. M., Nasim Thompson, A., & Van Dusen, B. (2018). Comparison of normalized gain and Cohen's d for analyzing gains on concept inventories. *Physical Review Physics Education Research*, 14(1), 010115. *Étude empirique.* doi:10.1103/PhysRevPhysEducRes.14.010115 · **[PDF](https://link.aps.org/pdf/10.1103/PhysRevPhysEducRes.14.010115)** (version publiée, libre accès, American Physical Society)
 - Corbett, A. T., & Anderson, J. R. (1995). Knowledge tracing: Modeling the acquisition of procedural knowledge. *User Modeling and User-Adapted Interaction*, 4(4), 253–278. *Étude empirique.* doi:10.1007/BF01099821 · **[PDF](http://act-r.psy.cmu.edu/wordpress/wp-content/uploads/2012/12/893CorbettAnderson1995.pdf)** (version publiée numérisée, groupe ACT-R, Carnegie Mellon University)
-- Pelánek, R. (2016). Applications of the Elo rating system in adaptive educational systems. *Computers & Education*, 98, 169–179. *Revue de la littérature.* doi:10.1016/j.compedu.2016.03.017 · **[PDF](https://www.fi.muni.cz/~xpelanek/publications/CAE-elo.pdf)** (version acceptée, page de l'auteur, Université Masaryk)
 - Pelánek, R. (2017). Bayesian knowledge tracing, logistic models, and beyond: an overview of learner modeling techniques. *User Modeling and User-Adapted Interaction*, 27(3–5), 313–350. *Revue de la littérature.* doi:10.1007/s11257-017-9193-2 · **[PDF](https://www.fi.muni.cz/~xpelanek/publications/umuai-overview.pdf)** (version acceptée, page de l'auteur, Université Masaryk)
 - Legoux, C., Gerein, R., Boutis, K., Barrowman, N., & Plint, A. (2021). Retention of critical procedural skills after simulation training: A systematic review. *AEM Education and Training*, 5(3), e10536. *Revue systématique.* doi:10.1002/aet2.10536 · **[PDF](https://pmc.ncbi.nlm.nih.gov/articles/PMC8166305/pdf/AET2-5-e10536.pdf)** (version acceptée, PubMed Central)
 

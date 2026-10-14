@@ -81,7 +81,8 @@
             <span class="kpi-label">Note du livre</span>
             {%- if bookp and bookp.global is not none %}
             <span class="kpi-value">{{ bookp.global | note(1) }}<small> /100</small></span>
-            <span class="kpi-foot">Niveaux de tous les passages notés · {{ bookp.n_evaluated }}/{{ bookp.n_chapters }} chapitres évalués</span>
+            {%- if bookp.band %}<span class="band-chip{{ ' is-capped' if bookp.band.capped }}">{{ bookp.band.label }}</span>{% endif %}
+            <span class="kpi-foot">Niveaux de tous les passages notés · {{ bookp.n_evaluated }}/{{ bookp.n_chapters }} chapitres évalués{% if bookp.band and bookp.band.capped %} · plafonnée : réponse critique ou chapitre insuffisant{% endif %}</span>
             {%- else %}
             <span class="kpi-value">—</span>
             <span class="kpi-foot">Dès le premier chapitre terminé</span>
@@ -103,8 +104,8 @@
         <h2 id="h-profile">Profil de compétences</h2>
         <p class="acc-hint">Qualité de vos choix par compétence, sur 100 : chaque réponse est comparée aux réponses proposées au même moment. 100 = la meilleure réponse à chaque fois, 0 = la pire ; répondre au hasard donne environ 50. Clé de cotation provisoire : les points des réponses n'ont pas encore été validés par un panel d'experts.</p>
         <div class="chart-legend">
-            <span><i class="key-bar" aria-hidden="true"></i>Session {{ bs.number }}</span>
-            {%- if prev %}<span><i class="key-tick" aria-hidden="true"></i>Session {{ prev.number }}</span>{% endif %}
+            <span><i class="key-rose" aria-hidden="true"></i>Session {{ bs.number }}</span>
+            {%- if prev %}<span><i class="key-arc" aria-hidden="true"></i>Session {{ prev.number }}</span>{% endif %}
         </div>
         <div id="skills-chart"></div>
         <details class="acc-table-view">

@@ -114,12 +114,35 @@ def recount(passages: list[ChapterPassage], spacing_days: int) -> None:
     for group in groups.values():
         last_end: datetime | None = None
         for p in sorted(group, key=lambda p: (as_utc(p.started_at), p.id)):
-            p.counted = countable(last_end, p.started_at, spacing_days)
+            p.counted = countable(last_end, p.started_at, spacing_days) and not too_fast(p)
             if p.counted and p.is_completed:
                 last_end = p.completed_at
             first = {a.id for a in scored_attempts(p.attempts)}
             for a in p.attempts:
                 a.counted = p.counted and a.id in first
+
+
+def too_fast(passage: ChapterPassage) -> bool:
+    """Passage joué trop vite (scoring v3) : il reste un entraînement."""
+    return bool(((passage.results or {}).get("timing") or {}).get("too_fast"))
+
+
+MAX_TIME_MS = 3_600_000
+
+
+def clean_times(times: Any, n: int) -> list[int | None] | None:
+    """Temps de réponse envoyés par le navigateur, en ms (un par choix).
+
+    Une liste mal formée est ignorée : le temps sert à repérer un passage trop
+    rapide, il ne doit jamais empêcher d'enregistrer une scène.
+    """
+    if not isinstance(times, list) or len(times) != n:
+        return None
+    out: list[int | None] = []
+    for t in times:
+        ok = isinstance(t, (int, float)) and not isinstance(t, bool) and 0 <= t <= MAX_TIME_MS
+        out.append(int(t) if ok else None)
+    return out
 
 
 def passage_attempt_dicts(passage: ChapterPassage) -> list[dict[str, Any]]:
@@ -249,12 +272,20 @@ class PlaySessionService:
         choices: list[int],
         flags: Any = None,
         passage_id: int | None = None,
+        times: Any = None,
     ) -> SceneAttempt:
-        """Rejoue et enregistre une scène terminée (InvalidPathError si incohérente)."""
+        """Rejoue et enregistre une scène terminée (InvalidPathError si incohérente).
+
+        `times` : temps de réponse de chaque choix (ms), gardé dans la trace.
+        """
         self._ensure_open(book_session)
         chapter = self._chapter(book_session.book_slug, chapter_id)
         scene = self._scene(chapter, scene_id)
         run = replay_scene(scene, entry_id, choices)
+        cleaned = clean_times(times, len(choices))
+        if cleaned is not None:
+            for step, ms in zip(run.trace, cleaned):
+                step["time_ms"] = ms
         passage = self._passage_for(book_session, chapter_id, passage_id)
 
         previous = sum(1 for a in passage.attempts if a.scene_id == scene_id)
@@ -292,6 +323,12 @@ class PlaySessionService:
         passage.status = STATUS_COMPLETED
         passage.completed_at = utcnow()
         passage.results = passage_results(passage_attempt_dicts(passage))
+        if passage.counted and too_fast(passage):
+            # Plus d'un quart des choix en moins de 2 s : le passage reste un
+            # entraînement (scoring v3, § 2.3), et le prochain pourra compter.
+            passage.counted = False
+            for a in passage.attempts:
+                a.counted = False
 
         done = set(book_session.completed_chapters or []) | {chapter_id}
         book_session.completed_chapters = sorted(done)

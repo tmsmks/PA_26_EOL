@@ -70,7 +70,9 @@
             <div class="kpi">
                 <span class="kpi-label">Note du livre</span>
                 <span class="kpi-value">{{ prof.global | note(1) }}<small> /100</small></span>
-                <span class="kpi-foot">{% if prof.complete %}Moyenne des {{ prof.n_chapters }} chapitres{% else %}Partielle : moyenne des chapitres évalués{% endif %}</span>
+                {%- if prof.band %}<span class="band-chip{{ ' is-capped' if prof.band.capped }}">{{ prof.band.label }}</span>{% endif %}
+                <span class="kpi-foot">{% if prof.margin is not none %}± {{ prof.margin | round | int }} · {% endif %}{% if prof.complete %}moyenne des {{ prof.n_chapters }} chapitres{% else %}partielle : moyenne des chapitres évalués{% endif %}
+                {%- if prof.band and prof.band.capped %} · plafonnée : {% if prof.critical_chapters %}réponse critique à revoir (ch. {{ prof.critical_chapters | join(', ') }}){% endif %}{% if prof.critical_chapters and prof.insufficient_chapters %} et {% endif %}{% if prof.insufficient_chapters %}chapitre insuffisant (ch. {{ prof.insufficient_chapters | join(', ') }}){% endif %}{% endif %}</span>
             </div>
             <div class="kpi">
                 <span class="kpi-label">Chapitres évalués</span>
@@ -84,11 +86,12 @@
                 <span class="kpi-foot">{% if practice %}+ {{ practice }} d'entraînement{% else %}Un passage = un chapitre joué en entier{% endif %}</span>
             </div>
             <div class="kpi">
-                <span class="kpi-label">Progression moyenne</span>
-                {%- if prof.progression is not none %}
-                {%- set d = prof.progression | round | int %}
-                <span class="kpi-value {{ 'delta-up' if d > 0 else ('delta-down' if d < 0 else '') }}">{{ '+' if d > 0 else ('−' if d < 0 else '±') }}{{ d | abs }}<small> %</small></span>
-                <span class="kpi-foot">de ce qui restait à gagner depuis le 1ᵉʳ passage</span>
+                <span class="kpi-label">Progression</span>
+                {%- if prof.progress %}
+                {%- set g = prof.progress.gain %}
+                {%- set d = g | round | int %}
+                <span class="kpi-value {{ 'delta-up' if prof.progress.status == 'net_gain' else ('delta-down' if prof.progress.status == 'net_loss' else '') }}">{{ '+' if d > 0 else ('−' if d < 0 else '±') }}{{ d | abs }}<small> pts</small></span>
+                <span class="kpi-foot">{{ prof.progress.label | capitalize }}{% if prof.progress.gain_margin is not none %} (marge ± {{ prof.progress.gain_margin | round | int }}){% endif %} · depuis le 1ᵉʳ passage, sur {{ prof.progress.n_chapters }} chapitre{{ 's' if prof.progress.n_chapters > 1 }}</span>
                 {%- else %}
                 <span class="kpi-value">—</span>
                 <span class="kpi-foot">Visible dès le 2ᵉ passage noté d'un chapitre</span>
@@ -105,11 +108,11 @@
 
         <div class="acc-card">
             <h2>Chapitres</h2>
-            <p class="acc-hint">Niveau = moyenne des passages notés, les plus récents pèsent plus (1 ; 1,25 ; 1,5…). ± = marge d'incertitude à 95 % : elle se resserre à chaque passage. Progression = part de ce qui restait à gagner depuis le premier passage. Un chapitre rejoué compte s'il a lieu au moins {{ spacing_days }} jour{{ 's' if spacing_days > 1 }} après son dernier passage noté ; avant, c'est de l'entraînement.</p>
+            <p class="acc-hint">Niveau = moyenne des passages notés ; un passage pèse moins en vieillissant (moitié moins après 90 jours). ± = marge d'incertitude à 95 % : elle se resserre à chaque passage. Bande (seuils provisoires 60, 75, 90) : donnée seulement si la marge tient dedans, sinon « entre deux bandes » ; une réponse critique dans le dernier passage la plafonne à « À consolider », jusqu'au prochain passage sans réponse critique. Progression = points gagnés depuis le premier passage ; « net » seulement au-delà de la marge. Un chapitre rejoué compte s'il a lieu au moins {{ spacing_days }} jour{{ 's' if spacing_days > 1 }} après son dernier passage noté, et s'il n'est pas joué trop vite (plus d'un quart des choix en moins de 2 secondes) ; sinon, c'est de l'entraînement. <a href="{{ url_for('pages.scoring_explained') }}">Comment est-ce noté ?</a></p>
             <div class="acc-table-wrap">
             <table class="acc-table">
                 <thead><tr>
-                    <th>Chapitre</th><th class="num">Niveau</th><th class="num">±</th>
+                    <th>Chapitre</th><th class="num">Niveau</th><th class="num">±</th><th>Bande</th>
                     <th class="num">Progression</th><th class="num">Passages notés</th><th>Dernier passage</th>
                     {%- if not trainer_view %}<th></th>{% endif %}
                 </tr></thead>
@@ -119,15 +122,21 @@
                 <tr>
                     <td>{{ c.id }}. {{ c.name }}</td>
                     <td class="num">{% if lv %}<strong>{{ lv.level | note }}</strong>{% else %}<span class="muted">—</span>{% endif %}</td>
-                    <td class="num muted">{% if lv and lv.margin is not none %}± {{ lv.margin | round | int }}{% else %}—{% endif %}</td>
-                    <td class="num">
-                        {%- if lv and lv.progression is not none %}
-                        {%- set d = lv.progression | round | int %}
-                        <span class="{{ 'delta-up' if d > 0 else ('delta-down' if d < 0 else '') }}">{{ '+' if d > 0 else ('−' if d < 0 else '±') }}{{ d | abs }} %</span>
+                    <td class="num muted nowrap">{% if lv and lv.margin is not none %}± {{ lv.margin | round | int }}{% else %}—{% endif %}</td>
+                    <td>
+                        {%- if lv and lv.band %}<span class="band-chip small{{ ' is-capped' if lv.band.capped }}">{{ lv.band.label }}</span>
+                        {%- if lv.critical_capped %}<span class="band-note">réponse critique à revoir</span>{% endif %}
                         {%- else %}<span class="muted">—</span>{% endif %}
                     </td>
-                    <td class="num">{{ lv.n_passages if lv else 0 }}{% if c.n_practice %} <span class="muted">(+{{ c.n_practice }})</span>{% endif %}</td>
-                    <td class="muted nowrap">{{ c.last_at | date_fr }}</td>
+                    <td class="num">
+                        {%- if lv and lv.gain is not none %}
+                        {%- set d = lv.gain | round | int %}
+                        <span class="{{ 'delta-up' if lv.progress.status == 'net_gain' else ('delta-down' if lv.progress.status == 'net_loss' else '') }}">{{ '+' if d > 0 else ('−' if d < 0 else '±') }}{{ d | abs }} pts</span>
+                        <span class="band-note">{{ lv.progress.label }}</span>
+                        {%- else %}<span class="muted">—</span>{% endif %}
+                    </td>
+                    <td class="num">{{ lv.n_passages if lv else 0 }}{% if c.n_practice %} <span class="muted">(+{{ c.n_practice }}{% if c.n_too_fast %}, dont {{ c.n_too_fast }} trop rapide{{ 's' if c.n_too_fast > 1 }}{% endif %})</span>{% endif %}</td>
+                    <td class="muted nowrap">{{ c.last_at | date_fr }}{% if lv and lv.refresh %} <span class="band-note is-warn">à rafraîchir</span>{% endif %}</td>
                     {%- if not trainer_view %}
                     <td class="num"><a href="{{ url_for('pages.play_chapter', book_slug=b.slug, chapter_id=c.id) }}">{{ 'Rejouer' if lv else 'Jouer' }} →</a></td>
                     {%- endif %}
@@ -138,6 +147,22 @@
             </div>
         </div>
 
+        {%- set open_critical = pr.chapters | selectattr('critical') | list %}
+        {%- if open_critical %}
+        <div class="acc-card acc-critical" aria-labelledby="h-critical-{{ b.slug }}">
+            <h2 id="h-critical-{{ b.slug }}">Réponses critiques à {{ 'débriefer' if trainer_view else 'revoir' }}</h2>
+            <p class="acc-hint">Dans le dernier passage noté de ces chapitres. Une réponse critique met en danger le patient ou un tiers, ou enfreint la loi ou une règle déontologique essentielle : elle ne se compense pas par de bonnes réponses ailleurs. La bande du chapitre reste plafonnée à « À consolider » jusqu'au prochain passage noté sans réponse critique.</p>
+            {%- for c in open_critical %}
+            <h3>{{ c.id }}. {{ c.name | e }}</h3>
+            <ul class="critical-list">
+                {%- for it in c.critical %}
+                <li><span class="muted">{{ it.scene_title | e }}</span> — {{ it.text | e }}{% if it.rationale %}<br><span class="band-note">Pourquoi : {{ it.rationale | e }}</span>{% endif %}</li>
+                {%- endfor %}
+            </ul>
+            {%- endfor %}
+        </div>
+        {%- endif %}
+
         {%- if prof.global is not none %}
         <div class="acc-card">
             <h2>Progression par chapitre</h2>
@@ -147,7 +172,7 @@
             <div class="acc-grid-2">
                 {%- for c in curves %}
                 <div>
-                    <h3>{{ c.id }}. {{ c.name }}</h3>
+                    <h3>{{ c.id }}. {{ c.name | e }}</h3>
                     <div data-chart="chapter" data-book="{{ b.slug }}" data-chapter="{{ c.id }}"></div>
                 </div>
                 {%- endfor %}

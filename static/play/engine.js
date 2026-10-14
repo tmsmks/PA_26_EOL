@@ -50,6 +50,10 @@ export function createGame(scenes, options) {
         /** Scène en cours, pour l'enregistrement : entrée et indices des réponses. */
         entryId: "",
         choices: [],
+        /** Temps de réponse de chaque choix (ms), envoyés avec la scène. */
+        times: [],
+        /** Réponses critiques choisies dans la scène en cours. */
+        sceneCritical: 0,
         snapshots: {},
         sceneScores: emptyScores(),
         chapterScores: emptyScores(),
@@ -160,6 +164,8 @@ export function startScene(game) {
     game.sceneScores = emptyScores();
     game.visited = [];
     game.choices = [];
+    game.times = [];
+    game.sceneCritical = 0;
     const entry = resolveEntry(game);
     game.current = s && s.id_to_parcours ? s.id_to_parcours[entry.id] || null : null;
     if (!game.current && s && s.parcours && s.parcours.length) game.current = s.parcours[0];
@@ -168,8 +174,9 @@ export function startScene(game) {
     return game.current;
 }
 
-/** Applique un choix et avance. Retourne la nouvelle interaction, ou null. */
-export function choose(game, response) {
+/** Applique un choix et avance. Retourne la nouvelle interaction, ou null.
+ * `ms` : temps de réponse depuis l'affichage des réponses (repère les passages trop rapides). */
+export function choose(game, response, ms) {
     const s = scene(game);
     addScores(game.sceneScores, response);
     addScores(game.chapterScores, response);
@@ -177,6 +184,8 @@ export function choose(game, response) {
     for (const f of response.set_flags || []) game.flags.add(f);
     if (game.current) game.visited.push(game.current.node_id);
     game.choices.push(response.idx);
+    game.times.push(Number.isFinite(ms) ? Math.round(ms) : null);
+    if (response.critical) game.sceneCritical += 1;
 
     const nextId = String(response.next_id || "-1");
     game.current =
@@ -248,6 +257,19 @@ export function appraise(scores, best, game) {
     const weak = SCORE_SKILLS.filter((sk) => (scores[sk] || 0) < 0);
 
     const outcome = game ? outcomeDebrief(game) : null;
+    // Une réponse critique ne se compense pas : le bilan le dit d'abord.
+    if (game && game.sceneCritical > 0) {
+        return {
+            tone: "hard",
+            lead:
+                (game.sceneCritical > 1 ? "Des réponses critiques" : "Une réponse critique") +
+                " dans ce scénario : elle met en danger la personne ou enfreint une règle " +
+                "essentielle, et de bonnes réponses ailleurs ne la compensent pas. " +
+                "Voyez ci-dessous ce qui était attendu." +
+                (outcome ? " " + outcome.lead : ""),
+            weak,
+        };
+    }
     if (outcome) {
         return { tone: outcome.tone || "hard", lead: outcome.lead, weak };
     }
